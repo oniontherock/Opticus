@@ -136,6 +136,11 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
+    <ClCompile Include="Include\Common\TimeHandler.cpp" />
+    <ClCompile Include="Include\Simulation\Distortions\DistortionFunctions.cpp" />
+    <ClCompile Include="Include\Simulation\RayCast.cpp" />
+    <ClCompile Include="Include\Simulation\Distortions\WorldDistortionGrid.cpp" />
+    <ClCompile Include="Include\Simulation\WorldImageGrid.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +166,17 @@
     <ClInclude Include="ACECS\GameLevel.hpp" />
     <ClInclude Include="ACECS\GameStates.hpp" />
     <ClInclude Include="ACECS\Panels.hpp" />
+    <ClInclude Include="Include\Common\Math.hpp" />
+    <ClInclude Include="Include\Common\NumberGenerator.hpp" />
+    <ClInclude Include="Include\Common\TimeHandler.hpp" />
+    <ClInclude Include="Include\Common\VectorMath.hpp" />
+    <ClInclude Include="Include\Simulation\Distortions\DistortionFunctions.hpp" />
+    <ClInclude Include="Include\Simulation\RayCast.hpp" />
+    <ClInclude Include="Include\Simulation\Distortions\WorldDistortionGrid.hpp" />
+    <ClInclude Include="Include\Simulation\WorldImageGrid.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Art\Test Image.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

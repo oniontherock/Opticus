@@ -1,5 +1,7 @@
 #include "ACECS.hpp"
 
+#include "../Include/Simulation/WorldImageGrid.hpp"
+#include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "GameState.hpp"
@@ -11,6 +13,13 @@
 
 void Engine::inputsRegister() {
 	InputInterface::inputRegister("Pause", KeySet{ KeyEvent("Escape", Pressed) });
+	
+	InputInterface::inputRegister("Move Right", KeySet{ KeyEvent("D", Held), KeyEvent("Right", Held) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Move Up", KeySet{ KeyEvent("W", Held), KeyEvent("Up", Held) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Move Left", KeySet{ KeyEvent("A", Held), KeyEvent("Left", Held) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Move Down", KeySet{ KeyEvent("S", Held), KeyEvent("Down", Held) }, InputKeyLogic::Or);
+
+
 }
 
 // game states are registered here
@@ -75,6 +84,7 @@ void Engine::gameStateRegister() {
 // initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 // of course, certain modules do not have to be initialized if the user does not want them to be
 void Engine::engineInitialize() {
+
 	GameLevelGrid::levelGridInitialize(1, 1, 1);
 	GameLevelGrid::levelAdd(new GameLevel(0, 0, 0), true);
 
@@ -82,6 +92,11 @@ void Engine::engineInitialize() {
 	ECSRegistry::ECSInitialize();
 	panelsRegister();
 	gameStateRegister();
+
+	WorldImageGrid::worldTextureGridInitialize(1, 1, 1280, 720);
+	
+	distortionFunctionsInitialize();
+	WorldDistortionGrid::worldDistortionGridInitialize(1280, 720, 1, 1);
 }
 // updates the engines input
 void Engine::engineInputUpdate(sf::RenderWindow& window) {

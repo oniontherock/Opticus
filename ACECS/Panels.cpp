@@ -1,5 +1,10 @@
 #include "Panels.hpp"
 
+#include "../Include/Common/Math.hpp"
+#include "../Include/Common/VectorMath.hpp"
+#include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Simulation/RayCast.hpp"
+#include "../Include/Simulation/WorldImageGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -11,6 +16,7 @@ void PanelGameView::panelUpdate() {
 	checkModeChange();
 
 	if (mode == Normal) {
+
 	}
 }
 

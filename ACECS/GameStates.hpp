@@ -23,6 +23,10 @@ struct GameStatePlay : public GameState {
 	Modes mode = Normal;
 
 	void gameStateUpdate() final;
+private:
+	bool firstUpdate = false;
+
+	void gameStateStart();
 };
 
 struct GameStatePause : public GameState {

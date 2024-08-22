@@ -104,11 +104,13 @@ using namespace EntityEvents;
 #include "../Include/Common/TimeHandler.hpp"
 #include "../Include/Simulation/RayCast.hpp"
 #include "../Include/Simulation/WorldImageGrid.hpp"
-#include "SFML/OpenGL.hpp"
 #include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
 #include "Input.hpp"
 #include "Panels.hpp"
 #include "Graphics.hpp"
+#include "../Include/Shaders/Compute.hpp"
+#include <numeric>
+#include <glad/glad.h>
 
 
 // if the system is not using the entity parameter, remove it's name to avoid a C4100 error
@@ -187,53 +189,73 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
-		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
-		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+		// the amount of rays
+		constexpr uint32_t rayCount = 1024;
+		// angular difference between two ray rotations
+		float rayAngleDifference = visionConeSize / rayCount;
 
-		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+		// the starting rotation of every ray
+		std::vector<float> rayRotations = std::vector<float>(rayCount);
 
-		sf::Image viewImage;
-		viewImage.create(worldImage.getSize().x, worldImage.getSize().y);
-
-		float coneStart = -visionConeSize / 2.f;
-		float coneEnd = visionConeSize / 2.f;
-		constexpr float angleMoveAmount = Mathf::PI / 1024.f;
-
-		constexpr float angleMoveAmountHalf = angleMoveAmount / 2.f;
-
-		while (coneStart < coneEnd) {
-
-			float startDist = 0.f;
-			float endDist = 600;
-			float distMoveAmount = 1.f;
-
-			RayCast raycast;
-			raycast.create(positionComponent->position.x, positionComponent->position.y, cos(rotationComponent->rotation + coneStart), sin(rotationComponent->rotation + coneStart));
-			auto colors = raycast.launch(endDist);
-			
-			int i = 0;
-
-			while (startDist < endDist) {
-
-				for (float extraAngle = -angleMoveAmountHalf; extraAngle < angleMoveAmountHalf; extraAngle += angleMoveAmountHalf / 2.f) {
-
-					float axisX = cos(rotationComponent->rotation + coneStart + extraAngle) * startDist;
-					float axisY = sin(rotationComponent->rotation + coneStart + extraAngle) * startDist;
-
-					float scanX = positionComponent->position.x + axisX;
-					float scanY = positionComponent->position.y + axisY;
-
-					if (scanX >= 0 && scanX < viewImage.getSize().x && scanY >= 0 && scanY < viewImage.getSize().y) {
-						viewImage.setPixel(uint32_t(scanX), uint32_t(scanY), colors[i]);
-					}
-				}
-
-				startDist += distMoveAmount;
-				i++;
-			}
-
-			coneStart += angleMoveAmount;
+		for (uint32_t i = 0; i < rayCount; i++) {
+			rayRotations[i] = (float(i) * rayAngleDifference) - (visionConeSize / 2.f);
 		}
+
+		// initialise compute stuff
+		Compute compute_shader("Include/Shaders/Compute.glsl", sf::Vector2u(rayCount, 1));
+		compute_shader.use();
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, compute_shader.work_size.x, compute_shader.work_size.y, 0, GL_RGBA, GL_FLOAT, values);
+
+		compute_shader.set_values(values);
+
+
+		//auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		//auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+		//auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+
+		//sf::Image viewImage;
+		//viewImage.create(worldImage.getSize().x, worldImage.getSize().y);
+
+		//float coneStart = -visionConeSize / 2.f;
+		//float coneEnd = visionConeSize / 2.f;
+
+		//constexpr float angleMoveAmountHalf = angleMoveAmount / 2.f;
+
+		//while (coneStart < coneEnd) {
+
+		//	float startDist = 0.f;
+		//	float endDist = 600;
+		//	float distMoveAmount = 1.f;
+
+		//	RayCast raycast;
+		//	raycast.create(positionComponent->position.x, positionComponent->position.y, cos(rotationComponent->rotation + coneStart), sin(rotationComponent->rotation + coneStart));
+		//	auto colors = raycast.launch(endDist);
+		//	
+		//	int i = 0;
+
+		//	while (startDist < endDist) {
+
+		//		for (float extraAngle = -angleMoveAmountHalf; extraAngle < angleMoveAmountHalf; extraAngle += angleMoveAmountHalf / 2.f) {
+
+		//			float axisX = cos(rotationComponent->rotation + coneStart + extraAngle) * startDist;
+		//			float axisY = sin(rotationComponent->rotation + coneStart + extraAngle) * startDist;
+
+		//			float scanX = positionComponent->position.x + axisX;
+		//			float scanY = positionComponent->position.y + axisY;
+
+		//			if (scanX >= 0 && scanX < viewImage.getSize().x && scanY >= 0 && scanY < viewImage.getSize().y) {
+		//				viewImage.setPixel(uint32_t(scanX), uint32_t(scanY), colors[i]);
+		//			}
+		//		}
+
+		//		startDist += distMoveAmount;
+		//		i++;
+		//	}
+
+		//	coneStart += angleMoveAmount;
+		//}
 
 
 

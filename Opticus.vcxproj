@@ -136,12 +136,13 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
+    <ClCompile Include="glad.c" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
+    <ClCompile Include="Include\Shaders\Compute.cpp" />
     <ClCompile Include="Include\Simulation\Distortions\DistortionFunctions.cpp" />
     <ClCompile Include="Include\Simulation\RayCast.cpp" />
     <ClCompile Include="Include\Simulation\Distortions\WorldDistortionGrid.cpp" />
     <ClCompile Include="Include\Simulation\WorldImageGrid.cpp" />
-    <ClCompile Include="glad.c" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -152,7 +153,7 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
-    <None Include="Shaders\Compute.glsl" />
+    <None Include="Include\Shaders\VisionRaycaster.glsl" />
     <Text Include="readme.txt">
       <DeploymentContent>false</DeploymentContent>
     </Text>
@@ -178,7 +179,7 @@
     <ClInclude Include="Include\Simulation\WorldImageGrid.hpp" />
     <ClInclude Include="OpenGL\glad.h" />
     <ClInclude Include="OpenGL\khrplatform.h" />
-    <ClInclude Include="Source\Compute.hpp" />
+    <ClInclude Include="Include\Shaders\Compute.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Art\Test Image.png" />

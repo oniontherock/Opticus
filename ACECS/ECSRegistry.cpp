@@ -84,10 +84,10 @@ void EntityComponents::componentTemplatesInitialize() {
 		},
 		/// list of components in template
 		{
-			createComponentPairFromType<ComponentMoveByInput>(120.f),
+			createComponentPairFromType<ComponentMoveByInput>(480.f),
 			createComponentPairFromType<ComponentRotateToMouse>(0.20f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionDrawer>(),
+			createComponentPairFromType<ComponentVisionDrawer>(Mathf::TAU / 8.f),
 		}
 		);
 }
@@ -104,6 +104,7 @@ using namespace EntityEvents;
 #include "../Include/Common/TimeHandler.hpp"
 #include "../Include/Simulation/RayCast.hpp"
 #include "../Include/Simulation/WorldImageGrid.hpp"
+#include "SFML/OpenGL.hpp"
 #include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
 #include "Input.hpp"
 #include "Panels.hpp"
@@ -114,9 +115,8 @@ using namespace EntityEvents;
 
 void ComponentMoveByInput::system(Entity& entity) {
 	sf::Vector2f inputAxis;
-	inputAxis.x = InputInterface::inputGetActive("Move Right") - InputInterface::inputGetActive("Move Left");
-	inputAxis.y = InputInterface::inputGetActive("Move Down") - InputInterface::inputGetActive("Move Up");
-
+	inputAxis.x = float(InputInterface::inputGetActive("Move Right") - InputInterface::inputGetActive("Move Left"));
+	inputAxis.y = float(InputInterface::inputGetActive("Move Down") - InputInterface::inputGetActive("Move Up"));
 
 	if (inputAxis.x != 0 || inputAxis.y != 0) {
 		
@@ -179,7 +179,7 @@ void ComponentSprite::system(Entity& entity) {
 
 	for (uint32_t x = 0; x < testImage.getSize().x; x++) {
 		for (uint32_t y = 0; y < testImage.getSize().y; y++) {
-			worldImage.setPixel(x + positionComponent->position.x, y + positionComponent->position.y, testImage.getPixel(x, y));
+			worldImage.setPixel(x + uint32_t(positionComponent->position.x), y + uint32_t(positionComponent->position.y), testImage.getPixel(x, y));
 		}
 	}
 }
@@ -210,9 +210,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 			RayCast raycast;
 			raycast.create(positionComponent->position.x, positionComponent->position.y, cos(rotationComponent->rotation + coneStart), sin(rotationComponent->rotation + coneStart));
 			auto colors = raycast.launch(endDist);
-
-			//std::cout << "burger" << std::endl;
-
+			
 			int i = 0;
 
 			while (startDist < endDist) {
@@ -226,7 +224,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 					float scanY = positionComponent->position.y + axisY;
 
 					if (scanX >= 0 && scanX < viewImage.getSize().x && scanY >= 0 && scanY < viewImage.getSize().y) {
-						viewImage.setPixel(scanX, scanY, colors[i]);
+						viewImage.setPixel(uint32_t(scanX), uint32_t(scanY), colors[i]);
 					}
 				}
 

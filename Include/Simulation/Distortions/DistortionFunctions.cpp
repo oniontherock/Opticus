@@ -27,7 +27,7 @@ WorldDistortion::WorldDistortion() {
 
 void WorldDistortion::headingApplyDistortion(sf::Vector2f& heading) {
 	for (uint16_t i = 0; i < distortionFunctionIds.size(); i++) {
-		std::invoke(distortionFunctions[1], heading);
+		std::invoke(distortionFunctions[3], heading);
 	}
 }
 

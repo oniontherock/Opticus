@@ -29,7 +29,7 @@ struct WorldDistortionGrid {
 	static void headingApplyDistortionSafe(sf::Vector2f& heading, DistortionCellVector distortionCell);
 
 private:
-	static sf::Vector2i gridSize;
+	static sf::Vector2u gridSize;
 };
 
 #endif

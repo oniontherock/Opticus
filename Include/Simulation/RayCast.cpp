@@ -45,7 +45,7 @@ std::vector<sf::Color> RayCast::launch(float dist) {
 		step();
 		totalMoveAmount += 1.f;
 
-		colors.push_back(WorldImageGrid::pixelGetColorSafe(position.x, position.y));
+		colors.push_back(WorldImageGrid::pixelGetColorSafe(uint32_t(position.x), uint32_t(position.y)));
 	}
 
 	return colors;

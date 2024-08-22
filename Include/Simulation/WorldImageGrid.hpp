@@ -23,7 +23,7 @@ struct WorldImageGrid {
 	static const PixelColor pixelGetColorSafe(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY);
 
 private:
-	static sf::Vector2i fullGridSize;
+	static sf::Vector2u fullGridSize;
 };
 
 

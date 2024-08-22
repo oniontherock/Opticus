@@ -4,12 +4,12 @@
 
 sf::Vector2f WorldImageGrid::textureQuadrantSize = sf::Vector2f(0, 0);
 WorldImageGrid2D WorldImageGrid::worldTextureGrid{};
-sf::Vector2i WorldImageGrid::fullGridSize{};
+sf::Vector2u WorldImageGrid::fullGridSize{};
 
 
 void WorldImageGrid::worldTextureGridInitialize(uint32_t gridSizeX, uint32_t gridSizeY, float quadrantSizeX, float quadrantSizeY) {
 
-	fullGridSize = sf::Vector2i(gridSizeX * quadrantSizeX, gridSizeY * quadrantSizeY);
+	fullGridSize = sf::Vector2u(gridSizeX * uint32_t(quadrantSizeX), gridSizeY * uint32_t(quadrantSizeY));
 
 	textureQuadrantSize = sf::Vector2f(quadrantSizeX, quadrantSizeY);
 
@@ -19,7 +19,7 @@ void WorldImageGrid::worldTextureGridInitialize(uint32_t gridSizeX, uint32_t gri
 
 		WorldImageGrid1D columns(gridSizeY);
 		for (uint32_t y = 0; y < gridSizeY; y++) {
-			columns[y].create(textureQuadrantSize.x, textureQuadrantSize.y);
+			columns[y].create(uint32_t(textureQuadrantSize.x), uint32_t(textureQuadrantSize.y));
 		}
 
 		rows[x] = std::move(columns);
@@ -29,7 +29,7 @@ void WorldImageGrid::worldTextureGridInitialize(uint32_t gridSizeX, uint32_t gri
 }
 
 WorldImage& WorldImageGrid::worldImageFromPixel(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY) {
-	return worldTextureGrid[pixelX / textureQuadrantSize.x][pixelY / textureQuadrantSize.y];
+	return worldTextureGrid[pixelX / uint32_t(textureQuadrantSize.x)][pixelY / uint32_t(textureQuadrantSize.y)];
 }
 
 void WorldImageGrid::pixelSetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY, PixelColor color) {

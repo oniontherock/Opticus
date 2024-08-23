@@ -18,6 +18,8 @@ int main() {
 		return -1;
 	}
 
+	glEnable(GL_DEBUG_OUTPUT);
+
 	Engine::engineInitialize();
 
 	uint32_t frames = 0;

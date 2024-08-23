@@ -2,8 +2,9 @@
 
 #include <glad/glad.h>
 
-Compute::Compute(const char* path, sf::Vector2u size) {
-    work_size = size;
+Compute::Compute(const char* path, sf::Vector2u _workSize, sf::Vector2u _screenSize) {
+    workSize = _workSize;
+    screenSize = _screenSize;
 
     // read in shader code
     std::string compute_code;
@@ -40,32 +41,57 @@ Compute::Compute(const char* path, sf::Vector2u size) {
     // cleanup
     glDeleteShader(shader);
 
-    // create input/output textures
-    glGenTextures(1, &out_tex);
+    glGenTextures(1, &texWorld);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, out_tex);
-
-    // turns out we need this. huh.
+    glBindTexture(GL_TEXTURE_2D, texWorld);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
     // create empty texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, work_size.x, work_size.y, 0, GL_RGBA, GL_FLOAT, NULL);
-    glBindImageTexture(0, out_tex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glBindImageTexture(0, texWorld, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+
+    glGenTextures(1, &texVision);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texVision);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // create empty texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glBindImageTexture(1, texVision, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
+
+
+    glGenTextures(1, &texTransform);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texTransform);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    // create empty texture
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, workSize.x, workSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
+    glBindImageTexture(2, texTransform, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 }
 
 Compute::~Compute() {
     glDeleteProgram(id);
+    glDeleteTextures(1, &texWorld);
+    glDeleteTextures(1, &texVision);
+    glDeleteTextures(1, &texTransform);
 }
 
 void Compute::use() {
     glUseProgram(id);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, out_tex);
+    glBindTexture(GL_TEXTURE_2D, texWorld);
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texVision);
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texTransform);
 }
 
 void Compute::dispatch(uint32_t local_size_x, uint32_t local_size_y) {
-    glDispatchCompute(work_size.x / local_size_x, work_size.y / local_size_y, 1);
+    glDispatchCompute(workSize.x / local_size_x, workSize.y / local_size_y, 1);
 }
 
 void Compute::wait() {
@@ -73,12 +99,20 @@ void Compute::wait() {
 }
 
 void Compute::set_values(float* values) {
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, work_size.x, work_size.y, 0, GL_RGBA, GL_FLOAT, values);
+    glActiveTexture(GL_TEXTURE0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, values);
+}
+
+void Compute::set_transform(float* values) {
+    glActiveTexture(GL_TEXTURE2);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, workSize.x, workSize.y, 0, GL_RGBA, GL_FLOAT, values);
 }
 
 std::vector<float> Compute::get_values() {
-    unsigned int collection_size = work_size.x * work_size.y;
+    unsigned int collection_size = screenSize.x * screenSize.y;
     std::vector<float> compute_data(collection_size * 4u);
+
+    glActiveTexture(GL_TEXTURE1);
     glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, compute_data.data());
 
     return compute_data;

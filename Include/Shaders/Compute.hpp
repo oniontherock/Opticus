@@ -11,15 +11,19 @@
 
 struct Compute {
     uint32_t id;
-    uint32_t out_tex;
-    sf::Vector2u work_size;
+    unsigned int texWorld;
+    unsigned int texVision;
+    unsigned int texTransform;
+    sf::Vector2u workSize;
+    sf::Vector2u screenSize;
 
-    Compute(const char* path, sf::Vector2u size);
+    Compute(const char* path, sf::Vector2u _workSize, sf::Vector2u _screenSize);
     ~Compute();
     void use();
     void dispatch(uint32_t local_size_x, uint32_t local_size_y);
     void wait();
     void set_values(float* values);
+    void set_transform(float* values);
     std::vector<float> get_values();
 };
 

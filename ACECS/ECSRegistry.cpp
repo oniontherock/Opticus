@@ -190,7 +190,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
 		// the amount of rays
-		constexpr uint32_t rayCount = 1024;
+		constexpr uint32_t rayCount = 512;
 		// angular difference between two ray rotations
 		float rayAngleDifference = visionConeSize / rayCount;
 
@@ -201,21 +201,80 @@ void ComponentVisionDrawer::system(Entity& entity) {
 			rayRotations[i] = (float(i) * rayAngleDifference) - (visionConeSize / 2.f);
 		}
 
+		constexpr uint32_t worldWidth = 1280;
+		constexpr uint32_t worldHeight = 720;
+
 		// initialise compute stuff
-		Compute compute_shader("Include/Shaders/Compute.glsl", sf::Vector2u(rayCount, 1));
+		Compute compute_shader("Include/Shaders/VisionRaycaster.glsl", sf::Vector2u(rayCount, 1), sf::Vector2u(worldWidth, worldHeight));
 		compute_shader.use();
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R32F, compute_shader.work_size.x, compute_shader.work_size.y, 0, GL_RGBA, GL_FLOAT, values);
+		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+		std::vector<float> worldImageInputData = std::vector<float>(worldWidth * worldHeight * 4u);
 
-		compute_shader.set_values(values);
+		for (uint32_t i = 0; i < worldImageInputData.size(); i += 4) {
 
+			uint32_t coord = i / 4u;
 
-		//auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
-		//auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+			uint32_t x = coord % worldWidth;
+			uint32_t y = coord / worldWidth;
 
-		//auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+			sf::Color color = worldImage.getPixel(x, y);
 
-		//sf::Image viewImage;
+			worldImageInputData[i + 0] = float(color.r) / 255.f;
+			worldImageInputData[i + 1] = float(color.g) / 255.f;
+			worldImageInputData[i + 2] = float(color.b) / 255.f;
+			worldImageInputData[i + 3] = float(color.a) / 255.f;
+		}
+
+		compute_shader.set_values(worldImageInputData.data());
+
+		std::vector<float> transformInputData = std::vector<float>(rayCount * 4u);
+
+		for (uint32_t i = 0; i < transformInputData.size(); i += 4) {
+
+			uint32_t coord = i / 4u;
+
+			transformInputData[i + 0] = 320.f;
+			transformInputData[i + 1] = 180.f;
+			transformInputData[i + 2] = rayRotations[coord];
+			transformInputData[i + 3] = 0.f;
+		}
+
+		compute_shader.set_transform(transformInputData.data());
+
+		compute_shader.use();
+		compute_shader.dispatch(1, 1);
+		compute_shader.wait();   
+
+		std::vector<float> worldImageOutputData = compute_shader.get_values();
+
+		sf::Image visionImage;
+		visionImage.create(worldWidth, worldHeight);
+
+		for (uint32_t i = 0; i < worldImageOutputData.size(); i += 4) {
+
+			sf::Color color = sf::Color(
+				worldImageOutputData[i + 0] * 255.f,
+				worldImageOutputData[i + 1] * 255.f,
+				worldImageOutputData[i + 2] * 255.f,
+				worldImageOutputData[i + 3] * 255.f
+			);
+
+			uint32_t coord = i / 4u;
+			
+			uint32_t x = coord % worldWidth;
+			uint32_t y = coord / worldWidth;
+
+			visionImage.setPixel(x, y, color);
+		}
+		//std::cout << "burger" << std::endl;
+
+		////auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		////auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+		////auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+
+		////sf::Image viewImage;
 		//viewImage.create(worldImage.getSize().x, worldImage.getSize().y);
 
 		//float coneStart = -visionConeSize / 2.f;
@@ -260,7 +319,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 
 		sf::Texture worldTexture;
-		worldTexture.loadFromImage(viewImage);
+		worldTexture.loadFromImage(visionImage);
 
 		sf::Sprite worldSprite;
 		worldSprite.setTexture(worldTexture);

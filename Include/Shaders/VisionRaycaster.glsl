@@ -1,8 +1,8 @@
 #version 450
 
-layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-// the actual world texture
+// the texture of the world
 layout(rgba32f, binding = 0) uniform image2D worldTex;
 // the vision texture that is written to in the shader and read from outside the shader
 // doesn't necessarily reflect the worldTex
@@ -12,7 +12,8 @@ layout(rgba32f, binding = 1) uniform image2D visionTex;
 layout(rgba32f, binding = 2) uniform image2D rayStartingTransforms;
 
 void main() {
-    // get id to read/write data from
+//
+	// get id to read/write data from
     const ivec2 id = ivec2(gl_GlobalInvocationID.xy);
 
 	// the starting rotation of this ray, only used for calculating the ray's heading

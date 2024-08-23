@@ -3,10 +3,10 @@
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 // the texture of the world
-layout(rgba32f, binding = 0) uniform image2D worldTex;
+layout(rgba32f, binding = 1) uniform image2D worldTex;
 // the vision texture that is written to in the shader and read from outside the shader
 // doesn't necessarily reflect the worldTex
-layout(rgba32f, binding = 1) uniform image2D visionTex;
+layout(rgba32f, binding = 0) uniform image2D visionTex;
 
 // list of starting transforms for the rays, the r and g value of each pixel is the x and y coordinate of each ray, and the b value is the rotation of each ray
 layout(rgba32f, binding = 2) uniform image2D rayStartingTransforms;

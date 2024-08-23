@@ -34,9 +34,7 @@ int main() {
 		Engine::engineUpdate();
 
 		WindowHolder::windowGet().clear(sf::Color::Black);
-
 		Engine::engineDraw(WindowHolder::windowGet());
-
 		WindowHolder::windowGet().display();
 	
 		frames++;

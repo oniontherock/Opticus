@@ -109,6 +109,7 @@ using namespace EntityEvents;
 #include "Panels.hpp"
 #include "Graphics.hpp"
 #include "../Include/Shaders/Compute.hpp"
+#include "Graphics/WindowHolder.hpp"
 #include <numeric>
 #include <glad/glad.h>
 
@@ -189,8 +190,11 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
+		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
 		// the amount of rays
-		constexpr uint32_t rayCount = 512;
+		constexpr uint32_t rayCount = 256;
 		// angular difference between two ray rotations
 		float rayAngleDifference = visionConeSize / rayCount;
 
@@ -205,11 +209,12 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		constexpr uint32_t worldHeight = 720;
 
 		// initialise compute stuff
-		Compute compute_shader("Include/Shaders/VisionRaycaster.glsl", sf::Vector2u(rayCount, 1), sf::Vector2u(worldWidth, worldHeight));
-		compute_shader.use();
+		Compute computeShader("Include/Shaders/VisionRaycaster.glsl", sf::Vector2u(rayCount, 1), sf::Vector2u(worldWidth, worldHeight));
+		computeShader.use();
 
-		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
 		std::vector<float> worldImageInputData = std::vector<float>(worldWidth * worldHeight * 4u);
+		
+		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
 
 		for (uint32_t i = 0; i < worldImageInputData.size(); i += 4) {
 
@@ -226,7 +231,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 			worldImageInputData[i + 3] = float(color.a) / 255.f;
 		}
 
-		compute_shader.set_values(worldImageInputData.data());
+		computeShader.set_values(worldImageInputData.data());
 
 		std::vector<float> transformInputData = std::vector<float>(rayCount * 4u);
 
@@ -234,19 +239,21 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 			uint32_t coord = i / 4u;
 
-			transformInputData[i + 0] = 320.f;
-			transformInputData[i + 1] = 180.f;
-			transformInputData[i + 2] = rayRotations[coord];
+			transformInputData[i + 0] = positionComponent->position.x;
+			transformInputData[i + 1] = positionComponent->position.y;
+			transformInputData[i + 2] = rotationComponent->rotation + rayRotations[coord];
 			transformInputData[i + 3] = 0.f;
 		}
 
-		compute_shader.set_transform(transformInputData.data());
+		computeShader.set_transform(transformInputData.data());
 
-		compute_shader.use();
-		compute_shader.dispatch(1, 1);
-		compute_shader.wait();   
+		computeShader.dispatch(1, 1);
+		computeShader.wait();   
 
-		std::vector<float> worldImageOutputData = compute_shader.get_values();
+		std::vector<float> worldImageOutputData = computeShader.get_values();
+
+		computeShader.terminate();
+		//glActiveTexture(GL_TEXTURE0);
 
 		sf::Image visionImage;
 		visionImage.create(worldWidth, worldHeight);
@@ -267,56 +274,8 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 			visionImage.setPixel(x, y, color);
 		}
-		//std::cout << "burger" << std::endl;
 
-		////auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
-		////auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-		////auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
-
-		////sf::Image viewImage;
-		//viewImage.create(worldImage.getSize().x, worldImage.getSize().y);
-
-		//float coneStart = -visionConeSize / 2.f;
-		//float coneEnd = visionConeSize / 2.f;
-
-		//constexpr float angleMoveAmountHalf = angleMoveAmount / 2.f;
-
-		//while (coneStart < coneEnd) {
-
-		//	float startDist = 0.f;
-		//	float endDist = 600;
-		//	float distMoveAmount = 1.f;
-
-		//	RayCast raycast;
-		//	raycast.create(positionComponent->position.x, positionComponent->position.y, cos(rotationComponent->rotation + coneStart), sin(rotationComponent->rotation + coneStart));
-		//	auto colors = raycast.launch(endDist);
-		//	
-		//	int i = 0;
-
-		//	while (startDist < endDist) {
-
-		//		for (float extraAngle = -angleMoveAmountHalf; extraAngle < angleMoveAmountHalf; extraAngle += angleMoveAmountHalf / 2.f) {
-
-		//			float axisX = cos(rotationComponent->rotation + coneStart + extraAngle) * startDist;
-		//			float axisY = sin(rotationComponent->rotation + coneStart + extraAngle) * startDist;
-
-		//			float scanX = positionComponent->position.x + axisX;
-		//			float scanY = positionComponent->position.y + axisY;
-
-		//			if (scanX >= 0 && scanX < viewImage.getSize().x && scanY >= 0 && scanY < viewImage.getSize().y) {
-		//				viewImage.setPixel(uint32_t(scanX), uint32_t(scanY), colors[i]);
-		//			}
-		//		}
-
-		//		startDist += distMoveAmount;
-		//		i++;
-		//	}
-
-		//	coneStart += angleMoveAmount;
-		//}
-
-
+		WindowHolder::windowGet().resetGLStates();
 
 		sf::Texture worldTexture;
 		worldTexture.loadFromImage(visionImage);

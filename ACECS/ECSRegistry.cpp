@@ -194,7 +194,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		// the amount of rays
-		constexpr uint32_t rayCount = 256;
+		constexpr uint32_t rayCount = 1024;
 		// angular difference between two ray rotations
 		float rayAngleDifference = visionConeSize / rayCount;
 
@@ -211,27 +211,17 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		// initialise compute stuff
 		Compute computeShader("Include/Shaders/VisionRaycaster.glsl", sf::Vector2u(rayCount, 1), sf::Vector2u(worldWidth, worldHeight));
 		computeShader.use();
-
-		std::vector<float> worldImageInputData = std::vector<float>(worldWidth * worldHeight * 4u);
 		
 		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
 
-		for (uint32_t i = 0; i < worldImageInputData.size(); i += 4) {
+		const sf::Uint8* pixels = worldImage.getPixelsPtr();
+		std::vector<float> values(worldWidth * worldHeight * 4u);
 
-			uint32_t coord = i / 4u;
-
-			uint32_t x = coord % worldWidth;
-			uint32_t y = coord / worldWidth;
-
-			sf::Color color = worldImage.getPixel(x, y);
-
-			worldImageInputData[i + 0] = float(color.r) / 255.f;
-			worldImageInputData[i + 1] = float(color.g) / 255.f;
-			worldImageInputData[i + 2] = float(color.b) / 255.f;
-			worldImageInputData[i + 3] = float(color.a) / 255.f;
+		for (uint32_t i = 0; i < values.size(); i++) {
+			values[i] = float(pixels[i]);
 		}
 
-		computeShader.set_values(worldImageInputData.data());
+		computeShader.set_values(values.data());
 
 		std::vector<float> transformInputData = std::vector<float>(rayCount * 4u);
 
@@ -242,40 +232,25 @@ void ComponentVisionDrawer::system(Entity& entity) {
 			transformInputData[i + 0] = positionComponent->position.x;
 			transformInputData[i + 1] = positionComponent->position.y;
 			transformInputData[i + 2] = rotationComponent->rotation + rayRotations[coord];
-			transformInputData[i + 3] = 0.f;
+			//transformInputData[i + 3] = 0.f;
 		}
 
 		computeShader.set_transform(transformInputData.data());
 
+		//computeShader.use();
 		computeShader.dispatch(1, 1);
 		computeShader.wait();   
 
 		std::vector<float> worldImageOutputData = computeShader.get_values();
-
-		computeShader.terminate();
-		//glActiveTexture(GL_TEXTURE0);
-
-		sf::Image visionImage;
-		visionImage.create(worldWidth, worldHeight);
-
-		for (uint32_t i = 0; i < worldImageOutputData.size(); i += 4) {
-
-			sf::Color color = sf::Color(
-				worldImageOutputData[i + 0] * 255.f,
-				worldImageOutputData[i + 1] * 255.f,
-				worldImageOutputData[i + 2] * 255.f,
-				worldImageOutputData[i + 3] * 255.f
-			);
-
-			uint32_t coord = i / 4u;
-			
-			uint32_t x = coord % worldWidth;
-			uint32_t y = coord / worldWidth;
-
-			visionImage.setPixel(x, y, color);
+		std::vector<sf::Uint8> imageData(worldImageOutputData.size());
+		for (uint32_t i = 0; i < imageData.size(); i++) {
+			imageData[i] = static_cast<sf::Uint8>(worldImageOutputData[i]);
 		}
 
-		WindowHolder::windowGet().resetGLStates();
+		computeShader.terminate();
+
+		sf::Image visionImage;
+		visionImage.create(worldWidth, worldHeight, imageData.data());
 
 		sf::Texture worldTexture;
 		worldTexture.loadFromImage(visionImage);

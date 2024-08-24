@@ -29,7 +29,7 @@ void main() {
 	vec2 rayHeading = rayHeadingOrig;
 
 	// the distance the ray must travel, doesn't necessarily reflect the actual amount the ray has to move in the world
-    const float desiredDistance = 500;
+    const float desiredDistance = 250;
 	// the distance the ray has traveled so far, doesn't necessarily reflect the actual amount the ray has moved in the world
 	float movedAmount = 0;
 

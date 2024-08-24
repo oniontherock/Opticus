@@ -15,6 +15,7 @@ struct Compute {
     sf::Vector2u workSize;
     sf::Vector2u screenSize;
 
+    Compute();
     Compute(const char* path, sf::Vector2u _workSize, sf::Vector2u _screenSize);
     ~Compute();
     void terminate();

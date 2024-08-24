@@ -66,7 +66,6 @@ Compute::Compute(const char* path, sf::Vector2u _workSize, sf::Vector2u _screenS
     // create empty texture
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, workSize.x, workSize.y, 0, GL_RGBA, GL_FLOAT, NULL);
     glBindImageTexture(2, textures[2], 0, GL_FALSE, 0, GL_READ_ONLY, GL_RGBA32F);
-
 }
 
 Compute::~Compute() {

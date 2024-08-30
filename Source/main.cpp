@@ -3,7 +3,6 @@
 #include "Auxiliary/ConsoleHandler.hpp"
 #include "Graphics/WindowHolder.hpp"
 #include "Input/Input Events/InputManager.hpp"
-#include <glad/glad.h>
 #include <iostream>
 #include <iostream>
 #include <SFML/Window.hpp>
@@ -12,13 +11,7 @@ int main() {
 
 	// setup window
 	WindowHolder::windowInitialize(sf::VideoMode(1280, 720), "Window");
-
-	if (!gladLoadGL()) {
-		ConsoleHandler::consolePrintErr("GLAD loading failed! Program terminated");
-		return -1;
-	}
-
-	glEnable(GL_DEBUG_OUTPUT);
+	//WindowHolder::windowGet().setFramerateLimit(60);
 
 	Engine::engineInitialize();
 

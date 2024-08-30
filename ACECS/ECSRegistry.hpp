@@ -2,6 +2,7 @@
 #define __ECS_REGISTRY_H__
 
 #include "../Include/Common/Math.hpp"
+#include "../Include/Simulation/Vision.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -154,17 +155,16 @@ namespace EntityComponents {
 		ComponentVisionDrawer() {
 			hasSystem = true;
 		};
-		ComponentVisionDrawer(float _visionConeSize) :
+		ComponentVisionDrawer(Vision _vision) :
 			ComponentVisionDrawer()
 		{
-			visionConeSize = _visionConeSize;
+			vision = _vision;
 		};
 
-		// range of the vision cone. actual radian coverage, so 360 is a full circle, 180 is everything in front, 90 is a cone.
-		float visionConeSize = Mathf::TAU / 4.f;
+		Vision vision;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(visionConeSize));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(vision));
 		};
 	};
 

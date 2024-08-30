@@ -87,7 +87,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(480.f),
 			createComponentPairFromType<ComponentRotateToMouse>(0.20f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionDrawer>(Mathf::TAU / 8.f),
+			createComponentPairFromType<ComponentVisionDrawer>(Vision(640, 360)),
 		}
 		);
 }
@@ -99,19 +99,18 @@ using namespace EntityComponents;
 using namespace EntityEvents;
 
 // if you need to include a certain file for a system, include it here.
-#include <iostream>
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Common/TimeHandler.hpp"
-#include "../Include/Simulation/RayCast.hpp"
-#include "../Include/Simulation/WorldImageGrid.hpp"
+#include "../Include/Simulation/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
-#include "Input.hpp"
+#include "../Include/Simulation/Vision.hpp"
+#include <iostream>
+#include <Input.hpp>
 #include "Panels.hpp"
-#include "Graphics.hpp"
-#include "../Include/Shaders/Compute.hpp"
-#include "Graphics/WindowHolder.hpp"
+#include <Graphics.hpp>
+#include <Graphics/WindowHolder.hpp>
+#include <Auxiliary/ConsoleHandler.hpp>
 #include <numeric>
-#include <glad/glad.h>
 
 
 // if the system is not using the entity parameter, remove it's name to avoid a C4100 error
@@ -129,7 +128,6 @@ void ComponentMoveByInput::system(Entity& entity) {
 		moveEvent->moveAxis = inputAxis;
 	}
 }
-
 void ComponentRotateToMouse::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentPosition>() && entity.entityComponentHas<ComponentRotation>()) {
 
@@ -149,7 +147,6 @@ void ComponentRotateToMouse::system(Entity& entity) {
 		rotateEvent->rotateAmount = angleDiff * lerpSpeed;
 	}
 }
-
 void ComponentPosition::system(Entity& entity) {
 	if (entity.entityEventHas<EventMove>()) {
 
@@ -186,79 +183,35 @@ void ComponentSprite::system(Entity& entity) {
 		}
 	}
 }
+
 void ComponentVisionDrawer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+		//Vision vision = Vision(1280, 720);
 
-		// the amount of rays
-		constexpr uint32_t rayCount = 1024;
-		// angular difference between two ray rotations
-		float rayAngleDifference = visionConeSize / rayCount;
+		sf::Image& visionImage = vision.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation);
 
-		// the starting rotation of every ray
-		std::vector<float> rayRotations = std::vector<float>(rayCount);
+		sf::Texture visionTexture;
+		visionTexture.create(640, 360);
+		visionTexture.loadFromImage(visionImage);
 
-		for (uint32_t i = 0; i < rayCount; i++) {
-			rayRotations[i] = (float(i) * rayAngleDifference) - (visionConeSize / 2.f);
-		}
+		sf::Sprite visionSprite;
+		visionSprite.setTexture(visionTexture);
 
-		constexpr uint32_t worldWidth = 1280;
-		constexpr uint32_t worldHeight = 720;
+		sf::Shader grayScaleShader;
+		grayScaleShader.loadFromFile("Include/Shaders/GrayScale.glsl", sf::Shader::Fragment);
 
-		// initialise compute stuff
-		Compute computeShader("Include/Shaders/VisionRaycaster.glsl", sf::Vector2u(rayCount, 1), sf::Vector2u(worldWidth, worldHeight));
-		computeShader.use();
-		
-		auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+		const sf::Texture& memoryTexture = vision.memoryGet();
 
-		const sf::Uint8* pixels = worldImage.getPixelsPtr();
-		std::vector<float> values(worldWidth * worldHeight * 4u);
+		sf::Sprite memorySprite;
+		memorySprite.setTexture(memoryTexture);
 
-		for (uint32_t i = 0; i < values.size(); i++) {
-			values[i] = float(pixels[i]);
-		}
 
-		computeShader.set_values(values.data());
-
-		std::vector<float> transformInputData = std::vector<float>(rayCount * 4u);
-
-		for (uint32_t i = 0; i < transformInputData.size(); i += 4) {
-
-			uint32_t coord = i / 4u;
-
-			transformInputData[i + 0] = positionComponent->position.x;
-			transformInputData[i + 1] = positionComponent->position.y;
-			transformInputData[i + 2] = rotationComponent->rotation + rayRotations[coord];
-			//transformInputData[i + 3] = 0.f;
-		}
-
-		computeShader.set_transform(transformInputData.data());
-
-		//computeShader.use();
-		computeShader.dispatch(1, 1);
-		computeShader.wait();   
-
-		std::vector<float> worldImageOutputData = computeShader.get_values();
-		std::vector<sf::Uint8> imageData(worldImageOutputData.size());
-		for (uint32_t i = 0; i < imageData.size(); i++) {
-			imageData[i] = static_cast<sf::Uint8>(worldImageOutputData[i]);
-		}
-
-		computeShader.terminate();
-
-		sf::Image visionImage;
-		visionImage.create(worldWidth, worldHeight, imageData.data());
-
-		sf::Texture worldTexture;
-		worldTexture.loadFromImage(visionImage);
-
-		sf::Sprite worldSprite;
-		worldSprite.setTexture(worldTexture);
-
-		PanelManager::panelGet(PanelName::GameView).objectDraw(worldSprite);
+		PanelManager::panelGet(PanelName::GameView).objectDraw(memorySprite, grayScaleShader);
+		PanelManager::panelGet(PanelName::GameView).objectDraw(visionSprite);
 	}
 }
 

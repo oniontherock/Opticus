@@ -8,7 +8,7 @@ void distortionFunctionsInitialize() {
 	distortionFunctions.resize(DistortionFunctionId::ENUM_SIZE);
 
 	distortionFunctions[Slow] = [](sf::Vector2f& heading) {
-		heading /= 1.001f;
+		heading /= 1.0025f;
 		};
 	distortionFunctions[Stop] = [](sf::Vector2f& heading) {
 		heading *= 999999999.f;
@@ -22,12 +22,14 @@ void distortionFunctionsInitialize() {
 }
 
 WorldDistortion::WorldDistortion() {
-	distortionFunctionIds = std::vector<DistortionFunctionId>{ 3 };
+	distortionFunctionIds = std::vector<uint16_t>{ };
 }
+
+#include <iostream>
 
 void WorldDistortion::headingApplyDistortion(sf::Vector2f& heading) {
 	for (uint16_t i = 0; i < distortionFunctionIds.size(); i++) {
-		std::invoke(distortionFunctions[3], heading);
+		std::invoke(distortionFunctions[distortionFunctionIds[i]], heading);
 	}
 }
 

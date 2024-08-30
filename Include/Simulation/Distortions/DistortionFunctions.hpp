@@ -19,9 +19,13 @@ void distortionFunctionsInitialize();
 
 struct WorldDistortion {
 
-	std::vector<DistortionFunctionId> distortionFunctionIds;
+	std::vector<uint16_t> distortionFunctionIds;
 
 	WorldDistortion();
+	template <typename... Args>
+	WorldDistortion(Args... args) {
+		distortionFunctionIds = std::vector<uint16_t>{ args... };
+	}
 
 	void headingApplyDistortion(sf::Vector2f& heading);
 };

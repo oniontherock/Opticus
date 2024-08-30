@@ -1,6 +1,6 @@
 #include "ACECS.hpp"
 
-#include "../Include/Simulation/WorldImageGrid.hpp"
+#include "../Include/Simulation/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -27,7 +27,7 @@ void Engine::panelsRegister() {
 	using namespace PanelManager;
 	panelAdd(PanelTypes::GameView, PanelPtr(new PanelGameView(
 		PanelRect(0, 0, 1280, 720), // screen coordinates
-		PanelRect(0, 0, 1280, 720), // world coordinates
+		PanelRect(0, 0, 640, 360), // world coordinates
 		sf::Color::Black
 	)));
 }
@@ -93,10 +93,10 @@ void Engine::engineInitialize() {
 	panelsRegister();
 	gameStateRegister();
 
-	WorldImageGrid::worldTextureGridInitialize(1, 1, 1280, 720);
+	WorldImageGrid::worldTextureGridInitialize(1, 1, 640, 360);
 	
 	distortionFunctionsInitialize();
-	WorldDistortionGrid::worldDistortionGridInitialize(1280, 720, 1, 1);
+	WorldDistortionGrid::worldDistortionGridInitialize(640, 360, 1, 1);
 }
 // updates the engines input
 void Engine::engineInputUpdate(sf::RenderWindow& window) {

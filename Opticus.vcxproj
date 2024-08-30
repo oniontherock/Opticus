@@ -75,7 +75,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules;C:\Users\dayna\Documents\glad all extensions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -91,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Platform)'=='Win32'">
     <ClCompile>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules;C:\Users\dayna\Documents\glad all extensions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\SFMLLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -108,8 +108,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules;C:\Users\dayna\Documents\glad all extensions\include</AdditionalIncludeDirectories>
-      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules;C:\Users\dayna\Documents\glad all extensions\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -136,22 +136,11 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
-    <ClCompile Include="glad.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      </ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      </ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
-    <ClCompile Include="Include\Shaders\Compute.cpp" />
     <ClCompile Include="Include\Simulation\Distortions\DistortionFunctions.cpp" />
-    <ClCompile Include="Include\Simulation\RayCast.cpp" />
     <ClCompile Include="Include\Simulation\Distortions\WorldDistortionGrid.cpp" />
-    <ClCompile Include="Include\Simulation\WorldImageGrid.cpp" />
+    <ClCompile Include="Include\Simulation\Vision.cpp" />
+    <ClCompile Include="Include\Simulation\Image Grid\WorldImageGrid.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,9 +149,10 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-graphics-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-system-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
+    <None Include="Include\Shaders\Blur.glsl" />
+    <None Include="Include\Shaders\GrayScale.glsl" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
-    <None Include="Include\Shaders\VisionRaycaster.glsl" />
     <Text Include="readme.txt">
       <DeploymentContent>false</DeploymentContent>
     </Text>
@@ -183,12 +173,11 @@
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
     <ClInclude Include="Include\Simulation\Distortions\DistortionFunctions.hpp" />
-    <ClInclude Include="Include\Simulation\RayCast.hpp" />
     <ClInclude Include="Include\Simulation\Distortions\WorldDistortionGrid.hpp" />
-    <ClInclude Include="Include\Simulation\WorldImageGrid.hpp" />
+    <ClInclude Include="Include\Simulation\Vision.hpp" />
+    <ClInclude Include="Include\Simulation\Image Grid\WorldImageGrid.hpp" />
     <ClInclude Include="OpenGL\glad.h" />
     <ClInclude Include="OpenGL\khrplatform.h" />
-    <ClInclude Include="Include\Shaders\Compute.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Art\Test Image.png" />

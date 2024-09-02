@@ -1,13 +1,6 @@
 #include "WorldImageGrid.hpp"
 
-
-
-sf::Vector2f WorldImageGrid::textureQuadrantSize = sf::Vector2f(0, 0);
-WorldImageGrid2D WorldImageGrid::worldTextureGrid{};
-sf::Vector2u WorldImageGrid::fullGridSize{};
-
-
-void WorldImageGrid::worldTextureGridInitialize(uint32_t gridSizeX, uint32_t gridSizeY, float quadrantSizeX, float quadrantSizeY) {
+WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float quadrantSizeX, float quadrantSizeY) {
 
 	fullGridSize = sf::Vector2u(gridSizeX * uint32_t(quadrantSizeX), gridSizeY * uint32_t(quadrantSizeY));
 
@@ -29,7 +22,7 @@ void WorldImageGrid::worldTextureGridInitialize(uint32_t gridSizeX, uint32_t gri
 }
 
 WorldImage& WorldImageGrid::worldImageFromPixel(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY) {
-	return worldTextureGrid[pixelX / uint32_t(textureQuadrantSize.x)][pixelY / uint32_t(textureQuadrantSize.y)];
+	return worldTextureGrid[static_cast<uint32_t>(pixelX / textureQuadrantSize.x)][static_cast<uint32_t>(pixelY / textureQuadrantSize.y)];
 }
 
 void WorldImageGrid::pixelSetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY, PixelColor color) {

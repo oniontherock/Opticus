@@ -1,7 +1,7 @@
 #include "ACECS.hpp"
 
-#include "../Include/Simulation/Image Grid/WorldImageGrid.hpp"
-#include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "GameState.hpp"
@@ -92,11 +92,6 @@ void Engine::engineInitialize() {
 	ECSRegistry::ECSInitialize();
 	panelsRegister();
 	gameStateRegister();
-
-	WorldImageGrid::worldTextureGridInitialize(1, 1, 640, 360);
-	
-	distortionFunctionsInitialize();
-	WorldDistortionGrid::worldDistortionGridInitialize(640, 360, 1, 1);
 }
 // updates the engines input
 void Engine::engineInputUpdate(sf::RenderWindow& window) {

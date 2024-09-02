@@ -2,8 +2,8 @@
 
 #include "../Include/Common/Math.hpp"
 #include "../Include/Common/VectorMath.hpp"
-#include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Simulation/Image Grid/WorldImageGrid.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"

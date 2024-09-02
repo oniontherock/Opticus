@@ -1,10 +1,6 @@
 #include "WorldDistortionGrid.hpp"
 
-sf::Vector2f WorldDistortionGrid::distortionCellSize{};
-WorldDistortionGrid2D WorldDistortionGrid::worldDistortionGrid{};
-sf::Vector2u WorldDistortionGrid::gridSize{};
-
-void WorldDistortionGrid::worldDistortionGridInitialize(uint32_t gridSizeX, uint32_t gridSizeY, float distortionCellSizeX, float distortionCellSizeY) {
+WorldDistortionGrid::WorldDistortionGrid(uint32_t gridSizeX, uint32_t gridSizeY, float distortionCellSizeX, float distortionCellSizeY) {
 
 	gridSize = sf::Vector2u(gridSizeX, gridSizeY);
 

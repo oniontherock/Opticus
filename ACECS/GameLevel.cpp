@@ -4,10 +4,11 @@
 
 #include "ECSRegistry.hpp"
 
-GameLevel::GameLevel() {
+GameLevel::GameLevel() :
+	levelSize(sf::Vector2u(640, 360)),
+	worldGrid(WorldGrid(levelSize.x, levelSize.y))
+{
 	entities = std::vector<EntityId>();
-
-	levelSize = sf::Vector2i(1280, 720);
 }
 
 GameLevel::GameLevel(LevelCoordinate _idX, LevelCoordinate _idY, LevelCoordinate _idZ) :

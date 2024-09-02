@@ -2,7 +2,7 @@
 #define __ECS_REGISTRY_H__
 
 #include "../Include/Common/Math.hpp"
-#include "../Include/Simulation/Vision.hpp"
+#include "../Include/Game/Vision/VisionRenderer.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -148,23 +148,23 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentRotation(rotation));
 		};
 	};
-	struct ComponentVisionDrawer final : public Component {
+	struct ComponentVisionRenderer final : public Component {
 
 		void system(Entity& entity) final;
 
-		ComponentVisionDrawer() {
+		ComponentVisionRenderer() {
 			hasSystem = true;
 		};
-		ComponentVisionDrawer(Vision _vision) :
-			ComponentVisionDrawer()
+		ComponentVisionRenderer(VisionRenderer _vision) :
+			ComponentVisionRenderer()
 		{
-			vision = _vision;
+			visionRenderer = _vision;
 		};
 
-		Vision vision;
+		VisionRenderer visionRenderer;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(vision));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionRenderer(visionRenderer));
 		};
 	};
 

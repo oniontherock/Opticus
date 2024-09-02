@@ -4,7 +4,7 @@
 #include "World/Level.hpp"
 #include "World/LevelGrid.hpp"
 #include "SFML/System/Vector2.hpp"
-
+#include "../Include/Game/World/WorldGrid.hpp"
 
 // example of the game level class,
 // 
@@ -17,9 +17,11 @@ struct GameLevel : public BaseLevel {
 	GameLevel(LevelCoordinate _idX, LevelCoordinate _idY, LevelCoordinate _idZ);
 	GameLevel(LevelPosition _id);
 
-	sf::Vector2i levelSize;
+	sf::Vector2u levelSize;
 
 	bool firstRun = true;
+
+	WorldGrid worldGrid;
 };
 
 using GameLevelGrid = LevelGrid<GameLevel>;

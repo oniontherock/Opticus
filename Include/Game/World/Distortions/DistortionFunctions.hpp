@@ -1,7 +1,7 @@
 #ifndef __DISTORTION_FUNCTIONS_H__
 #define __DISTORTION_FUNCTIONS_H__
 
-#include "../../Common/VectorMath.hpp"
+#include "../../../Common/VectorMath.hpp"
 #include <functional>
 
 typedef std::function<void(sf::Vector2f&)> DistortionFunction;

@@ -42,7 +42,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionRenderer>>();
 }
 
 #pragma endregion Components
@@ -87,7 +87,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(480.f),
 			createComponentPairFromType<ComponentRotateToMouse>(0.20f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionDrawer>(Vision(640, 360)),
+			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(640, 360)),
 		}
 		);
 }
@@ -101,11 +101,12 @@ using namespace EntityEvents;
 // if you need to include a certain file for a system, include it here.
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Common/TimeHandler.hpp"
-#include "../Include/Simulation/Image Grid/WorldImageGrid.hpp"
-#include "../Include/Simulation/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Simulation/Vision.hpp"
+#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/Vision/VisionRenderer.hpp"
 #include <iostream>
 #include <Input.hpp>
+#include "GameLevel.hpp"
 #include "Panels.hpp"
 #include <Graphics.hpp>
 #include <Graphics/WindowHolder.hpp>
@@ -175,7 +176,7 @@ void ComponentSprite::system(Entity& entity) {
 
 	sf::Image testImage = spriteTexture.copyToImage();
 
-	auto& worldImage = WorldImageGrid::worldImageFromPixel(0, 0);
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
 
 	for (uint32_t x = 0; x < testImage.getSize().x; x++) {
 		for (uint32_t y = 0; y < testImage.getSize().y; y++) {
@@ -184,7 +185,7 @@ void ComponentSprite::system(Entity& entity) {
 	}
 }
 
-void ComponentVisionDrawer::system(Entity& entity) {
+void ComponentVisionRenderer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
@@ -192,7 +193,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 		//Vision vision = Vision(1280, 720);
 
-		sf::Image& visionImage = vision.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation);
+		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation);
 
 		sf::Texture visionTexture;
 		visionTexture.create(640, 360);
@@ -204,7 +205,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		sf::Shader grayScaleShader;
 		grayScaleShader.loadFromFile("Include/Shaders/GrayScale.glsl", sf::Shader::Fragment);
 
-		const sf::Texture& memoryTexture = vision.memoryGet();
+		const sf::Texture& memoryTexture = visionRenderer.memoryGet();
 
 		sf::Sprite memorySprite;
 		memorySprite.setTexture(memoryTexture);

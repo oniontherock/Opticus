@@ -1,17 +1,17 @@
-#ifndef __VISION_H__
-#define __VISION_H__
+#ifndef __VISION_RENDERER_H__
+#define __VISION_RENDERER_H__
 
 #include <SFML/Graphics.hpp>
 #include <bitset>
 #include <cstdint>
-#include "../Common/Math.hpp"
+#include "../../Common/Math.hpp"
 
-struct Vision {
+struct VisionRenderer {
 
-	Vision();
-	Vision(uint16_t sizeX, uint16_t sizeY);
-	Vision(const Vision& other);
-	void operator= (const Vision& other);
+	VisionRenderer();
+	VisionRenderer(uint16_t sizeX, uint16_t sizeY);
+	VisionRenderer(const VisionRenderer& other);
+	void operator= (const VisionRenderer& other);
 
 	sf::Image& visionProcess(float posX, float posY, float rotation);
 	const sf::Texture& memoryGet();

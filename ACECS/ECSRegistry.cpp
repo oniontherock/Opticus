@@ -1,4 +1,5 @@
 #include "ECSRegistry.hpp"
+#include "GameLevel.hpp"
 
 uint32_t MAX_ENTITIES = 100;
 uint16_t MAX_COMPONENT_TYPES = 8;
@@ -43,6 +44,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionRenderer>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 }
 
 #pragma endregion Components
@@ -84,10 +86,11 @@ void EntityComponents::componentTemplatesInitialize() {
 		},
 		/// list of components in template
 		{
-			createComponentPairFromType<ComponentMoveByInput>(480.f),
-			createComponentPairFromType<ComponentRotateToMouse>(0.20f),
+			createComponentPairFromType<ComponentMoveByInput>(120.f),
+			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(640, 360)),
+			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(GameLevelGrid::levelGet(0, 0)->levelSize)),
+			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
 }
@@ -106,11 +109,10 @@ using namespace EntityEvents;
 #include "../Include/Game/Vision/VisionRenderer.hpp"
 #include <iostream>
 #include <Input.hpp>
-#include "GameLevel.hpp"
 #include "Panels.hpp"
-#include <Graphics.hpp>
 #include <Graphics/WindowHolder.hpp>
 #include <Auxiliary/ConsoleHandler.hpp>
+#include <Graphics.hpp>
 #include <numeric>
 
 
@@ -132,6 +134,8 @@ void ComponentMoveByInput::system(Entity& entity) {
 void ComponentRotateToMouse::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentPosition>() && entity.entityComponentHas<ComponentRotation>()) {
 
+		float delta = float(TimeHandler::deltaSimulatedGet());
+
 		auto& gameViewPanel = PanelManager::panelGet(PanelName::GameView);
 
 		float angle = Vector2fMath::angle(entity.entityComponentGet<ComponentPosition>()->position, gameViewPanel.viewMousePositionGet());
@@ -140,12 +144,20 @@ void ComponentRotateToMouse::system(Entity& entity) {
 
 		float angleDiff = angle - rotationComponent->rotation;
 
-		if (angleDiff > Mathf::PI) angleDiff -= Mathf::TAU;
-		if (angleDiff < -Mathf::PI) angleDiff += Mathf::TAU;
+		float rotateAngle = angleDiff;
+		// wrap rotation between -PI and +PI
+		if (rotateAngle > +Mathf::PI) rotateAngle -= Mathf::TAU;
+		if (rotateAngle < -Mathf::PI) rotateAngle += Mathf::TAU;
+
+		// limit the speed of the rotation;
+		float rotLimit = Mathf::TAU * 2.f / delta;
+		rotateAngle *= lerpSpeed / delta;
+		if (rotateAngle > +rotLimit) rotateAngle = +rotLimit;
+		if (rotateAngle < -rotLimit) rotateAngle = -rotLimit;
 
 		auto* rotateEvent = entity.entityEventAddAndGet<EventRotate>();
 
-		rotateEvent->rotateAmount = angleDiff * lerpSpeed;
+		rotateEvent->rotateAmount = rotateAngle * delta;
 	}
 }
 void ComponentPosition::system(Entity& entity) {
@@ -184,19 +196,34 @@ void ComponentSprite::system(Entity& entity) {
 		}
 	}
 }
-
 void ComponentVisionRenderer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
+		auto& gameViewPanel = PanelManager::panelGet(PanelName::GameView);
+
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-		//Vision vision = Vision(1280, 720);
 
-		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation);
+		auto& panel = PanelManager::panelGet(PanelName::GameView);
+
+		sf::Vector2f mouseDiff = Vector2fMath::axis(panel.viewGet().getCenter(), positionComponent->position);
+
+		float len = Vector2fMath::length(mouseDiff);
+
+		if (len > 100) len = 100;
+
+		float coneAngle = 135 - (115 * (len / 100));
+
+		std::cout << len << " " << coneAngle << std::endl;
+
+		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation, 1024, coneAngle);
 
 		sf::Texture visionTexture;
-		visionTexture.create(640, 360);
+
+		static const sf::Vector2u panelSize = GameLevelGrid::levelGet(0, 0)->levelSize;
+
+		visionTexture.create(panelSize.x, panelSize.y);
 		visionTexture.loadFromImage(visionImage);
 
 		sf::Sprite visionSprite;
@@ -211,8 +238,35 @@ void ComponentVisionRenderer::system(Entity& entity) {
 		memorySprite.setTexture(memoryTexture);
 
 
-		PanelManager::panelGet(PanelName::GameView).objectDraw(memorySprite, grayScaleShader);
-		PanelManager::panelGet(PanelName::GameView).objectDraw(visionSprite);
+		gameViewPanel.objectDraw(memorySprite, grayScaleShader);
+		gameViewPanel.objectDraw(visionSprite);
+	}
+}
+void ComponentViewFollow::system(Entity& entity) {
+	
+	if (entity.entityComponentHas<ComponentPosition>()) {
+		
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+		
+		auto& panel = PanelManager::panelGet(panelViewToFollow);
+
+		sf::Vector2f posDiff = positionComponent->position - panel.viewGet().getCenter();
+
+		float lerp = 0.15f;
+
+		panel.viewMove(posDiff * lerp);
+
+
+		sf::Vector2f mousePos = panel.viewMousePositionGet();
+
+		sf::Vector2f mouseDiff = mousePos - panel.viewGet().getCenter();
+
+		lerp = 0.05f;
+
+		mouseDiff.x *= lerp;
+		mouseDiff.y *= lerp * panel.viewAspectRatioGet();
+
+		panel.viewMove(mouseDiff);
 	}
 }
 

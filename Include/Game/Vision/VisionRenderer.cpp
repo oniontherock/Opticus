@@ -18,6 +18,12 @@ VisionRenderer::VisionRenderer(uint16_t sizeX, uint16_t sizeY) {
 	visionImage.create(screenSize.x, screenSize.y);
 	memoryTexture.create(screenSize.x, screenSize.y);
 }
+VisionRenderer::VisionRenderer(sf::Vector2u size) {
+	screenSize = size;
+
+	visionImage.create(screenSize.x, screenSize.y);
+	memoryTexture.create(screenSize.x, screenSize.y);
+}
 VisionRenderer::VisionRenderer(const VisionRenderer& other) {
 	screenSize = other.screenSize;
 
@@ -34,8 +40,7 @@ void VisionRenderer::operator= (const VisionRenderer& other) {
 	memoryTexture.create(screenSize.x, screenSize.y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 }
-
-sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation) {
+sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees) {
 
 	const sf::Color clearColor = sf::Color(0, 0, 0, 0);
 
@@ -44,19 +49,24 @@ sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation)
 			visionImage.setPixel(x, y, clearColor);
 		}
 	}
+	
+	float coneAngleRadians = coneAngleDegrees * Mathf::PI / 180.f;
 
 	memoryBlur();
-	visionUpdate(posX, posY, rotation - (coneAngle / 2.f));
+	visionUpdate(posX, posY, rotation - (coneAngleRadians / 2.f), rayCountTotal, coneAngleRadians);
 	visionMemorize();
 
 	return visionImage;
+}
+sf::Image& VisionRenderer::visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees) {
+	return visionProcess(pos.x, pos.y, rotation, rayCountTotal, coneAngleDegrees);
 }
 
 const sf::Texture& VisionRenderer::memoryGet() {
 	return memoryTexture.getTexture();
 }
 
-void VisionRenderer::visionUpdate(float posX, float posY, float rotation) {
+void VisionRenderer::visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians) {
 
 	auto& worldGrid = GameLevelGrid::levelGet(0, 0, 0)->worldGrid;
 
@@ -68,14 +78,14 @@ void VisionRenderer::visionUpdate(float posX, float posY, float rotation) {
 
 	for (uint32_t rayCur = 0; rayCur < rayCountTotal; rayCur++) {
 
-		const float rayRotation = rotation + (rayCur * rayAngleDifference);
+		const float rayRotation = rotation + (rayCur * (coneAngleRadians / rayCountTotal));
 		const sf::Vector2f rayHeadingOrig = sf::Vector2f(cos(rayRotation), sin(rayRotation));
 		
 		sf::Vector2f rayHeading = rayHeadingOrig;
 		sf::Vector2f rayPosition = rayPositionStarting;
-
+	
 		float dist = 0;
-		constexpr float desiredDist = 300;
+		constexpr float desiredDist = 500;
 
 		while (dist <= desiredDist) {
 

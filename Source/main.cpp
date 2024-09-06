@@ -11,7 +11,7 @@ int main() {
 
 	// setup window
 	WindowHolder::windowInitialize(sf::VideoMode(1280, 720), "Window");
-	//WindowHolder::windowGet().setFramerateLimit(60);
+	WindowHolder::windowGet().setFramerateLimit(60);
 
 	Engine::engineInitialize();
 

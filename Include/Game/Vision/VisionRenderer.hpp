@@ -10,23 +10,21 @@ struct VisionRenderer {
 
 	VisionRenderer();
 	VisionRenderer(uint16_t sizeX, uint16_t sizeY);
+	VisionRenderer(sf::Vector2u size);
 	VisionRenderer(const VisionRenderer& other);
 	void operator= (const VisionRenderer& other);
 
-	sf::Image& visionProcess(float posX, float posY, float rotation);
+	sf::Image& visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees);
+	sf::Image& visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees);
 	const sf::Texture& memoryGet();
 private:
-
-	static constexpr uint32_t rayCountTotal = 512;
-	static constexpr float coneAngle = Mathf::TAU / 8.f;
-	static constexpr float rayAngleDifference = coneAngle / rayCountTotal;
 
 	sf::Vector2u screenSize;
 
 	sf::Image visionImage;
 	sf::RenderTexture memoryTexture;
 
-	void visionUpdate(float posX, float posY, float rotation);
+	void visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians);
 	void visionMemorize();
 	void memoryBlur();
 };

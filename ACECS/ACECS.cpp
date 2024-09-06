@@ -89,8 +89,8 @@ void Engine::engineInitialize() {
 	GameLevelGrid::levelAdd(new GameLevel(0, 0, 0), true);
 
 	inputsRegister();
-	ECSRegistry::ECSInitialize();
 	panelsRegister();
+	ECSRegistry::ECSInitialize();
 	gameStateRegister();
 }
 // updates the engines input

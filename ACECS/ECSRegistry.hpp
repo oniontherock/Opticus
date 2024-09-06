@@ -3,6 +3,7 @@
 
 #include "../Include/Common/Math.hpp"
 #include "../Include/Game/Vision/VisionRenderer.hpp"
+#include "../ACECS/Panels.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -167,7 +168,26 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentVisionRenderer(visionRenderer));
 		};
 	};
+	struct ComponentViewFollow final : public Component {
 
+		void system(Entity& entity) final;
+
+		ComponentViewFollow() {
+			hasSystem = true;
+			panelViewToFollow = PanelName::GameView;
+		};
+		ComponentViewFollow(PanelName _panelViewToFollow) :
+			ComponentViewFollow()
+		{
+			panelViewToFollow = _panelViewToFollow;
+		};
+
+		PanelName panelViewToFollow;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentViewFollow(panelViewToFollow));
+		};
+	};
 }
 
 #endif

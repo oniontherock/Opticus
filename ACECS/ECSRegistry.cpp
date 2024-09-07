@@ -1,5 +1,6 @@
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
+#include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
 uint16_t MAX_COMPONENT_TYPES = 8;
@@ -89,7 +90,10 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(GameLevelGrid::levelGet(0, 0)->levelSize)),
+			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(
+				sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize()),
+				GameLevelGrid::levelGet(0, 0)->levelSize)
+			),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
@@ -112,7 +116,6 @@ using namespace EntityEvents;
 #include "Panels.hpp"
 #include <Graphics/WindowHolder.hpp>
 #include <Auxiliary/ConsoleHandler.hpp>
-#include <Graphics.hpp>
 #include <numeric>
 
 
@@ -207,23 +210,9 @@ void ComponentVisionRenderer::system(Entity& entity) {
 
 		auto& panel = PanelManager::panelGet(PanelName::GameView);
 
-		sf::Vector2f mouseDiff = Vector2fMath::axis(panel.viewGet().getCenter(), positionComponent->position);
-
-		float len = Vector2fMath::length(mouseDiff);
-
-		if (len > 100) len = 100;
-
-		float coneAngle = 135 - (115 * (len / 100));
-
-		std::cout << len << " " << coneAngle << std::endl;
-
-		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation, 1024, coneAngle);
+		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position, rotationComponent->rotation, 1024, 60, panel.viewRect);
 
 		sf::Texture visionTexture;
-
-		static const sf::Vector2u panelSize = GameLevelGrid::levelGet(0, 0)->levelSize;
-
-		visionTexture.create(panelSize.x, panelSize.y);
 		visionTexture.loadFromImage(visionImage);
 
 		sf::Sprite visionSprite;
@@ -255,7 +244,6 @@ void ComponentViewFollow::system(Entity& entity) {
 		float lerp = 0.15f;
 
 		panel.viewMove(posDiff * lerp);
-
 
 		sf::Vector2f mousePos = panel.viewMousePositionGet();
 

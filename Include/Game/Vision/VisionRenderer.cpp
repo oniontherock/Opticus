@@ -8,39 +8,42 @@
 
 VisionRenderer::VisionRenderer() {
 	screenSize = sf::Vector2u(1, 1);
+	worldSize = sf::Vector2u(1, 1);
 
 	visionImage.create(screenSize.x, screenSize.y);
-	memoryTexture.create(screenSize.x, screenSize.y);
+	memoryTexture.create(worldSize.x, worldSize.y);
 }
-VisionRenderer::VisionRenderer(uint16_t sizeX, uint16_t sizeY) {
-	screenSize = sf::Vector2u(sizeX, sizeY);
+VisionRenderer::VisionRenderer(uint16_t screenSizeX, uint16_t screenSizeY, uint16_t worldSizeX, uint16_t worldSizeY) {
+	screenSize = sf::Vector2u(screenSizeX, screenSizeY);;
+	worldSize = sf::Vector2u(worldSizeX, worldSizeY);
 
 	visionImage.create(screenSize.x, screenSize.y);
-	memoryTexture.create(screenSize.x, screenSize.y);
+	memoryTexture.create(worldSize.x, worldSize.y);
 }
-VisionRenderer::VisionRenderer(sf::Vector2u size) {
-	screenSize = size;
+VisionRenderer::VisionRenderer(sf::Vector2u _screenSize, sf::Vector2u _worldSize) {
+	screenSize = _screenSize;
+	worldSize = _worldSize;
 
 	visionImage.create(screenSize.x, screenSize.y);
-	memoryTexture.create(screenSize.x, screenSize.y);
+	memoryTexture.create(worldSize.x, worldSize.y);
 }
 VisionRenderer::VisionRenderer(const VisionRenderer& other) {
-	screenSize = other.screenSize;
+	worldSize = other.worldSize;
 
 	visionImage.create(screenSize.x, screenSize.y);
 
-	memoryTexture.create(screenSize.x, screenSize.y);
+	memoryTexture.create(worldSize.x, worldSize.y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 }
 void VisionRenderer::operator= (const VisionRenderer& other) {
-	screenSize = other.screenSize;
+	worldSize = other.worldSize;
 
 	visionImage.create(screenSize.x, screenSize.y);
 
-	memoryTexture.create(screenSize.x, screenSize.y);
+	memoryTexture.create(worldSize.x, worldSize.y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 }
-sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees) {
+sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees, const sf::FloatRect viewRect) {
 
 	const sf::Color clearColor = sf::Color(0, 0, 0, 0);
 
@@ -53,20 +56,20 @@ sf::Image& VisionRenderer::visionProcess(float posX, float posY, float rotation,
 	float coneAngleRadians = coneAngleDegrees * Mathf::PI / 180.f;
 
 	memoryBlur();
-	visionUpdate(posX, posY, rotation - (coneAngleRadians / 2.f), rayCountTotal, coneAngleRadians);
+	visionUpdate(posX, posY, rotation - (coneAngleRadians / 2.f), rayCountTotal, coneAngleRadians, viewRect);
 	visionMemorize();
 
 	return visionImage;
 }
-sf::Image& VisionRenderer::visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees) {
-	return visionProcess(pos.x, pos.y, rotation, rayCountTotal, coneAngleDegrees);
+sf::Image& VisionRenderer::visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees, const sf::FloatRect viewRect) {
+	return visionProcess(pos.x, pos.y, rotation, rayCountTotal, coneAngleDegrees, viewRect);
 }
 
 const sf::Texture& VisionRenderer::memoryGet() {
 	return memoryTexture.getTexture();
 }
 
-void VisionRenderer::visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians) {
+void VisionRenderer::visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians, const sf::FloatRect viewRect) {
 
 	auto& worldGrid = GameLevelGrid::levelGet(0, 0, 0)->worldGrid;
 
@@ -85,7 +88,7 @@ void VisionRenderer::visionUpdate(float posX, float posY, float rotation, uint32
 		sf::Vector2f rayPosition = rayPositionStarting;
 	
 		float dist = 0;
-		constexpr float desiredDist = 500;
+		constexpr float desiredDist = 550;
 
 		while (dist <= desiredDist) {
 
@@ -94,7 +97,9 @@ void VisionRenderer::visionUpdate(float posX, float posY, float rotation, uint32
 			rayPosition += rayHeading;
 			dist += 1.f;
 
-			if (rayPosition.x < 0 || rayPosition.x >= screenSize.x || rayPosition.y < 0 || rayPosition.y >= screenSize.y) break;
+			if (Vector2fMath::lengthSqrd(rayHeading) <= 0.0001f) break;
+
+			if (rayPosition.x < 0 || rayPosition.x >= worldSize.x || rayPosition.y < 0 || rayPosition.y >= worldSize.y) break;
 
 			sf::Color worldColor = worldImage.getPixel(uint16_t(rayPosition.x), uint16_t(rayPosition.y));
 

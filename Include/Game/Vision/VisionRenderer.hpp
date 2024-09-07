@@ -9,22 +9,24 @@
 struct VisionRenderer {
 
 	VisionRenderer();
-	VisionRenderer(uint16_t sizeX, uint16_t sizeY);
-	VisionRenderer(sf::Vector2u size);
+	VisionRenderer(uint16_t screenSizeX, uint16_t screenSizeY, uint16_t worldSizeX, uint16_t worldSizeY);
+	VisionRenderer(sf::Vector2u _screenSize, sf::Vector2u _worldSize);
 	VisionRenderer(const VisionRenderer& other);
 	void operator= (const VisionRenderer& other);
 
-	sf::Image& visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees);
-	sf::Image& visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees);
+	sf::Image& visionProcess(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleDegrees, const sf::FloatRect viewRect);
+	sf::Image& visionProcess(sf::Vector2f pos, float rotation, uint32_t rayCountTotal, float coneAngleDegrees, const sf::FloatRect viewRect);
 	const sf::Texture& memoryGet();
-private:
 
 	sf::Vector2u screenSize;
+	sf::Vector2u worldSize;
+
+private:
 
 	sf::Image visionImage;
 	sf::RenderTexture memoryTexture;
 
-	void visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians);
+	void visionUpdate(float posX, float posY, float rotation, uint32_t rayCountTotal, float coneAngleRadians, const sf::FloatRect viewRect);
 	void visionMemorize();
 	void memoryBlur();
 };

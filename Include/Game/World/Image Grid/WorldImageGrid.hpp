@@ -7,7 +7,7 @@ typedef sf::Image WorldImage;
 typedef std::vector<WorldImage> WorldImageGrid1D;
 typedef std::vector<WorldImageGrid1D> WorldImageGrid2D;
 
-typedef uint32_t DistortionCellCoordinate;
+typedef uint32_t PixelCoordinate;
 typedef sf::Color PixelColor;
 
 struct WorldImageGrid {
@@ -16,11 +16,11 @@ struct WorldImageGrid {
 	WorldImageGrid2D worldTextureGrid;
 
 	WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float quadrantSizeX, float quadrantSizeY);
-	WorldImage& worldImageFromPixel(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY);
+	WorldImage& worldImageFromPixel(PixelCoordinate pixelX, PixelCoordinate pixelY);
 
-	void pixelSetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY, PixelColor color);
-	const PixelColor pixelGetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY);
-	const PixelColor pixelGetColorSafe(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY);
+	void pixelSetColor(PixelCoordinate pixelX, PixelCoordinate pixelY, PixelColor color);
+	const PixelColor pixelGetColor(PixelCoordinate pixelX, PixelCoordinate pixelY);
+	const PixelColor pixelGetColorSafe(PixelCoordinate pixelX, PixelCoordinate pixelY);
 
 private:
 	sf::Vector2u fullGridSize;

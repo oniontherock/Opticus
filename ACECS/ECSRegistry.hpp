@@ -2,7 +2,7 @@
 #define __ECS_REGISTRY_H__
 
 #include "../Include/Common/Math.hpp"
-#include "../Include/Game/Vision/VisionRenderer.hpp"
+#include "../Include/Game/RayCasting/VisionCaster.hpp"
 #include "../ACECS/Panels.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
@@ -118,16 +118,18 @@ namespace EntityComponents {
 		ComponentPosition() {
 			hasSystem = true;
 		};
-		ComponentPosition(sf::Vector2f _position) :
+		ComponentPosition(WorldPosition _worldPosition) :
 			ComponentPosition()
 		{
-			position = _position;
+			worldPosition = _worldPosition;
+			position = worldPosition.position;
 		};
 
-		sf::Vector2f position;
+		WorldPosition worldPosition;
+		sf::Vector2f& position = worldPosition.position;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentPosition(position));
+			return std::unique_ptr<Duplicatable>(new ComponentPosition(worldPosition));
 		};
 	};
 	struct ComponentRotation final : public Component {
@@ -149,23 +151,23 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentRotation(rotation));
 		};
 	};
-	struct ComponentVisionRenderer final : public Component {
+	struct ComponentVisionDrawer final : public Component {
 
 		void system(Entity& entity) final;
 
-		ComponentVisionRenderer() {
+		ComponentVisionDrawer() {
 			hasSystem = true;
 		};
-		ComponentVisionRenderer(VisionRenderer _vision) :
-			ComponentVisionRenderer()
+		ComponentVisionDrawer(VisionCaster _visionCaster) :
+			ComponentVisionDrawer()
 		{
-			visionRenderer = _vision;
+			visionCaster = _visionCaster;
 		};
 
-		VisionRenderer visionRenderer;
+		VisionCaster visionCaster;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionRenderer(visionRenderer));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(visionCaster));
 		};
 	};
 	struct ComponentViewFollow final : public Component {

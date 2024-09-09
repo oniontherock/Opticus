@@ -44,7 +44,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionRenderer>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 }
 
@@ -90,11 +90,8 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionRenderer>(VisionRenderer(
-				sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize()),
-				GameLevelGrid::levelGet(0, 0)->levelSize)
-			),
-			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
+			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster()),
+			//createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
 }
@@ -110,7 +107,6 @@ using namespace EntityEvents;
 #include "../Include/Common/TimeHandler.hpp"
 #include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/Vision/VisionRenderer.hpp"
 #include <iostream>
 #include <Input.hpp>
 #include "Panels.hpp"
@@ -199,7 +195,7 @@ void ComponentSprite::system(Entity& entity) {
 		}
 	}
 }
-void ComponentVisionRenderer::system(Entity& entity) {
+void ComponentVisionDrawer::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
@@ -208,26 +204,10 @@ void ComponentVisionRenderer::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		auto& panel = PanelManager::panelGet(PanelName::GameView);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation, Mathf::TAU / 6.f, 1024);
 
-		sf::Image& visionImage = visionRenderer.visionProcess(positionComponent->position, rotationComponent->rotation, 1024, 60, panel.viewRect);
+		const sf::Sprite& visionSprite = visionCaster.visionSpriteGet();
 
-		sf::Texture visionTexture;
-		visionTexture.loadFromImage(visionImage);
-
-		sf::Sprite visionSprite;
-		visionSprite.setTexture(visionTexture);
-
-		sf::Shader grayScaleShader;
-		grayScaleShader.loadFromFile("Include/Shaders/GrayScale.glsl", sf::Shader::Fragment);
-
-		const sf::Texture& memoryTexture = visionRenderer.memoryGet();
-
-		sf::Sprite memorySprite;
-		memorySprite.setTexture(memoryTexture);
-
-
-		gameViewPanel.objectDraw(memorySprite, grayScaleShader);
 		gameViewPanel.objectDraw(visionSprite);
 	}
 }

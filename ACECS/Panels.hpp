@@ -1,7 +1,7 @@
 #ifndef __PANELS_H__
 #define __PANELS_H__
 
-#include "Graphics/Panel.hpp"
+#include <Graphics.hpp>
 
 enum PanelTypes : uint16_t {
 	GameView,

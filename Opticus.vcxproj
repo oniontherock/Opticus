@@ -137,10 +137,11 @@
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\WorldGrid.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\DistortionFunctions.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortionGrid.cpp" />
-    <ClCompile Include="Include\Game\Vision\VisionRenderer.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\RayCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldImageGrid.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
@@ -173,9 +174,10 @@
     <ClInclude Include="Include\Common\NumberGenerator.hpp" />
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\DistortionFunctions.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
-    <ClInclude Include="Include\Game\Vision\VisionRenderer.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
     <ClInclude Include="Include\Game\World\Image Grid\WorldImageGrid.hpp" />
     <ClInclude Include="Include\Game\World\WorldGrid.hpp" />
     <ClInclude Include="OpenGL\glad.h" />

@@ -21,19 +21,19 @@ WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float qua
 	worldTextureGrid = std::move(rows);
 }
 
-WorldImage& WorldImageGrid::worldImageFromPixel(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY) {
+WorldImage& WorldImageGrid::worldImageFromPixel(PixelCoordinate pixelX, PixelCoordinate pixelY) {
 	return worldTextureGrid[static_cast<uint32_t>(pixelX / textureQuadrantSize.x)][static_cast<uint32_t>(pixelY / textureQuadrantSize.y)];
 }
 
-void WorldImageGrid::pixelSetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY, PixelColor color) {
+void WorldImageGrid::pixelSetColor(PixelCoordinate pixelX, PixelCoordinate pixelY, PixelColor color) {
 	worldImageFromPixel(pixelX, pixelY).setPixel(pixelX, pixelY, color);
 }
 
-const PixelColor WorldImageGrid::pixelGetColor(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY) {
+const PixelColor WorldImageGrid::pixelGetColor(PixelCoordinate pixelX, PixelCoordinate pixelY) {
 	return worldImageFromPixel(pixelX, pixelY).getPixel(pixelX, pixelY);
 }
 
-const PixelColor WorldImageGrid::pixelGetColorSafe(DistortionCellCoordinate pixelX, DistortionCellCoordinate pixelY) {
+const PixelColor WorldImageGrid::pixelGetColorSafe(PixelCoordinate pixelX, PixelCoordinate pixelY) {
 	if (pixelX < 0 || pixelX >= fullGridSize.x || pixelY < 0 || pixelY >= fullGridSize.y) return sf::Color::Black;
 
 	return pixelGetColor(pixelX, pixelY);

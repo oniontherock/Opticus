@@ -11,7 +11,7 @@ typedef std::vector<WorldDistortion> WorldDistortionGrid1D;
 typedef std::vector<WorldDistortionGrid1D> WorldDistortionGrid2D;
 
 typedef uint32_t DistortionCellCoordinate;
-typedef sf::Vector2i DistortionCellVector;
+typedef sf::Vector2u DistortionCellVector;
 
 struct WorldDistortionGrid {
 	sf::Vector2f distortionCellSize;

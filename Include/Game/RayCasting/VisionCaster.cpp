@@ -60,8 +60,11 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	// the angular difference (in radians) between two rays.
 	const float rayAngleDifference = coneSize / rayCount;
 
-	auto& worldImage = gameLevel->worldGrid.imageGrid.worldImageFromPixel(0, 0);
+	if (castPosition.position.x < 0 || castPosition.position.x >= gameLevel->levelSize.x || castPosition.position.y < 0 || castPosition.position.y >= gameLevel->levelSize.y) {
+		return;
 	
+	}
+	auto& worldImage = gameLevel->worldGrid.imageGrid.worldImageFromPixel(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
 
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 
@@ -75,6 +78,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
+
 		// the maximum assumed distance a ray can travel
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
@@ -84,9 +88,11 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
 		for (float curDist = 0.f; curDist < maxDist; curDist++) {
-
-			// apply the distortion at the rayPosition to the rayHeading.
-			gameLevel->worldGrid.distortionGrid.headingApplyDistortion(rayHeading, DistortionCellCoordinate(rayPosition.x), DistortionCellCoordinate(rayPosition.y));
+			// check if there are any distortions at the ray's position
+			if (gameLevel->worldGrid.distortionGrid.worldDistortionGrid[uint32_t(rayPosition.x)][uint32_t(rayPosition.y)].distortions.size() > 0) {
+				// apply the distortion at the rayPosition to the ray.
+				gameLevel->worldGrid.distortionGrid.worldDistortionGrid[uint32_t(rayPosition.x)][uint32_t(rayPosition.y)].headingApplyDistortion(rayHeading, rayPosition);
+			}
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
 			rayPosition += rayHeading;
@@ -132,7 +138,7 @@ void VisionCaster::memoryUpdate() {
 void VisionCaster::memoryBlur() {
 
 	// get simulated delta
-	double delta = TimeHandler::deltaSimulatedGet();
+	float delta = float(TimeHandler::deltaSimulatedGet());
 
 	// update the blurCooldown, if it is ready, blur the memoryTexture a bit
 	if (blurCooldown.updateAutoReset(delta)) {

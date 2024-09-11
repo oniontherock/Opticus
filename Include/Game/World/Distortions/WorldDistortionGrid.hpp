@@ -1,7 +1,7 @@
 #ifndef __WORLD_DISTORTION_GRID_H__
 #define __WORLD_DISTORTION_GRID_H__
 
-#include "DistortionFunctions.hpp"
+#include "WorldDistortion.hpp"
 #include "SFML/System/Vector2.hpp"
 #include <functional>
 #include <string>
@@ -21,12 +21,6 @@ struct WorldDistortionGrid {
 
 	void pixelSetDistortion(DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY, WorldDistortion distortion);
 	const WorldDistortion pixelGetDistortion(DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY);
-
-	void headingApplyDistortion(sf::Vector2f& heading, DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY);
-	void headingApplyDistortion(sf::Vector2f& heading, DistortionCellVector distortionCell);
-
-	void headingApplyDistortionSafe(sf::Vector2f& heading, DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY);
-	void headingApplyDistortionSafe(sf::Vector2f& heading, DistortionCellVector distortionCell);
 
 private:
 	sf::Vector2u gridSize;

@@ -18,27 +18,4 @@ const WorldDistortion WorldDistortionGrid::pixelGetDistortion(DistortionCellCoor
 	return worldDistortionGrid[distortionCellX][distortionCellY];
 }
 
-void WorldDistortionGrid::headingApplyDistortion(sf::Vector2f& heading, DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY) {
-	worldDistortionGrid[distortionCellX][distortionCellY].headingApplyDistortion(heading);
-}
-
-void WorldDistortionGrid::headingApplyDistortion(sf::Vector2f& heading, DistortionCellVector distortionCell) {
-	headingApplyDistortion(heading, distortionCell.x, distortionCell.x);
-}
-
-void WorldDistortionGrid::headingApplyDistortionSafe(sf::Vector2f& heading, DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY) {
-	if (distortionCellX < 0 || distortionCellX >= gridSize.x || distortionCellY < 0 || distortionCellY >= gridSize.y) {
-		
-		std::cout << distortionCellX << " " << distortionCellY << std::endl;
-
-		return;
-	}
-
-	headingApplyDistortion(heading, distortionCellX, distortionCellY);
-}
-
-void WorldDistortionGrid::headingApplyDistortionSafe(sf::Vector2f& heading, DistortionCellVector distortionCell) {
-	headingApplyDistortionSafe(heading, distortionCell.x, distortionCell.x);
-}
-
 

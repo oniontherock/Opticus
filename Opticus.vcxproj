@@ -140,7 +140,7 @@
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Game\RayCasting\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\WorldGrid.cpp" />
-    <ClCompile Include="Include\Game\World\Distortions\DistortionFunctions.cpp" />
+    <ClCompile Include="Include\Game\World\Distortions\WorldDistortion.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortionGrid.cpp" />
     <ClCompile Include="Include\Game\RayCasting\RayCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldImageGrid.cpp" />
@@ -177,7 +177,7 @@
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
     <ClInclude Include="Include\Game\RayCasting\VisionCaster.hpp" />
-    <ClInclude Include="Include\Game\World\Distortions\DistortionFunctions.hpp" />
+    <ClInclude Include="Include\Game\World\Distortions\WorldDistortion.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
     <ClInclude Include="Include\Game\World\Image Grid\WorldImageGrid.hpp" />

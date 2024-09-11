@@ -44,5 +44,4 @@ uint32_t TimeHandler::timeRealGet() {
 }
 uint32_t TimeHandler::timeSimulatedGet() {
 	return timeSimulatedCur;
-
 }

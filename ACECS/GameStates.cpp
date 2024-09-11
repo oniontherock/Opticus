@@ -61,9 +61,14 @@ void GameStatePlay::gameStateStart() {
 		}
 	}
 
-	for (uint32_t x = 320; x < 640; x++) {
-		for (uint32_t y = 0; y < 360; y++) {
-			//gameLevel->worldGrid.distortionGrid.pixelSetDistortion(x, y, WorldDistortion(uint16_t(3)));
+	for (uint32_t x = 320; x < 1280; x++) {
+		for (uint32_t y = 0; y < 720; y++) {
+
+			//Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
+			//	position.x = 100;
+			//	}, Cooldown(x/100.f));
+
+			//gameLevel->worldGrid.distortionGrid.pixelSetDistortion(x, y, WorldDistortion(distortion));
 		}
 	}
 

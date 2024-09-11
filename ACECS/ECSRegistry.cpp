@@ -39,13 +39,13 @@ void EntityComponents::componentIDsInitialize() {
 
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 }
 
 #pragma endregion Components
@@ -91,7 +91,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster()),
-			//createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
+			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
 }
@@ -204,9 +204,14 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation, Mathf::TAU / 6.f, 1024);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 1024);
 
-		const sf::Sprite& visionSprite = visionCaster.visionSpriteGet();
+		sf::Texture visionTexture;
+		visionTexture.loadFromImage(visionCaster.visionImageGet());
+		
+		sf::Sprite visionSprite;
+		visionSprite.setTexture(visionTexture);
+		visionSprite.setPosition(gameViewPanel.viewRect.getPosition());
 
 		gameViewPanel.objectDraw(visionSprite);
 	}

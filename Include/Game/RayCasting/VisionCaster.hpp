@@ -18,22 +18,13 @@ struct VisionCaster : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) override;
 
-	const sf::Sprite& visionSpriteGet();
-	const sf::Sprite& memorySpriteGet();
+	const sf::Image& visionImageGet();
+	const sf::RenderTexture& renderTextureGet();
 
 protected:
+	
 	sf::Image visionImage;
 	sf::RenderTexture memoryTexture;
-
-	// a sprite created from visionImage, updated in the spritesUpdate() function.
-	// this is only really used in visionSpriteRetrieve, but it's stored in the class so it doesn't have to be created every call of visionSpriteGet.
-	sf::Sprite visionSprite;
-	// a sprite created from memoryTexture, updated in the spritesUpdate() function.
-	// this is only really used in memorySpriteRetrieve, but it's stored in the class so it doesn't have to be created every call of memorySpriteGet.
-	sf::Sprite memorySprite;
-
-	// updates visionSprite and memorySprite.
-	void spritesUpdate();
 
 	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
 	void memoryUpdate();

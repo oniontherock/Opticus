@@ -8,72 +8,62 @@ VisionCaster::VisionCaster() {
 	memoryTexture.create(roomSize.x, roomSize.y);
 }
 VisionCaster::VisionCaster(const VisionCaster& other) {
-	visionImage = other.visionImage;
+	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
+	visionImage.create(panelSize.x, panelSize.y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
-
-	visionSprite = other.visionSprite;
-	memorySprite = other.memorySprite;
 
 	castPosition = other.castPosition;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
-	visionImage = other.visionImage;
+	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
+	visionImage.create(panelSize.x, panelSize.y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 
-	visionSprite = other.visionSprite;
-	memorySprite = other.memorySprite;
-
 	castPosition = other.castPosition;
+}
+
+const sf::Image& VisionCaster::visionImageGet() {
+	return visionImage;
+}
+const sf::RenderTexture& VisionCaster::renderTextureGet() {
+	return memoryTexture;
 }
 
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
 
+	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
+	visionImage.create(panelSize.x, panelSize.y);
+
 	castPosition = sf::Vector2f(fromX, fromY);
 
-	spritesUpdate();
 	raysCast(angleTo, coneSize, rayCount);
-}
-const sf::Sprite& VisionCaster::visionSpriteGet() {
-	return visionSprite;
-}
-const sf::Sprite& VisionCaster::memorySpriteGet() {
-	return memorySprite;
-}
-void VisionCaster::spritesUpdate() {
-
-	// get texture from visionImage
-	sf::Texture visionTexture;
-	visionTexture.loadFromImage(visionImage);
-	// create sprite from vision texture.
-	visionSprite.setTexture(visionTexture);
-	visionSprite.setPosition(castPosition.position - (PanelManager::panelGet(PanelName::GameView).viewGet().getSize() / 2.f));
-
-	memoryTexture.display();
-	memorySprite.setTexture(memoryTexture.getTexture());
 }
 
 void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
-	// the rectangle of the visionImage, used for checking if a position is in vision bounds
-	const sf::FloatRect visionImageRect = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(visionImage.getSize()));
 	// the center of the visionImage
-	const sf::Vector2f visionImageCenter = visionImageRect.getSize() / 2.f;
-	// the rectangle of the level, used for checking if a position is in level bounds
-	const sf::FloatRect levelRect = sf::FloatRect(sf::Vector2f(0, 0), sf::Vector2f(gameLevel->levelSize));
+	const sf::Vector2f visionImageCenter = sf::Vector2f(visionImage.getSize()) / 2.f;
+	// center of the GameView panel's view in global room coordinates
+	const sf::Vector2f cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
+	// center of the GameView panel's view localized around the global cast position,
+	const sf::Vector2f cameraCenterLocal = cameraCenterGlobal - castPosition.position;
 
 	// the angular difference (in radians) between two rays.
 	const float rayAngleDifference = coneSize / rayCount;
 
+	auto& worldImage = gameLevel->worldGrid.imageGrid.worldImageFromPixel(0, 0);
+	
+
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 
 		// the rotation (in radians) of the current ray.
-		const float rayRotation = (angleTo - (coneSize / 2.f)) + (float(curRayInd) * rayAngleDifference);
+		const float rayRotation = angleTo + (float(curRayInd) * rayAngleDifference);
 		// the original/unmodified heading of a ray.
 		// this is the heading before applying distortions, will be the same to rayHeading in a distortionless environment.
 		// used for determining the pixel in the visionImage to write at, because the visionImage should be written to as if there were no distortions.
@@ -82,7 +72,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
-		constexpr float maxDist = 250.f;
+		constexpr float maxDist = 525;
 
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
@@ -90,27 +80,30 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		for (float curDist = 0.f; curDist < maxDist; curDist++) {
 
 			// apply the distortion at the rayPosition to the rayHeading.
-			gameLevel->worldGrid.distortionGrid.headingApplyDistortion(rayHeading, sf::Vector2u(rayPosition));
+			gameLevel->worldGrid.distortionGrid.headingApplyDistortion(rayHeading, DistortionCellCoordinate(rayPosition.x), DistortionCellCoordinate(rayPosition.y));
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
 			rayPosition += rayHeading;
 			// make sure the rayPosition is in the bounds of the level.
-			if (!levelRect.contains(rayPosition)) break;
+			if (rayPosition.x < 0 || rayPosition.x >= gameLevel->levelSize.x || rayPosition.y < 0 || rayPosition.y >= gameLevel->levelSize.y) break;
 
+			sf::Color worldPixelColor = worldImage.getPixel(uint32_t(rayPosition.x), uint32_t(rayPosition.y));
 
-			sf::Vector2f visionPixelCoordinate = visionImageCenter + (rayHeadingOrig * curDist);
-			if (!visionImageRect.contains(visionPixelCoordinate)) break;
-
-			//sf::Color worldPixelColor = gameLevel->worldGrid.imageGrid.pixelGetColor(PixelCoordinate(rayPosition.x), PixelCoordinate(rayPosition.y));
+			// this is a little complicated.
+			// remember that the visionImage is the same size as the camera, and when we draw to the visionImage we draw local to the center of the visionImage/camera.
+			// but the camera isn't locked directly to the player,
+			// that means that if we only draw in the center of the visionImage, and the player isn't directly in the center of the camera,
+			// then the rays will be drawn in the wrong position.
+			// so we offset the position the rays are drawn at by the amount the camera is offset from the player, and thus they are drawn at the correct position.
+			sf::Vector2f visionPixel = (visionImageCenter - cameraCenterLocal) + (rayHeadingOrig * curDist);
+			if (visionPixel.x < 0 || visionPixel.x >= visionImage.getSize().x || visionPixel.y < 0 || visionPixel.y >= visionImage.getSize().y) break;
 			
-			//std::cout << 1 << std::endl;
-
-			visionImage.setPixel(25, 25, sf::Color(0, 255, 0, 255));
+			visionImage.setPixel(uint32_t(visionPixel.x), uint32_t(visionPixel.y), worldPixelColor);
 		}
 	}
 }
 void VisionCaster::memoryUpdate() {
-	memoryTexture.draw(visionSpriteGet());
+	//memoryTexture.draw();
 }
 void VisionCaster::memoryBlur() {
 

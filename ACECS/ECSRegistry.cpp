@@ -206,6 +206,11 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 1024);
 
+		sf::Sprite memorySprite;
+		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
+
+		gameViewPanel.objectDraw(memorySprite);
+
 		sf::Texture visionTexture;
 		visionTexture.loadFromImage(visionCaster.visionImageGet());
 		
@@ -214,6 +219,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		visionSprite.setPosition(gameViewPanel.viewRect.getPosition());
 
 		gameViewPanel.objectDraw(visionSprite);
+
 	}
 }
 void ComponentViewFollow::system(Entity& entity) {

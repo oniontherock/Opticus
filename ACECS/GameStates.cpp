@@ -21,6 +21,8 @@ void GameStatePlay::gameStateUpdate() {
 }
 
 void GameStatePlay::gameStateStart() {
+
+	GameLevel* gameLevel = GameLevelGrid::levelGet(0, 0, 0);
 	
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
 
@@ -61,7 +63,7 @@ void GameStatePlay::gameStateStart() {
 
 	for (uint32_t x = 320; x < 640; x++) {
 		for (uint32_t y = 0; y < 360; y++) {
-			//WorldDistortionGrid::pixelSetDistortion(x, y, WorldDistortion(uint16_t(3)));
+			//gameLevel->worldGrid.distortionGrid.pixelSetDistortion(x, y, WorldDistortion(uint16_t(3)));
 		}
 	}
 

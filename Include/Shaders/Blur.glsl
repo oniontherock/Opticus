@@ -1,34 +1,31 @@
 uniform sampler2D texture;
-uniform vec2 dir;
-uniform float blur;
+uniform float directions; // LOWER IS FASTER
+uniform float quality; // LOWER IS FASTER
+uniform float size;
 
 void main() {
-   
-	// RGBA sum
-	vec4 sum = vec4(0.0);
 
-	vec2 tc = gl_TexCoord[0].xy;
+    vec2 resolution = vec2(textureSize(texture, 0));
 
-	float blur = 1.0 / blur;
+    float TAU = 6.28318530718;
 
-	float hstep = dir.x;
-	float vstep = dir.y;
+    vec2 radius = size / resolution;
 
-	//apply blurring, using a 9-tap filter with predefined gaussian weights
+    // Normalized pixel coordinates (from 0 to 1)
+    vec2 uv = gl_FragCoord.xy / resolution;
 
-	sum += texture2D(texture, vec2(tc.x - 4.0*blur*hstep, tc.y - 4.0*blur*vstep)) * 0.0162162162;
-	sum += texture2D(texture, vec2(tc.x - 3.0*blur*hstep, tc.y - 3.0*blur*vstep)) * 0.0540540541;
-	sum += texture2D(texture, vec2(tc.x - 2.0*blur*hstep, tc.y - 2.0*blur*vstep)) * 0.1216216216;
-	sum += texture2D(texture, vec2(tc.x - 1.0*blur*hstep, tc.y - 1.0*blur*vstep)) * 0.1945945946;
-	sum += texture2D(texture, vec2(tc.x, tc.y)) * 0.2270270270;
-	sum += texture2D(texture, vec2(tc.x + 1.0*blur*hstep, tc.y + 1.0*blur*vstep)) * 0.1945945946;
-	sum += texture2D(texture, vec2(tc.x + 2.0*blur*hstep, tc.y + 2.0*blur*vstep)) * 0.1216216216;
-	sum += texture2D(texture, vec2(tc.x + 3.0*blur*hstep, tc.y + 3.0*blur*vstep)) * 0.0540540541;
-	sum += texture2D(texture, vec2(tc.x + 4.0*blur*hstep, tc.y + 4.0*blur*vstep)) * 0.0162162162;
+    vec4 sum = vec4(0.0);
 
-	vec3 color = sum.rgb;
+    // Blur calculations
+    for(float d = 0.0; d < TAU; d += TAU / directions) {
+		for(float i = 1.0 / quality; i <= 1.001; i += 1.0 / quality) {
+			sum += texture2D(texture, uv+vec2(cos(d),sin(d))*radius*i);		
+        }
+    }
+    
+    // divide sum by the amount of pixels sampled (which is the quality * directions).
+    sum /= quality * directions;
 
-	float fragAlpha = texture2D(texture, gl_TexCoord[0].xy).a;
-
-	gl_FragColor = vec4(color, fragAlpha) / 1.005;
+    gl_FragColor = sum;
 }
+

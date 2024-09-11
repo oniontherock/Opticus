@@ -4,6 +4,8 @@
 #include "../ACECS/GameLevel.hpp"
 #include "../ACECS/Panels.hpp"
 #include "RayCaster.hpp"
+#include "../../Common/TimeHandler.hpp"
+#include "../../Common/Cooldown.hpp"
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 
@@ -25,6 +27,8 @@ protected:
 	
 	sf::Image visionImage;
 	sf::RenderTexture memoryTexture;
+
+	Cooldown blurCooldown = Cooldown(0.1f);
 
 	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
 	void memoryUpdate();

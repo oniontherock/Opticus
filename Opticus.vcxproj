@@ -136,6 +136,7 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
+    <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Game\RayCasting\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\WorldGrid.cpp" />
@@ -152,7 +153,7 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-system-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
     <None Include="Include\Shaders\Blur.glsl" />
-    <None Include="Include\Shaders\GrayScale.glsl" />
+    <None Include="Include\Shaders\Grayscale.glsl" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
     <Text Include="readme.txt">
@@ -170,6 +171,7 @@
     <ClInclude Include="ACECS\GameLevel.hpp" />
     <ClInclude Include="ACECS\GameStates.hpp" />
     <ClInclude Include="ACECS\Panels.hpp" />
+    <ClInclude Include="Include\Common\Cooldown.hpp" />
     <ClInclude Include="Include\Common\Math.hpp" />
     <ClInclude Include="Include\Common\NumberGenerator.hpp" />
     <ClInclude Include="Include\Common\TimeHandler.hpp" />

@@ -8,8 +8,7 @@ VisionCaster::VisionCaster() {
 	memoryTexture.create(roomSize.x, roomSize.y);
 }
 VisionCaster::VisionCaster(const VisionCaster& other) {
-	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
-	visionImage.create(panelSize.x, panelSize.y);
+	visionImage.create(other.visionImage.getSize().x, other.visionImage.getSize().y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
@@ -17,8 +16,7 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 	castPosition = other.castPosition;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
-	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
-	visionImage.create(panelSize.x, panelSize.y);
+	visionImage.create(other.visionImage.getSize().x, other.visionImage.getSize().y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
@@ -35,12 +33,17 @@ const sf::RenderTexture& VisionCaster::renderTextureGet() {
 
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
 
+	// clear the visionImage by creating a new image and masking out the color black (which is the default color a new image has), thus creating a totally transparent image
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
 	visionImage.create(panelSize.x, panelSize.y);
+	visionImage.createMaskFromColor(sf::Color::Black);
 
 	castPosition = sf::Vector2f(fromX, fromY);
 
+	// cast the rays, updating the visionImage
 	raysCast(angleTo, coneSize, rayCount);
+	// update the memory, this blurs the memory then adds a grayscaled version of the visionImage to it
+	memoryUpdate();
 }
 
 void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
@@ -72,6 +75,9 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
+		// the maximum assumed distance a ray can travel
+		// note the "assumed", because the ray may have moved more or less, due to distortions.
+		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
 		constexpr float maxDist = 525;
 
 		// the assumed dist that the ray has moved.
@@ -103,10 +109,46 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	}
 }
 void VisionCaster::memoryUpdate() {
-	//memoryTexture.draw();
+	// blur the memory
+	memoryBlur();
+
+	// create a texture from the visionImage
+	sf::Texture visionTexture;
+	visionTexture.loadFromImage(visionImage);
+	// create a sprite from the visionTexture
+	sf::Sprite visionSprite(visionTexture);
+	// set the visionSprite's position to that of the camera
+	visionSprite.setPosition(PanelManager::panelGet(PanelName::GameView).viewRect.getPosition());
+
+	// load the grayscale shader
+	sf::Shader grayscaleShader;
+	grayscaleShader.loadFromFile("Include/Shaders/Grayscale.glsl", sf::Shader::Fragment);
+
+	// draw the visionSprite to the memoryTexture with a grayscale applied
+	memoryTexture.draw(visionSprite, &grayscaleShader);
+	// display the memoryTexture
+	memoryTexture.display();
 }
 void VisionCaster::memoryBlur() {
 
+	// get simulated delta
+	double delta = TimeHandler::deltaSimulatedGet();
+
+	// update the blurCooldown, if it is ready, blur the memoryTexture a bit
+	if (blurCooldown.updateAutoReset(delta)) {
+		// create a sprite from the memoryTexture
+		sf::Sprite memorySprite(memoryTexture.getTexture());
+
+		// load the blur shader
+		sf::Shader blurShader;
+		blurShader.loadFromFile("Include/Shaders/Blur.glsl", sf::Shader::Fragment);
+		blurShader.setUniform("directions", 4.f);
+		blurShader.setUniform("quality", 8.f);
+		blurShader.setUniform("size", 1.f);
+
+		// draw to the memoryTexture with the memorySprite with the blur shader applied, effectively bluring the memory.
+		memoryTexture.draw(memorySprite, &blurShader);
+	}
 }
 
 

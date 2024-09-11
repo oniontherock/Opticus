@@ -39,13 +39,13 @@ void EntityComponents::componentIDsInitialize() {
 
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 }
 
 #pragma endregion Components

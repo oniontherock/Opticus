@@ -1,21 +1,19 @@
 #include "WorldDistortionGrid.hpp"
 #include <iostream>
 
-WorldDistortionGrid::WorldDistortionGrid(uint32_t gridSizeX, uint32_t gridSizeY, float distortionCellSizeX, float distortionCellSizeY) {
+WorldDistortionGrid::WorldDistortionGrid(uint32_t gridSizeX, uint32_t gridSizeY) {
 
-	gridSize = sf::Vector2u(gridSizeX, gridSizeY);
+	gridSize = sf::Vector2u(gridSizeX * distortionCellMultiplierX, gridSizeY * distortionCellMultiplierY);
 
-	distortionCellSize = sf::Vector2f(distortionCellSizeX, distortionCellSizeY);
-
-	worldDistortionGrid = WorldDistortionGrid2D(gridSizeX, WorldDistortionGrid1D(gridSizeY, WorldDistortion()));
+	worldDistortionGrid = WorldDistortionGrid2D(gridSizeX * distortionCellMultiplierX, WorldDistortionGrid1D(gridSizeY * distortionCellMultiplierY, WorldDistortion()));
 }
 
 void WorldDistortionGrid::pixelSetDistortion(DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY, WorldDistortion distortion) {
-	worldDistortionGrid[distortionCellX][distortionCellY] = distortion;
+	worldDistortionGrid[distortionCellX * distortionCellMultiplierX][distortionCellY * distortionCellMultiplierY] = distortion;
 }
 
-const WorldDistortion WorldDistortionGrid::pixelGetDistortion(DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY) {
-	return worldDistortionGrid[distortionCellX][distortionCellY];
+WorldDistortion& WorldDistortionGrid::pixelGetDistortion(DistortionCellCoordinate distortionCellX, DistortionCellCoordinate distortionCellY) {
+	return worldDistortionGrid[distortionCellX * distortionCellMultiplierX][distortionCellY * distortionCellMultiplierY];
 }
 
 

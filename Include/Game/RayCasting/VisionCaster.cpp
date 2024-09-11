@@ -64,7 +64,10 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		return;
 	
 	}
+	
 	auto& worldImage = gameLevel->worldGrid.imageGrid.worldImageFromPixel(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
+
+	auto& distortionGrid = gameLevel->worldGrid.distortionGrid;
 
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 
@@ -88,10 +91,15 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
 		for (float curDist = 0.f; curDist < maxDist; curDist++) {
+
+			auto& distortion = distortionGrid.worldDistortionGrid
+				[uint32_t(rayPosition.x * distortionGrid.distortionCellMultiplierX)]
+				[uint32_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)];
+
 			// check if there are any distortions at the ray's position
-			if (gameLevel->worldGrid.distortionGrid.worldDistortionGrid[uint32_t(rayPosition.x)][uint32_t(rayPosition.y)].distortions.size() > 0) {
+			if (distortion.distortions.size() > 0) {
 				// apply the distortion at the rayPosition to the ray.
-				gameLevel->worldGrid.distortionGrid.worldDistortionGrid[uint32_t(rayPosition.x)][uint32_t(rayPosition.y)].headingApplyDistortion(rayHeading, rayPosition);
+				distortion.headingApplyDistortion(rayHeading, rayPosition);
 			}
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.

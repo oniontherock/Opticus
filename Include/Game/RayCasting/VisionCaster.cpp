@@ -101,6 +101,9 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 				// apply the distortion at the rayPosition to the ray.
 				distortion.headingApplyDistortion(rayHeading, rayPosition);
 			}
+
+			if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
+
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
 			rayPosition += rayHeading;

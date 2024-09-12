@@ -74,6 +74,7 @@ void GameStatePlay::gameStateStart() {
 	}
 
 	EntityManager::entityCreate(0, 0, 0, "Player");
+	EntityManager::entityCreate(0, 0, 0, "Distortion");
 }
 
 void GameStatePause::gameStateUpdate() {

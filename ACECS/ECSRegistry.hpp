@@ -190,6 +190,27 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentViewFollow(panelViewToFollow));
 		};
 	};
+	struct ComponentDistortionRadius final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentDistortionRadius() {
+			hasSystem = true;
+		};
+		ComponentDistortionRadius(float _distortionRadius, Distortion _distortion) :
+			ComponentDistortionRadius()
+		{
+			distortionRadius = _distortionRadius;
+			distortion = _distortion;
+		};
+
+		float distortionRadius;
+		Distortion distortion;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentDistortionRadius(distortionRadius, distortion));
+		};
+	};
 }
 
 #endif

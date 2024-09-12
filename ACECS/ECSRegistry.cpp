@@ -3,8 +3,8 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 8;
-uint16_t MAX_EVENT_TYPES = 4;
+uint16_t MAX_COMPONENT_TYPES = 9;
+uint16_t MAX_EVENT_TYPES = 3;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -42,6 +42,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
@@ -92,6 +93,20 @@ void EntityComponents::componentTemplatesInitialize() {
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster()),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
+		}
+		);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
+		"Skipper",
+		{
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentPosition>(WorldPosition(0, 0, 0, 64.f, 64.f)),
+			createComponentPairFromType<ComponentDistortionRadius>(16.f, Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
+			position += heading * 16.f;
+				}, Cooldown(0.01f))),
 		}
 		);
 }
@@ -248,7 +263,24 @@ void ComponentViewFollow::system(Entity& entity) {
 		panel.viewMove(mouseDiff);
 	}
 }
+void ComponentDistortionRadius::system(Entity& entity) {
+	if (!entity.entityComponentHas<ComponentPosition>()) return;
 
+	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+	for (float offsetX = -distortionRadius / 2.f; offsetX <= +distortionRadius / 2.f; offsetX += 1.f) {
+		for (float offsetY = -distortionRadius / 2.f; offsetY <= +distortionRadius / 2.f; offsetY += 1.f) {
+
+			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (distortionRadius * distortionRadius) / (2.f * 2.f)) continue;
+
+			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldGrid.distortionGrid.pixelSetDistortionSafe(
+				uint32_t(positionComponent->position.x + offsetX),
+				uint32_t(positionComponent->position.y + offsetY),
+				WorldDistortion(distortion)
+			);
+		}
+	}
+}
 
 #pragma endregion Systems
 

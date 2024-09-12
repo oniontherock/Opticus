@@ -61,12 +61,13 @@ void GameStatePlay::gameStateStart() {
 		}
 	}
 
+	Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
+		heading *= 0.99f;
+		}, Cooldown(INFINITY));
+
 	for (uint32_t x = 320; x < 1280; x++) {
 		for (uint32_t y = 0; y < 720; y++) {
 
-			Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
-				position.x = 100;
-				}, Cooldown(INFINITY));
 
 			gameLevel->worldGrid.distortionGrid.pixelSetDistortion(x, y, WorldDistortion(distortion));
 		}

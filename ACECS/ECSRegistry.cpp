@@ -106,7 +106,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentPosition>(WorldPosition(0, 0, 0, 64.f, 64.f)),
 			createComponentPairFromType<ComponentDistortionRadius>(16.f, Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
 			position += heading * 16.f;
-				}, Cooldown(0.01f))),
+				}, Cooldown(0.1f))),
 		}
 		);
 }

@@ -127,6 +127,7 @@ IntegerNumberGenerator<T> RNGi<T>::generator;
 using RNGi16 = RNGi<int16_t>;
 using RNGi32 = RNGi<int32_t>;
 using RNGi64 = RNGi<int64_t>;
+using RNGu8 = RNGi<uint8_t>;
 using RNGu16 = RNGi<uint16_t>;
 using RNGu32 = RNGi<uint32_t>;
 using RNGu64 = RNGi<uint64_t>;

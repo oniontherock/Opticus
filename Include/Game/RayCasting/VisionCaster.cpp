@@ -57,6 +57,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	// center of the GameView panel's view localized around the global cast position,
 	const sf::Vector2f cameraCenterLocal = cameraCenterGlobal - castPosition.position;
 
+
 	// the angular difference (in radians) between two rays.
 	const float rayAngleDifference = coneSize / rayCount;
 
@@ -65,7 +66,13 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	
 	}
 	
-	auto& worldImage = gameLevel->worldGrid.imageGrid.worldImageFromPixel(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
+
+	// the maximum assumed distance a ray can travel
+	// note the "assumed", because the ray may have moved more or less, due to distortions.
+	// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
+	constexpr float maxDist = 525;
+
+	auto* worldImage = &gameLevel->worldGrid.imageGrid.worldImageFromPixel(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
 
 	auto& distortionGrid = gameLevel->worldGrid.distortionGrid;
 
@@ -82,19 +89,18 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
 
-		// the maximum assumed distance a ray can travel
-		// note the "assumed", because the ray may have moved more or less, due to distortions.
-		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
-		constexpr float maxDist = 525;
+
 
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
-		for (float curDist = 0.f; curDist < maxDist; curDist++) {
+		float curDist = 0.f;
+		while (curDist < maxDist) {
+			curDist += 1.f;
 
 			auto& distortion = distortionGrid.worldDistortionGrid
-				[uint32_t(rayPosition.x * distortionGrid.distortionCellMultiplierX)]
-				[uint32_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)];
+				[rayPosition.x * distortionGrid.distortionCellMultiplierX]
+				[rayPosition.y * distortionGrid.distortionCellMultiplierY];
 
 			// check if there are any distortions at the ray's position
 			if (distortion.distortions.size() > 0) {
@@ -110,7 +116,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			// make sure the rayPosition is in the bounds of the level.
 			if (rayPosition.x < 0 || rayPosition.x >= gameLevel->levelSize.x || rayPosition.y < 0 || rayPosition.y >= gameLevel->levelSize.y) break;
 
-			sf::Color worldPixelColor = worldImage.getPixel(uint32_t(rayPosition.x), uint32_t(rayPosition.y));
+			sf::Color worldPixelColor = worldImage->getPixel(uint32_t(rayPosition.x), uint32_t(rayPosition.y));
 
 			// this is a little complicated.
 			// remember that the visionImage is the same size as the camera, and when we draw to the visionImage we draw local to the center of the visionImage/camera.

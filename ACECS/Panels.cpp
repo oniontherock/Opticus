@@ -14,6 +14,7 @@ void PanelGameView::panelUpdate() {
 	checkModeChange();
 
 	if (mode == Normal) {
+
 	}
 }
 

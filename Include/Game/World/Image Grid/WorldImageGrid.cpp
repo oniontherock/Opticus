@@ -1,41 +1,59 @@
 #include "WorldImageGrid.hpp"
 
-WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float quadrantSizeX, float quadrantSizeY) {
+WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float imageSizeX, float imageSizeY) {
 
-	fullGridSize = sf::Vector2u(gridSizeX * uint32_t(quadrantSizeX), gridSizeY * uint32_t(quadrantSizeY));
+	gridSize = sf::Vector2u(gridSizeX, gridSizeY);
 
-	textureQuadrantSize = sf::Vector2f(quadrantSizeX, quadrantSizeY);
+	gridSizeFull = sf::Vector2u(gridSize.x * uint32_t(imageSizeX), gridSize.y * uint32_t(imageSizeY));
 
-	WorldImageGrid2D rows(gridSizeX);
+	imageSize = sf::Vector2f(imageSizeX, imageSizeY);
 
-	for (uint32_t x = 0; x < gridSizeX; x++) {
 
-		WorldImageGrid1D columns(gridSizeY);
-		for (uint32_t y = 0; y < gridSizeY; y++) {
-			columns[y].create(uint32_t(textureQuadrantSize.x), uint32_t(textureQuadrantSize.y));
+	WorldImageGrid2D rows(gridSize.x);
+
+	for (uint32_t x = 0; x < gridSize.x; x++) {
+
+		WorldImageGrid1D columns(gridSize.y);
+		for (uint32_t y = 0; y < gridSize.y; y++) {
+			columns[y].create(uint32_t(imageSize.x), uint32_t(imageSize.y));
 		}
 
 		rows[x] = std::move(columns);
 	}
 
-	worldTextureGrid = std::move(rows);
+	imageGrid = std::move(rows);
 }
 
-WorldImage& WorldImageGrid::worldImageFromPixel(PixelCoordinate pixelX, PixelCoordinate pixelY) {
-	return worldTextureGrid[static_cast<uint32_t>(pixelX / textureQuadrantSize.x)][static_cast<uint32_t>(pixelY / textureQuadrantSize.y)];
+WorldTexture& WorldImageGrid::worldImageFromPixel(PixelCoordinate pixelX, PixelCoordinate pixelY) {
+	return imageGrid[static_cast<uint32_t>(pixelX / imageSize.x)][static_cast<uint32_t>(pixelY / imageSize.y)];
 }
 
-void WorldImageGrid::pixelSetColor(PixelCoordinate pixelX, PixelCoordinate pixelY, PixelColor color) {
-	worldImageFromPixel(pixelX, pixelY).setPixel(pixelX, pixelY, color);
-}
+//void WorldImageGrid::pixelSetColor(PixelCoordinate pixelX, PixelCoordinate pixelY, PixelColor color) {
+//	//worldImageFromPixel(pixelX, pixelY).setPixel(pixelX, pixelY, color);
+//}
 
 const PixelColor WorldImageGrid::pixelGetColor(PixelCoordinate pixelX, PixelCoordinate pixelY) {
-	return worldImageFromPixel(pixelX, pixelY).getPixel(pixelX, pixelY);
+	return worldImageFromPixel(pixelX, pixelY).getTexture().copyToImage().getPixel(pixelX, pixelY);
 }
 
 const PixelColor WorldImageGrid::pixelGetColorSafe(PixelCoordinate pixelX, PixelCoordinate pixelY) {
-	if (pixelX < 0 || pixelX >= fullGridSize.x || pixelY < 0 || pixelY >= fullGridSize.y) return sf::Color::Black;
+	if (pixelX < 0 || pixelX >= gridSizeFull.x || pixelY < 0 || pixelY >= gridSizeFull.y) return sf::Color::Black;
 
 	return pixelGetColor(pixelX, pixelY);
 }
 
+
+void WorldImageGrid::imagesAllReadSet(const bool state) {
+	for (uint16_t x = 0; x < imageGrid.size(); x++) {
+		for (uint16_t y = 0; y < imageGrid[x].size(); y++) {
+			imageGrid[x][y].read = state;
+		}
+	}
+}
+void WorldImageGrid::imagesAllWriteSet(const bool state) {
+	for (uint16_t x = 0; x < imageGrid.size(); x++) {
+		for (uint16_t y = 0; y < imageGrid[x].size(); y++) {
+			imageGrid[x][y].write = state;
+		}
+	}
+}

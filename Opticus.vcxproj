@@ -143,6 +143,7 @@
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Game\RayCasting\VisionCaster.cpp" />
+    <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
     <ClCompile Include="Include\Game\World\WorldGrid.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortion.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortionGrid.cpp" />
@@ -158,6 +159,7 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
     <None Include="Include\Shaders\Blur.glsl" />
     <None Include="Include\Shaders\Grayscale.glsl" />
+    <None Include="Include\Shaders\Raycasting\Fragment.glsl" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
     <Text Include="readme.txt">
@@ -185,6 +187,7 @@
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
     <ClInclude Include="Include\Game\World\Image Grid\WorldImageGrid.hpp" />
+    <ClInclude Include="Include\Game\World\Image Grid\WorldTexture.hpp" />
     <ClInclude Include="Include\Game\World\WorldGrid.hpp" />
     <ClInclude Include="OpenGL\glad.h" />
     <ClInclude Include="OpenGL\khrplatform.h" />

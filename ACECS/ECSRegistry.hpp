@@ -78,18 +78,20 @@ namespace EntityComponents {
 		ComponentSprite(std::string filepath) :
 			ComponentSprite()
 		{
-			spriteTexture.loadFromFile(filepath);
+			if (!texture.loadFromFile(filepath)) {
+				ConsoleHandler::consolePrintErr("Texture loading failed! Invalid file path: \"" + filepath + "\"");
+			}
 		};
-		ComponentSprite(sf::Texture _spriteTexture) :
+		ComponentSprite(sf::Texture _texture) :
 			ComponentSprite()
 		{
-			spriteTexture = _spriteTexture;
+			texture = _texture;
 		};
 
-		sf::Texture spriteTexture;
+		sf::Texture texture;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentSprite(spriteTexture));
+			return std::unique_ptr<Duplicatable>(new ComponentSprite(texture));
 		};
 	};
 	struct ComponentRotateToMouse final : public Component {

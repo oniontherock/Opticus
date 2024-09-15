@@ -98,6 +98,18 @@ void EntityComponents::componentTemplatesInitialize() {
 	ComponentTemplateManager::componentTemplateAdd(
 
 		/// template name
+		"Static Sprite",
+		{
+			"Transform",
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
+		}
+	);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
 		"Skipper",
 		{
 		},
@@ -109,6 +121,7 @@ void EntityComponents::componentTemplatesInitialize() {
 				}, Cooldown(0.1f))),
 		}
 		);
+
 }
 
 #pragma endregion Component Templates
@@ -200,15 +213,18 @@ void ComponentSprite::system(Entity& entity) {
 	
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-	sf::Image testImage = spriteTexture.copyToImage();
+	sf::Sprite sprite(texture);
 
-	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
+	sprite.setPosition(positionComponent->position);
 
-	for (uint32_t x = 0; x < testImage.getSize().x; x++) {
-		for (uint32_t y = 0; y < testImage.getSize().y; y++) {
-			worldImage.setPixel(x + uint32_t(positionComponent->position.x), y + uint32_t(positionComponent->position.y), testImage.getPixel(x, y));
-		}
+	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->
+		worldGrid.imageGrid.worldImageFromPixel(positionComponent->position.x, positionComponent->position.y);
+
+	if (entity.entityComponentHas<ComponentRotation>()) {
+		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation);
 	}
+
+	worldImage.draw(sprite);
 }
 void ComponentVisionDrawer::system(Entity& entity) {
 

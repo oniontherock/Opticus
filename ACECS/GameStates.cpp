@@ -9,6 +9,7 @@
 #include "Graphics.hpp"
 #include "Panels.hpp"
 #include "World/LevelUpdater.hpp"
+#include "../Include/Common/NumberGenerator.hpp"
 
 void GameStatePlay::gameStateUpdate() {
 
@@ -16,7 +17,9 @@ void GameStatePlay::gameStateUpdate() {
 		gameStateStart();
 		firstUpdate = true;
 	}
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
 
+	worldImage.display();
 	LevelUpdater::levelsUpdate();
 }
 
@@ -28,36 +31,23 @@ void GameStatePlay::gameStateStart() {
 
 	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
 
-	for (uint32_t x = 0; x < roomSize.x; x++) {
-		for (uint32_t y = 0; y < roomSize.y; y++) {
+	uint16_t tileCountX = 16;
+	uint16_t tileCountY = 9;
 
-			sf::Color chunkColor;
+	sf::Vector2f chunkSize = sf::Vector2f(roomSize.x / tileCountX, roomSize.y / tileCountY);
 
-			if (x <= roomSize.x / 2.f && y <= roomSize.y / 2.f) {
-				chunkColor = sf::Color::Red;
-			}
-			if (x > roomSize.x / 2.f && y <= roomSize.y / 2.f) {
-				chunkColor = sf::Color::Blue;
-			}
-			if (x <= roomSize.x / 2.f && y > roomSize.y / 2.f) {
-				chunkColor = sf::Color::Green;
-			}
-			if (x > roomSize.x / 2.f && y > roomSize.y / 2.f) {
-				chunkColor = sf::Color::Yellow;
-			}
+	sf::RectangleShape rectShape;
+	rectShape.setSize(chunkSize);
 
-			worldImage.setPixel(x, y, chunkColor);
-		}
-	}
+	for (uint32_t x = 0; x < tileCountX; x++) {
+		for (uint32_t y = 0; y < tileCountY; y++) {
 
-	sf::Image testImage;
-	if (!testImage.loadFromFile("Art/Test Image 2.png")) {
-		return;
-	}
-	
-	for (uint32_t x = 0; x < testImage.getSize().x; x++) {
-		for (uint32_t y = 0; y < testImage.getSize().y; y++) {
-			worldImage.setPixel(x + 100, y + 100, testImage.getPixel(x, y));
+			sf::Color chunkColor = sf::Color(RNGu8::getUnder(255), RNGu8::getUnder(255), RNGu8::getUnder(255), 255);
+
+			rectShape.setPosition(x * chunkSize.x, y * chunkSize.y);
+			rectShape.setFillColor(chunkColor);
+
+			worldImage.draw(rectShape);
 		}
 	}
 
@@ -75,6 +65,12 @@ void GameStatePlay::gameStateStart() {
 
 	EntityManager::entityCreate(0, 0, 0, "Player");
 	EntityManager::entityCreate(0, 0, 0, "Skipper");
+
+	EntityId spriteId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
+	Entity& sprite = EntityManager::entityGet(spriteId);
+	sprite.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(150, 150);
+
+
 }
 
 void GameStatePause::gameStateUpdate() {

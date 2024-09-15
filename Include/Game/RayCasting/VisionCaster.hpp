@@ -1,11 +1,12 @@
 #ifndef __VISION_CASTER_H__
 #define __VISION_CASTER_H__
 
+#include "../../Common/Cooldown.hpp"
+#include "../../Common/Math.hpp"
+#include "../../Common/TimeHandler.hpp"
 #include "../ACECS/GameLevel.hpp"
 #include "../ACECS/Panels.hpp"
 #include "RayCaster.hpp"
-#include "../../Common/TimeHandler.hpp"
-#include "../../Common/Cooldown.hpp"
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 

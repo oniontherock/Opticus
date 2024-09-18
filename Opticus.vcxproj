@@ -159,7 +159,7 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
     <None Include="Include\Shaders\Blur.glsl" />
     <None Include="Include\Shaders\Grayscale.glsl" />
-    <None Include="Include\Shaders\Raycasting\Fragment.glsl" />
+    <None Include="Include\Shaders\Raycasting\RayPositionsToWorldColors.glsl" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
     <Text Include="readme.txt">

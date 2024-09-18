@@ -105,7 +105,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		// used for determining the pixel in the visionImage to write at, because the visionImage should be written to as if there were no distortions.
 		const sf::Vector2f rayHeadingOrig = sf::Vector2f(cos(rayRotation), sin(rayRotation));
 
-		sf::Vector2f rayPosition = castPosition.position;
+		sf::Vector2f rayPosition = sf::Vector2f(round(castPosition.position.x), round(castPosition.position.y));
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
 
@@ -141,7 +141,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			// then the rays will be drawn in the wrong position.
 			// so we offset the position the rays are drawn at by the amount the camera is offset from the player, and thus they are drawn at the correct position.
 			sf::Vector2f visionPixel = (visionImageCenter - cameraCenterLocal) + (rayHeadingOrig * curDist);
-			if (visionPixel.x < 1 || visionPixel.x >= visionTexture.getSize().x-1 || visionPixel.y < 1 || visionPixel.y >= visionTexture.getSize().y-1) break;
+			if (visionPixel.x < 0 || visionPixel.x >= visionTexture.getSize().x || visionPixel.y < 0 || visionPixel.y >= visionTexture.getSize().y) break;
 
 			double xDivided = double((rayPosition.x)) / 255.0;
 			xChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(xDivided));
@@ -152,10 +152,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			yPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((yDivided - yChunk) * 255));
 
 			visionImage.setPixel(visionPixel.x, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
-			//visionImage.setPixel(visionPixel.x + 1, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
-			//visionImage.setPixel(visionPixel.x - 1, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
-			//visionImage.setPixel(visionPixel.x, visionPixel.y + 1, sf::Color(xChunk, xPoint, yChunk, yPoint));
-			//visionImage.setPixel(visionPixel.x, visionPixel.y - 1, sf::Color(xChunk, xPoint, yChunk, yPoint));
 		}
 	}
 
@@ -165,7 +161,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	visionImageTexture.loadFromImage(visionImage);
 
 	sf::Shader shader;
-	shader.loadFromFile("Include/Shaders/Raycasting/Fragment.glsl", sf::Shader::Fragment);
+	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
 	shader.setUniform("rayPositions", visionImageTexture);
 	shader.setUniform("worldTexture", worldImage->getTexture());
 	shader.setUniform("worldSize", sf::Glsl::Vec2(worldImageTextureSize.x, worldImageTextureSize.y));

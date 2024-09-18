@@ -286,7 +286,7 @@ void ComponentDistortionRadius::system(Entity& entity) {
 
 			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (distortionRadius * distortionRadius) / (2.f * 2.f)) continue;
 
-			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldGrid.distortionGrid.pixelSetDistortionSafe(
+			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldGrid.distortionGrid.cellSetFromWorld(
 				uint32_t(positionComponent->position.x + offsetX),
 				uint32_t(positionComponent->position.y + offsetY),
 				WorldDistortion(distortion)

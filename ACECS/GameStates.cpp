@@ -59,7 +59,7 @@ void GameStatePlay::gameStateStart() {
 		for (uint32_t y = 0; y < 720; y++) {
 
 
-			gameLevel->worldGrid.distortionGrid.pixelSetDistortion(x, y, WorldDistortion(distortion));
+			gameLevel->worldGrid.distortionGrid.cellSet(x, y, WorldDistortion(distortion));
 		}
 	}
 

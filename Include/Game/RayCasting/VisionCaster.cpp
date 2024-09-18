@@ -88,7 +88,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		multipliers[i] = 1.f / (i + 1);
 	}
 
-	
 	sf::Uint8 xChunk = 1;
 	sf::Uint8 xPoint = 1;
 	sf::Uint8 yChunk = 1;
@@ -102,6 +101,8 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	auto* worldImage = &gameLevel->worldGrid.imageGrid.worldImageFromPixel(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
 
 	auto& distortionGrid = gameLevel->worldGrid.distortionGrid;
+
+	constexpr double posMultiplier = 1.0 / 255.0;
 
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 
@@ -131,9 +132,10 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			if (distortion.distortions.size() > 0) {
 				// apply the distortion at the rayPosition to the ray.
 				distortion.headingApplyDistortion(rayHeading, rayPosition);
+				
+				if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
 			}
 
-			if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
 
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
@@ -150,15 +152,15 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			sf::Vector2f visionPixel = (visionImageCenter - cameraCenterLocal) + (rayHeadingOrig * curDist);
 			if (visionPixel.x < 0 || visionPixel.x >= visionTexture.getSize().x || visionPixel.y < 0 || visionPixel.y >= visionTexture.getSize().y) break;
 
-			double xDivided = double((rayPosition.x)) / 255.0;
+			double xDivided = double((rayPosition.x)) * posMultiplier;
 			xChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(xDivided));
 			xPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((xDivided - xChunk) * 255));
 
-			double yDivided = double((rayPosition.y)) / 255.0;
+			double yDivided = double((rayPosition.y)) * posMultiplier;
 			yChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(yDivided));
 			yPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((yDivided - yChunk) * 255));
 
-			visionImage.setPixel(visionPixel.x, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
+			visionImage.setPixel(static_cast<uint16_t>(visionPixel.x), static_cast<uint16_t>(visionPixel.y), sf::Color(xChunk, xPoint, yChunk, yPoint));
 		}
 	}
 
@@ -171,7 +173,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
 	shader.setUniform("rayPositions", visionImageTexture);
 	shader.setUniform("worldTexture", worldImage->getTexture());
-	shader.setUniform("worldSize", sf::Glsl::Vec2(worldImageTextureSize.x, worldImageTextureSize.y));
+	shader.setUniform("worldSize", sf::Glsl::Vec2(float(worldImageTextureSize.x), float(worldImageTextureSize.y)));
 
 	sf::Sprite visionSprite(visionImageTexture);
 

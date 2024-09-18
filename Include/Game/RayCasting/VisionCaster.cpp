@@ -6,6 +6,18 @@ VisionCaster::VisionCaster() {
 
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(castPosition.level)->levelSize;
 	memoryTexture.create(roomSize.x, roomSize.y);
+	memoryTexture.clear(sf::Color(90, 90, 90, 255));
+
+	sf::Texture noiseTexture;
+	noiseTexture.loadFromFile("Art/Cobweb Noise.jpg");
+	noiseTexture.setRepeated(true);
+
+	sf::Sprite noiseSprite(noiseTexture);
+	noiseSprite.setColor(sf::Color(130, 130, 130, 75));
+	noiseSprite.setScale(2.f, 2.f);
+	noiseSprite.setTextureRect(sf::IntRect(0, 0, roomSize.x, roomSize.y));
+
+	memoryTexture.draw(noiseSprite);
 }
 VisionCaster::VisionCaster(const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
@@ -32,11 +44,6 @@ const sf::RenderTexture& VisionCaster::renderTextureGet() {
 }
 
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
-
-	//// clear the visionImage by creating a new image and masking out the color black (which is the default color a new image has), thus creating a totally transparent image
-	//sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
-	//visionImage.create(panelSize.x, panelSize.y);
-	//visionImage.createMaskFromColor(sf::Color::Black);
 
 	castPosition = sf::Vector2f(fromX, fromY);
 
@@ -105,7 +112,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		// used for determining the pixel in the visionImage to write at, because the visionImage should be written to as if there were no distortions.
 		const sf::Vector2f rayHeadingOrig = sf::Vector2f(cos(rayRotation), sin(rayRotation));
 
-		sf::Vector2f rayPosition = sf::Vector2f(round(castPosition.position.x), round(castPosition.position.y));
+		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
 
@@ -180,6 +187,7 @@ void VisionCaster::memoryUpdate() {
 	sf::Sprite visionSprite(visionTexture.getTexture());
 	// set the visionSprite's position to that of the camera
 	visionSprite.setPosition(PanelManager::panelGet(PanelName::GameView).viewRect.getPosition());
+	//visionSprite.setColor(sf::Color(255 / 2, 255 / 2, 255 / 2, 255));
 
 	// load the grayscale shader
 	sf::Shader grayscaleShader;

@@ -31,8 +31,8 @@ void GameStatePlay::gameStateStart() {
 
 	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
 
-	uint16_t tileCountX = 16;
-	uint16_t tileCountY = 9;
+	uint16_t tileCountX = 160;
+	uint16_t tileCountY = 90;
 
 	sf::Vector2f chunkSize = sf::Vector2f(roomSize.x / tileCountX, roomSize.y / tileCountY);
 

@@ -8,5 +8,5 @@ void main() {
 
 	vec4 grayColor = vec4(avgColor, avgColor, avgColor, pixel.a);
 
-	gl_FragColor = grayColor;
+	gl_FragColor = grayColor / 2.0;
 }

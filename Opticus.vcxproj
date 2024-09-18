@@ -193,6 +193,8 @@
     <ClInclude Include="OpenGL\khrplatform.h" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Art\Funky Noise.jpg" />
+    <Image Include="Art\Perlin Noise.png" />
     <Image Include="Art\Test Image.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

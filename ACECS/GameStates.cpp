@@ -17,7 +17,7 @@ void GameStatePlay::gameStateUpdate() {
 		gameStateStart();
 		firstUpdate = true;
 	}
-	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.cellGet(0, 0);
 
 	worldImage.display();
 	LevelUpdater::levelsUpdate();
@@ -29,7 +29,7 @@ void GameStatePlay::gameStateStart() {
 	
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
 
-	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.worldImageFromPixel(0, 0);
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.cellGet(0, 0);
 
 	uint16_t tileCountX = 160;
 	uint16_t tileCountY = 90;

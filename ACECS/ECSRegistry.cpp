@@ -218,7 +218,7 @@ void ComponentSprite::system(Entity& entity) {
 	sprite.setPosition(positionComponent->position);
 
 	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->
-		worldGrid.imageGrid.worldImageFromPixel(positionComponent->position.x, positionComponent->position.y);
+		worldGrid.imageGrid.cellGetFromWorld(positionComponent->position.x, positionComponent->position.y);
 
 	if (entity.entityComponentHas<ComponentRotation>()) {
 		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation);

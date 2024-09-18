@@ -93,7 +93,7 @@ public:
 	}
 
 	bool worldPosIsInGridFull(WorldCoordinate worldX, WorldCoordinate worldY) {
-		return !(worldX < 0 || worldX >= gridSizeFull.x || worldY < 0 || worldY >= gridSizeFull.y);
+		return !(worldX < 0 || worldX >= gridSizeFull.x || worldY < 0 || worldY >= gridSizeFully.y);
 	}
 	bool worldPosIsInGridFull(WorldVector worldPos) {
 		return worldPosIsInGridFull(worldPos.x, worldPos.y);

@@ -2,13 +2,13 @@
 
 VisionCaster::VisionCaster() {
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
-	visionImage.create(panelSize.x, panelSize.y);
+	visionTexture.create(panelSize.x, panelSize.y);
 
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(castPosition.level)->levelSize;
 	memoryTexture.create(roomSize.x, roomSize.y);
 }
 VisionCaster::VisionCaster(const VisionCaster& other) {
-	visionImage.create(other.visionImage.getSize().x, other.visionImage.getSize().y);
+	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
@@ -16,7 +16,7 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 	castPosition = other.castPosition;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
-	visionImage.create(other.visionImage.getSize().x, other.visionImage.getSize().y);
+	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
 	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
@@ -24,8 +24,8 @@ void VisionCaster::operator= (const VisionCaster& other) {
 	castPosition = other.castPosition;
 }
 
-const sf::Image& VisionCaster::visionImageGet() {
-	return visionImage;
+const sf::RenderTexture& VisionCaster::visionTextureGet() {
+	return visionTexture;
 }
 const sf::RenderTexture& VisionCaster::renderTextureGet() {
 	return memoryTexture;
@@ -33,10 +33,10 @@ const sf::RenderTexture& VisionCaster::renderTextureGet() {
 
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
 
-	// clear the visionImage by creating a new image and masking out the color black (which is the default color a new image has), thus creating a totally transparent image
-	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
-	visionImage.create(panelSize.x, panelSize.y);
-	visionImage.createMaskFromColor(sf::Color::Black);
+	//// clear the visionImage by creating a new image and masking out the color black (which is the default color a new image has), thus creating a totally transparent image
+	//sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
+	//visionImage.create(panelSize.x, panelSize.y);
+	//visionImage.createMaskFromColor(sf::Color::Black);
 
 	castPosition = sf::Vector2f(fromX, fromY);
 
@@ -46,12 +46,23 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 	memoryUpdate();
 }
 
+std::pair<int, int> getClosestFactors(int input) {
+	int testNum = (int)sqrt(input);
+	while (input % testNum != 0) {
+		testNum--;
+	}
+	return { testNum, input / testNum };
+}
+
 void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
+	sf::Image visionImage;
+	visionImage.create(visionTexture.getSize().x, visionTexture.getSize().y, sf::Color::Transparent);
+
 	// the center of the visionImage
-	const sf::Vector2f visionImageCenter = sf::Vector2f(visionImage.getSize()) / 2.f;
+	const sf::Vector2f visionImageCenter = sf::Vector2f(visionTexture.getSize()) / 2.f;
 	// center of the GameView panel's view in global room coordinates
 	const sf::Vector2f cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
 	// center of the GameView panel's view localized around the global cast position,
@@ -63,9 +74,18 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 
 	if (castPosition.position.x < 0 || castPosition.position.x >= gameLevel->levelSize.x || castPosition.position.y < 0 || castPosition.position.y >= gameLevel->levelSize.y) {
 		return;
-	
 	}
+
+	std::vector<float> multipliers(255);
+	for (uint16_t i = 0; i < 255; i++) {
+		multipliers[i] = 1.f / (i + 1);
+	}
+
 	
+	sf::Uint8 xChunk = 1;
+	sf::Uint8 xPoint = 1;
+	sf::Uint8 yChunk = 1;
+	sf::Uint8 yPoint = 1;
 
 	// the maximum assumed distance a ray can travel
 	// note the "assumed", because the ray may have moved more or less, due to distortions.
@@ -87,8 +107,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = rayHeadingOrig;
-
-
 
 
 		// the assumed dist that the ray has moved.
@@ -116,8 +134,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			// make sure the rayPosition is in the bounds of the level.
 			if (rayPosition.x < 0 || rayPosition.x >= gameLevel->levelSize.x || rayPosition.y < 0 || rayPosition.y >= gameLevel->levelSize.y) break;
 
-			sf::Color worldPixelColor = worldImage->getPixel(uint32_t(rayPosition.x), uint32_t(rayPosition.y));
-
 			// this is a little complicated.
 			// remember that the visionImage is the same size as the camera, and when we draw to the visionImage we draw local to the center of the visionImage/camera.
 			// but the camera isn't locked directly to the player,
@@ -125,21 +141,47 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			// then the rays will be drawn in the wrong position.
 			// so we offset the position the rays are drawn at by the amount the camera is offset from the player, and thus they are drawn at the correct position.
 			sf::Vector2f visionPixel = (visionImageCenter - cameraCenterLocal) + (rayHeadingOrig * curDist);
-			if (visionPixel.x < 0 || visionPixel.x >= visionImage.getSize().x || visionPixel.y < 0 || visionPixel.y >= visionImage.getSize().y) break;
-			
-			visionImage.setPixel(uint32_t(visionPixel.x), uint32_t(visionPixel.y), worldPixelColor);
+			if (visionPixel.x < 1 || visionPixel.x >= visionTexture.getSize().x-1 || visionPixel.y < 1 || visionPixel.y >= visionTexture.getSize().y-1) break;
+
+			double xDivided = double((rayPosition.x)) / 255.0;
+			xChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(xDivided));
+			xPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((xDivided - xChunk) * 255));
+
+			double yDivided = double((rayPosition.y)) / 255.0;
+			yChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(yDivided));
+			yPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((yDivided - yChunk) * 255));
+
+			visionImage.setPixel(visionPixel.x, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
+			//visionImage.setPixel(visionPixel.x + 1, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
+			//visionImage.setPixel(visionPixel.x - 1, visionPixel.y, sf::Color(xChunk, xPoint, yChunk, yPoint));
+			//visionImage.setPixel(visionPixel.x, visionPixel.y + 1, sf::Color(xChunk, xPoint, yChunk, yPoint));
+			//visionImage.setPixel(visionPixel.x, visionPixel.y - 1, sf::Color(xChunk, xPoint, yChunk, yPoint));
 		}
 	}
+
+	sf::Vector2u worldImageTextureSize = worldImage->getTexture().getSize();
+
+	sf::Texture visionImageTexture;
+	visionImageTexture.loadFromImage(visionImage);
+
+	sf::Shader shader;
+	shader.loadFromFile("Include/Shaders/Raycasting/Fragment.glsl", sf::Shader::Fragment);
+	shader.setUniform("rayPositions", visionImageTexture);
+	shader.setUniform("worldTexture", worldImage->getTexture());
+	shader.setUniform("worldSize", sf::Glsl::Vec2(worldImageTextureSize.x, worldImageTextureSize.y));
+
+	sf::Sprite visionSprite(visionImageTexture);
+
+	visionTexture.clear(sf::Color::Transparent);
+	visionTexture.draw(visionSprite, &shader);
+	visionTexture.display();
 }
 void VisionCaster::memoryUpdate() {
 	// blur the memory
 	memoryBlur();
 
-	// create a texture from the visionImage
-	sf::Texture visionTexture;
-	visionTexture.loadFromImage(visionImage);
 	// create a sprite from the visionTexture
-	sf::Sprite visionSprite(visionTexture);
+	sf::Sprite visionSprite(visionTexture.getTexture());
 	// set the visionSprite's position to that of the camera
 	visionSprite.setPosition(PanelManager::panelGet(PanelName::GameView).viewRect.getPosition());
 

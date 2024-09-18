@@ -26,7 +26,7 @@ void WorldTexture::display() {
 }
 
 void WorldTexture::imageUpdate() {
-	image = getTexture().copyToImage();
+	//image = getTexture().copyToImage();
 	modified = false;
 }
 

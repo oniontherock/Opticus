@@ -235,18 +235,15 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 1024);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
 
 		sf::Sprite memorySprite;
 		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
 
 		gameViewPanel.objectDraw(memorySprite);
-
-		sf::Texture visionTexture;
-		visionTexture.loadFromImage(visionCaster.visionImageGet());
 		
 		sf::Sprite visionSprite;
-		visionSprite.setTexture(visionTexture);
+		visionSprite.setTexture(visionCaster.visionTextureGet().getTexture());
 		visionSprite.setPosition(gameViewPanel.viewRect.getPosition());
 
 		gameViewPanel.objectDraw(visionSprite);

@@ -21,12 +21,12 @@ struct VisionCaster : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) override;
 
-	const sf::Image& visionImageGet();
+	const sf::RenderTexture& visionTextureGet();
 	const sf::RenderTexture& renderTextureGet();
 
 protected:
 	
-	sf::Image visionImage;
+	sf::RenderTexture visionTexture;
 	sf::RenderTexture memoryTexture;
 
 	Cooldown blurCooldown = Cooldown(0.1f);

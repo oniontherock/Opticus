@@ -21,7 +21,20 @@ protected:
 	uint32_t cellCount;
 	// size of cells
 	sf::Vector2f cellSize;
+	// size of the whole grid, including the size of the cells
+	sf::Vector2f gridSizeFull;
+
 public:
+
+	Grid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
+		gridSize(sf::Vector2u(gridSizeX, gridSizeY)),
+		cellCount(gridSizeX * gridSizeY),
+		cellSize(sf::Vector2f(cellSizeX, cellSizeY)),
+		gridSizeFull(sf::Vector2f(gridSizeX * cellSize.x, gridSizeY * cellSize.y))
+	{}
+	Grid(uint32_t gridSizeX, uint32_t gridSizeY) :
+		Grid(gridSizeX, gridSizeY, 1.f, 1.f)
+	{}
 
 	CellVector coordinatesWorldToCell(WorldCoordinate worldX, WorldCoordinate worldY) {
 		return WorldVector(worldX / cellSize.x, worldY / cellSize.y);
@@ -58,21 +71,39 @@ public:
 		cells[cellPos.x][cellPos.y] = cell;
 	}
 	void cellSetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY, C cell) {
-		
-		CellCoordinate cellX = worldX / cellSize.x;
-		CellCoordinate cellY = worldY / cellSize.y;
-
-		cells[cellX][cellY] = cell;
+		CellVector cellPos = coordinatesWorldToCell(worldX, worldY);
+		cells[cellPos.x][cellPos.y] = cell;
 	}
 	void cellSetFromWorld(WorldVector worldPos, C cell) {
-
-		CellCoordinate cellX = worldPos.x / cellSize.x;
-		CellCoordinate cellY = worldPos.y / cellSize.y;
-
-		cells[cellX][cellY] = cell;
+		CellVector cellPos = coordinatesWorldToCell(worldPos);
+		cells[cellPos.x][cellPos.y] = cell;
 	}
 
+	bool cellPosIsInGrid(CellCoordinate cellX, CellCoordinate cellY) {
+		return !(cellX < 0 || cellX >= gridSize.x || cellY < 0 || cellY >= gridSize.y);
+	}
+	bool cellPosIsInGrid(CellVector cellPos) {
+		return cellPosIsInGrid(cellPos.x, cellPos.y);
+	}
+	bool worldPosIsInGrid(WorldCoordinate worldX, WorldCoordinate worldY) {
+		return cellPosIsInGrid(coordinatesWorldToCell(worldX, worldY));
+	}
+	bool worldPosIsInGrid(WorldVector worldPos) {
+		return worldPosIsInGrid(worldPos.x, worldPos.y);
+	}
 
+	bool worldPosIsInGridFull(WorldCoordinate worldX, WorldCoordinate worldY) {
+		return !(worldX < 0 || worldX >= gridSizeFull.x || worldY < 0 || worldY >= gridSizeFully.y);
+	}
+	bool worldPosIsInGridFull(WorldVector worldPos) {
+		return worldPosIsInGridFull(worldPos.x, worldPos.y);
+	}
+	bool cellPosIsInGridFull(CellCoordinate cellX, CellCoordinate cellY) {
+		return worldPosIsInGridFull(coordinatesCellToWorld(cellX, cellY));
+	}
+	bool cellPosIsInGridFull(CellVector cellPos) {
+		return worldPosIsInGridFull(coordinatesCellToWorld(cellPos));
+	}
 };
 
 

@@ -37,7 +37,7 @@ public:
 	{}
 
 	CellVector coordinatesWorldToCell(WorldCoordinate worldX, WorldCoordinate worldY) {
-		return WorldVector(worldX / cellSize.x, worldY / cellSize.y);
+		return CellVector(worldX / cellSize.x, worldY / cellSize.y);
 	}
 	CellVector coordinatesWorldToCell(WorldVector worldPos) {
 		return coordinatesWorldToCell(worldPos.x, worldPos.y);

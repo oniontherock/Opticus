@@ -98,7 +98,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
 	constexpr float maxDist = 525;
 
-	auto* worldImage = &gameLevel->worldGrid.imageGrid.cellGetFromWorld(PixelCoordinate(castPosition.position.x), PixelCoordinate(castPosition.position.y));
+	auto* worldImage = &gameLevel->worldGrid.imageGrid.cellGetFromWorld(castPosition.position.x, castPosition.position.y);
 
 	auto& distortionGrid = gameLevel->worldGrid.distortionGrid;
 
@@ -124,7 +124,10 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		while (curDist < maxDist) {
 			curDist += 1.f;
 
-			auto& distortion = distortionGrid.cellGet(rayPosition.x * distortionGrid.distortionCellMultiplierX, rayPosition.y * distortionGrid.distortionCellMultiplierY);
+			auto& distortion = distortionGrid.cellGet(
+				uint16_t(rayPosition.x * distortionGrid.distortionCellMultiplierX), 
+				uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
+			);
 
 			// check if there are any distortions at the ray's position
 			if (distortion.distortions.size() > 0) {

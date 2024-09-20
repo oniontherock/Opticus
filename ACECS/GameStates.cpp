@@ -31,25 +31,25 @@ void GameStatePlay::gameStateStart() {
 
 	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.cellGet(0, 0);
 
-	uint16_t tileCountX = 160;
-	uint16_t tileCountY = 90;
+	//uint16_t tileCountX = 625/32;
+	//uint16_t tileCountY = 625/32;
 
-	sf::Vector2f chunkSize = sf::Vector2f(roomSize.x / tileCountX, roomSize.y / tileCountY);
+	//sf::Vector2f chunkSize = sf::Vector2f(float(roomSize.x / tileCountX), float(roomSize.y / tileCountY));
 
-	sf::RectangleShape rectShape;
-	rectShape.setSize(chunkSize);
+	//sf::RectangleShape rectShape;
+	//rectShape.setSize(chunkSize);
 
-	for (uint32_t x = 0; x < tileCountX; x++) {
-		for (uint32_t y = 0; y < tileCountY; y++) {
+	//for (uint32_t x = 0; x < tileCountX; x++) {
+	//	for (uint32_t y = 0; y < tileCountY; y++) {
 
-			sf::Color chunkColor = sf::Color(RNGu8::getUnder(255), RNGu8::getUnder(255), RNGu8::getUnder(255), 255);
+	//		sf::Color chunkColor = sf::Color(RNGu8::getUnder(255), RNGu8::getUnder(255), RNGu8::getUnder(255), 255);
 
-			rectShape.setPosition(x * chunkSize.x, y * chunkSize.y);
-			rectShape.setFillColor(chunkColor);
+	//		rectShape.setPosition(x * chunkSize.x, y * chunkSize.y);
+	//		rectShape.setFillColor(chunkColor);
 
-			worldImage.draw(rectShape);
-		}
-	}
+	//		worldImage.draw(rectShape);
+	//	}
+	//}
 
 	Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
 		heading *= 0.99f;

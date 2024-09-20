@@ -24,6 +24,14 @@ protected:
 	// size of the whole grid, including the size of the cells
 	sf::Vector2f gridSizeFull;
 
+	void cellsInitialize() {
+		cells = std::vector<std::vector<C>>(gridSize.x, std::vector<C>(gridSize.y, C()));
+	}
+	template <typename... Args>
+	void cellsInitialize(Args... args) {
+		cells = std::vector<std::vector<C>>(gridSize.x, std::vector<C>(gridSize.y, C(args...)));
+	}
+
 public:
 
 	Grid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
@@ -37,7 +45,7 @@ public:
 	{}
 
 	CellVector coordinatesWorldToCell(WorldCoordinate worldX, WorldCoordinate worldY) {
-		return CellVector(worldX / cellSize.x, worldY / cellSize.y);
+		return CellVector(static_cast<CellCoordinate>(trunc(worldX / cellSize.x)), static_cast<CellCoordinate>(trunc(worldY / cellSize.y)));
 	}
 	CellVector coordinatesWorldToCell(WorldVector worldPos) {
 		return coordinatesWorldToCell(worldPos.x, worldPos.y);

@@ -206,7 +206,7 @@ namespace EntityComponents {
 			distortion = _distortion;
 		};
 
-		float distortionRadius;
+		float distortionRadius = 0.f;
 		Distortion distortion;
 
 		std::unique_ptr<Duplicatable> duplicate() override {

@@ -6,7 +6,8 @@
 
 GameLevel::GameLevel() :
 	levelSize(sf::Vector2u(10000, 10000)),
-	worldGrid(WorldGrid(levelSize.x, levelSize.y))
+	imageGrid(WorldImageGrid(1, 1, float(levelSize.x), float(levelSize.y))),
+	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y))
 {
 	entities = std::vector<EntityId>();
 }

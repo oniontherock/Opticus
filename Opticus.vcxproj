@@ -148,7 +148,6 @@
     <ClCompile Include="Include\Game\World\Room Grid\RoomGrid.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\Room.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\RoomCell.cpp" />
-    <ClCompile Include="Include\Game\World\WorldGrid.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortion.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortionGrid.cpp" />
     <ClCompile Include="Include\Game\RayCasting\RayCaster.cpp" />
@@ -197,7 +196,6 @@
     <ClInclude Include="Include\Game\World\Room Grid\RoomGrid.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\Room.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\RoomCell.hpp" />
-    <ClInclude Include="Include\Game\World\WorldGrid.hpp" />
     <ClInclude Include="OpenGL\glad.h" />
     <ClInclude Include="OpenGL\khrplatform.h" />
   </ItemGroup>

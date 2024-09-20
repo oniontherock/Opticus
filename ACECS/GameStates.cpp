@@ -17,7 +17,7 @@ void GameStatePlay::gameStateUpdate() {
 		gameStateStart();
 		firstUpdate = true;
 	}
-	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.cellGet(0, 0);
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->imageGrid.cellGet(0, 0);
 
 	worldImage.display();
 	LevelUpdater::levelsUpdate();
@@ -29,7 +29,7 @@ void GameStatePlay::gameStateStart() {
 	
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
 
-	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->worldGrid.imageGrid.cellGet(0, 0);
+	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->imageGrid.cellGet(0, 0);
 
 	//uint16_t tileCountX = 625/32;
 	//uint16_t tileCountY = 625/32;
@@ -59,7 +59,7 @@ void GameStatePlay::gameStateStart() {
 		for (uint32_t y = 0; y < 720; y++) {
 
 
-			gameLevel->worldGrid.distortionGrid.cellSet(x, y, WorldDistortion(distortion));
+			gameLevel->distortionGrid.cellSet(x, y, WorldDistortion(distortion));
 		}
 	}
 

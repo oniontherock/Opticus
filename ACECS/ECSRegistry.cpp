@@ -217,8 +217,7 @@ void ComponentSprite::system(Entity& entity) {
 
 	sprite.setPosition(positionComponent->position);
 
-	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->
-		worldGrid.imageGrid.cellGetFromWorld(positionComponent->position.x, positionComponent->position.y);
+	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->imageGrid.cellGetFromWorld(positionComponent->position.x, positionComponent->position.y);
 
 	if (entity.entityComponentHas<ComponentRotation>()) {
 		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation);
@@ -286,7 +285,7 @@ void ComponentDistortionRadius::system(Entity& entity) {
 
 			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (distortionRadius * distortionRadius) / (2.f * 2.f)) continue;
 
-			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldGrid.distortionGrid.cellSetFromWorld(
+			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->distortionGrid.cellSetFromWorld(
 				positionComponent->position.x + offsetX,
 				positionComponent->position.y + offsetY,
 				WorldDistortion(distortion)

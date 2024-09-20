@@ -1,10 +1,11 @@
 #ifndef __GAME_LEVEL_H__
 #define __GAME_LEVEL_H__
 
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
+#include "SFML/System/Vector2.hpp"
 #include "World/Level.hpp"
 #include "World/LevelGrid.hpp"
-#include "SFML/System/Vector2.hpp"
-#include "../Include/Game/World/WorldGrid.hpp"
 
 // example of the game level class,
 // 
@@ -21,7 +22,8 @@ struct GameLevel : public BaseLevel {
 
 	bool firstRun = true;
 
-	WorldGrid worldGrid;
+	WorldDistortionGrid distortionGrid;
+	WorldImageGrid imageGrid;
 };
 
 using GameLevelGrid = LevelGrid<GameLevel>;

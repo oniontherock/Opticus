@@ -25,43 +25,63 @@ void GameStatePlay::gameStateUpdate() {
 
 void GameStatePlay::gameStateStart() {
 
+	levelGenerate();
+
 	GameLevel* gameLevel = GameLevelGrid::levelGet(0, 0, 0);
 	
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
 
 	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->imageGrid.cellGet(0, 0);
 
-	//uint16_t tileCountX = 625/32;
-	//uint16_t tileCountY = 625/32;
+	sf::Vector2f cellSize = gameLevel->roomGrid.cellGet(0, 0).cellsGetSize();
 
-	//sf::Vector2f chunkSize = sf::Vector2f(float(roomSize.x / tileCountX), float(roomSize.y / tileCountY));
+	sf::RectangleShape rectShape;
+	rectShape.setSize(cellSize);
 
-	//sf::RectangleShape rectShape;
-	//rectShape.setSize(chunkSize);
-
-	//for (uint32_t x = 0; x < tileCountX; x++) {
-	//	for (uint32_t y = 0; y < tileCountY; y++) {
-
-	//		sf::Color chunkColor = sf::Color(RNGu8::getUnder(255), RNGu8::getUnder(255), RNGu8::getUnder(255), 255);
-
-	//		rectShape.setPosition(x * chunkSize.x, y * chunkSize.y);
-	//		rectShape.setFillColor(chunkColor);
-
-	//		worldImage.draw(rectShape);
-	//	}
-	//}
-
-	Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
-		heading *= 0.99f;
+	Distortion wallDistortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
+		heading *= 0.f;
 		}, Cooldown(INFINITY));
 
-	for (uint32_t x = 320; x < 1280; x++) {
-		for (uint32_t y = 0; y < 720; y++) {
+	for (uint32_t roomX = 0; roomX < gameLevel->roomGrid.gridGetSizeX(); roomX++) {
+		for (uint32_t roomY = 0; roomY < gameLevel->roomGrid.gridGetSizeY(); roomY++) {
+
+			Room& roomCur = gameLevel->roomGrid.cellGet(roomX, roomY);
+
+			for (uint32_t cellX = 0; cellX < roomCur.gridGetSizeX(); cellX++) {
+				for (uint32_t cellY = 0; cellY < roomCur.gridGetSizeY(); cellY++) {
 
 
-			gameLevel->distortionGrid.cellSet(x, y, WorldDistortion(distortion));
+					RoomCell& cellCur = roomCur.cellGet(cellX, cellY);
+
+					if (cellCur.isSolid) {
+						for (float x = 0; x <= 16; x++) {
+							for (float y = 0; y <= 16; y++) {
+								gameLevel->distortionGrid.cellSetFromWorld(cellCur.worldPos.position + sf::Vector2f(x, y), WorldDistortion(wallDistortion));
+							}
+						}
+					}
+
+					rectShape.setPosition(cellCur.worldPos.position);
+					rectShape.setFillColor(cellCur.color);
+
+					worldImage.draw(rectShape);
+				}
+			}
 		}
 	}
+	//worldImage.display();
+
+	//Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
+	//	heading *= 0.99f;
+	//	}, Cooldown(INFINITY));
+
+	//for (uint32_t x = 320; x < 1280; x++) {
+	//	for (uint32_t y = 0; y < 720; y++) {
+
+
+	//		gameLevel->distortionGrid.cellSet(x, y, WorldDistortion(distortion));
+	//	}
+	//}
 
 	EntityManager::entityCreate(0, 0, 0, "Player");
 	EntityManager::entityCreate(0, 0, 0, "Skipper");
@@ -69,10 +89,13 @@ void GameStatePlay::gameStateStart() {
 	EntityId spriteId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
 	Entity& sprite = EntityManager::entityGet(spriteId);
 	sprite.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(150, 150);
-
-
 }
+void GameStatePlay::levelGenerate() {
 
+	GameLevel* gameLevel = GameLevelGrid::levelGet(0, 0, 0);
+
+	gameLevel->roomGridGenerate();
+}
 void GameStatePause::gameStateUpdate() {
 }
 

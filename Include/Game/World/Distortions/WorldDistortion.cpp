@@ -22,5 +22,7 @@ void WorldDistortion::headingApplyDistortion(sf::Vector2f& heading, sf::Vector2f
 
 	lastUpdateTime = curTime;
 }
-
+void WorldDistortion::distortionAdd(Distortion distortion) {
+	distortions.push_back(distortion);
+}
 

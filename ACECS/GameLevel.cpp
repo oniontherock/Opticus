@@ -7,7 +7,9 @@
 GameLevel::GameLevel() :
 	levelSize(sf::Vector2u(10000, 10000)),
 	imageGrid(WorldImageGrid(1, 1, float(levelSize.x), float(levelSize.y))),
-	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y))
+	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
+	roomGrid(RoomGrid(16, 16, 32, 32, 16.f, 16.f)),
+	levelGenerator(LevelGenerator())
 {
 	entities = std::vector<EntityId>();
 }
@@ -21,3 +23,8 @@ GameLevel::GameLevel(LevelCoordinate _idX, LevelCoordinate _idY, LevelCoordinate
 GameLevel::GameLevel(LevelPosition _id) :
 	GameLevel(_id.x, _id.y, _id.z)
 {}
+
+void GameLevel::roomGridGenerate() {
+	levelGenerator.roomGridConnectionsGenerate(roomGrid);
+	levelGenerator.roomGridGenerate(roomGrid);
+}

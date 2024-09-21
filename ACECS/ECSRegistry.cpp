@@ -89,6 +89,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
+			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster()),
@@ -117,7 +118,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			createComponentPairFromType<ComponentPosition>(WorldPosition(0, 0, 0, 64.f, 64.f)),
 			createComponentPairFromType<ComponentDistortionRadius>(16.f, Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
-			position += heading * 16.f;
+			position += heading * 17.f;
 				}, Cooldown(0.1f))),
 		}
 		);
@@ -280,18 +281,20 @@ void ComponentDistortionRadius::system(Entity& entity) {
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
+	auto& distortionGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->distortionGrid;
+
 	for (float offsetX = -distortionRadius / 2.f; offsetX <= +distortionRadius / 2.f; offsetX += 1.f) {
 		for (float offsetY = -distortionRadius / 2.f; offsetY <= +distortionRadius / 2.f; offsetY += 1.f) {
 
 			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (distortionRadius * distortionRadius) / (2.f * 2.f)) continue;
 
-			GameLevelGrid::levelGet(positionComponent->worldPosition.level)->distortionGrid.cellSetFromWorld(
-				positionComponent->position.x + offsetX,
-				positionComponent->position.y + offsetY,
-				WorldDistortion(distortion)
-			);
+			distortionGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).distortionAdd(distortion);
 		}
 	}
+
+	positionComponent->position.x += 30.f * TimeHandler::deltaSimulatedGet();
+	positionComponent->position.y += 30.f * TimeHandler::deltaSimulatedGet();
+
 }
 
 #pragma endregion Systems

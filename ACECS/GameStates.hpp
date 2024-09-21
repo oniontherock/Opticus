@@ -27,6 +27,7 @@ private:
 	bool firstUpdate = false;
 
 	void gameStateStart();
+	void levelGenerate();
 };
 
 struct GameStatePause : public GameState {

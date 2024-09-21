@@ -3,6 +3,8 @@
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
+#include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
+#include "../Include/Game/World/Room Grid/RoomGrid.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "World/Level.hpp"
 #include "World/LevelGrid.hpp"
@@ -24,6 +26,10 @@ struct GameLevel : public BaseLevel {
 
 	WorldDistortionGrid distortionGrid;
 	WorldImageGrid imageGrid;
+	RoomGrid roomGrid;
+	LevelGenerator levelGenerator;
+
+	void roomGridGenerate();
 };
 
 using GameLevelGrid = LevelGrid<GameLevel>;

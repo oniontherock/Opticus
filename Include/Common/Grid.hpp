@@ -112,6 +112,36 @@ public:
 	bool cellPosIsInGridFull(CellVector cellPos) {
 		return worldPosIsInGridFull(coordinatesCellToWorld(cellPos));
 	}
+
+	sf::Vector2u gridGetSize() {
+		return gridSize;
+	}
+	uint32_t gridGetSizeX() {
+		return gridSize.x;
+	}
+	uint32_t gridGetSizeY() {
+		return gridSize.y;
+	}
+
+	sf::Vector2f gridGetSizeFull() {
+		return gridSizeFull;
+	}
+	uint32_t gridGetSizeFullX() {
+		return gridSizeFull.x;
+	}
+	uint32_t gridGetSizeFullY() {
+		return gridSizeFull.y;
+	}
+
+	sf::Vector2f cellsGetSize() {
+		return cellSize;
+	}
+	uint32_t cellsGetSizeX() {
+		return cellSize.x;
+	}
+	uint32_t cellsGetSizeY() {
+		return cellSize.y;
+	}
 };
 
 

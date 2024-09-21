@@ -25,8 +25,8 @@ struct WorldDistortion {
 	WorldDistortion(Args... args) {
 		distortions = std::vector<Distortion>{ args... };
 	}
-
 	void headingApplyDistortion(sf::Vector2f& heading, sf::Vector2f& position);
+	void distortionAdd(Distortion distortion);
 
 private:
 	uint32_t lastUpdateTime = TimeHandler::timeSimulatedGet();

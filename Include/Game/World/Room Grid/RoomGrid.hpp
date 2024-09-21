@@ -4,12 +4,13 @@
 #include "../../../Common/Grid.hpp"
 #include "Rooms/Room.hpp"
 #include <cstdint>
+#include <Auxiliary/ConsoleHandler.hpp>
 #include <World/LevelTypeDefinitions.hpp>
 
-class RoomGrid : Grid<Room> {
+class RoomGrid : public Grid<Room> {
 public:
-	RoomGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
-	RoomGrid(uint32_t gridSizeX, uint32_t gridSizeY);
+	// initialize rooms and initialize those rooms' cells
+	RoomGrid(uint32_t gridSizeX, uint32_t gridSizeY, uint32_t roomCellCountX, uint32_t roomCellCountY, float roomCellSizeX, float roomCellSizeY);
 };
 
 

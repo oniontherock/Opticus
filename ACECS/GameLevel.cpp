@@ -5,10 +5,10 @@
 #include "ECSRegistry.hpp"
 
 GameLevel::GameLevel() :
-	levelSize(sf::Vector2u(2500, 2500)),
+	levelSize(sf::Vector2u(4100, 4100)),
 	imageGrid(WorldImageGrid(1, 1, float(levelSize.x), float(levelSize.y))),
 	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
-	roomGrid(RoomGrid(4, 4, 32, 32, 16.f, 16.f)),
+	roomGrid(RoomGrid(8, 8, 32.f, 32.f, 16.f, 16.f)),
 	levelGenerator(LevelGenerator())
 {
 	entities = std::vector<EntityId>();

@@ -33,6 +33,7 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 
 	castPosition = other.castPosition;
+	memoryPositionOffset = other.memoryPositionOffset;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
@@ -41,6 +42,7 @@ void VisionCaster::operator= (const VisionCaster& other) {
 	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 
 	castPosition = other.castPosition;
+	memoryPositionOffset = other.memoryPositionOffset;
 }
 
 const sf::RenderTexture& VisionCaster::visionTextureGet() {
@@ -56,8 +58,6 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 
 	// cast the rays, updating the visionImage
 	raysCast(angleTo, coneSize, rayCount);
-	//// update the memory, this blurs the memory then adds a grayscaled version of the visionImage to it
-	//memoryUpdate();
 }
 
 std::pair<int, int> getClosestFactors(int input) {
@@ -144,7 +144,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 				if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
 			}
 
-
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
 			rayPosition += rayHeading;
@@ -189,14 +188,18 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	visionTexture.draw(visionSprite, &shader);
 	visionTexture.display();
 }
-void VisionCaster::memoryUpdate(float centerX, float centerY, float moveX, float moveY) {
+void VisionCaster::memoryUpdate(float mememoryOffsetX, float mememoryOffsetY) {
 	// blur the memory
 	memoryBlur();
 
+	memoryPositionOffset.x += mememoryOffsetX;
+	memoryPositionOffset.y += mememoryOffsetY;
+
 	// create a sprite from the visionTexture
 	sf::Sprite visionSprite(visionTexture.getTexture());
-	// set the visionSprite's position to that of the camera
-	visionSprite.setPosition(PanelManager::panelGet(PanelName::GameView).viewRect.getPosition());
+	visionSprite.setOrigin(sf::Vector2f(visionTexture.getSize()) / 2.f);
+	// set the visionSprite's position to the center of the memoryTexture, minus the memoryPositionOffset
+	visionSprite.setPosition((sf::Vector2f(memoryTexture.getSize()) / 2.f) - memoryPositionOffset);
 
 	// load the grayscale shader
 	sf::Shader grayscaleShader;

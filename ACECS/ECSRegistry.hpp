@@ -43,10 +43,27 @@ namespace EntityEvents {
 
 		void clear() final {
 			movedAxis *= 0.f;
+			naturalMovedAxis *= 0.f;
 			unnaturalAxis *= 0.f;
 		}
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new EventMoved());
+		};
+	};
+	// event created after an update has been made to a view.
+	struct EventViewMoved final : public Event {
+
+		EventViewMoved() {};
+
+		sf::Vector2f movedAxis{ 0,0 };
+		sf::Vector2f naturalMovedAxis{ 0,0 };
+
+		void clear() final {
+			movedAxis *= 0.f;
+			naturalMovedAxis *= 0.f;
+		}
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventViewMoved());
 		};
 	};
 	struct EventRotate final : public Event {

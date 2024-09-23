@@ -4,7 +4,7 @@
 
 uint32_t MAX_ENTITIES = 100;
 uint16_t MAX_COMPONENT_TYPES = 9;
-uint16_t MAX_EVENT_TYPES = 3;
+uint16_t MAX_EVENT_TYPES = 4;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -29,6 +29,7 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventMove>>();
 	EventRegistry::typeRegister<EventIDs<EventRotate>>();
 	EventRegistry::typeRegister<EventIDs<EventMoved>>();
+	EventRegistry::typeRegister<EventIDs<EventViewMoved>>();
 }
 
 #pragma endregion Events
@@ -92,7 +93,6 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
-			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
@@ -259,10 +259,22 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
-		visionCaster.memoryUpdate()
+
+		// amount the camera has moved this frame
+		sf::Vector2f cameraMovedAmount;
+		if (entity.entityEventHas<EventViewMoved>()) {
+			cameraMovedAmount = entity.entityEventGet<EventViewMoved>()->naturalMovedAxis;
+		}
+		// update the memory, offsetting it by the inverted natural movement of the camera.
+		// we do this because, when drawing the memory sprite, we center it on the camera, and offset it by it's offset,
+		// and since we update the memory with the inverted movement of the camera,
+		// it gives the affect that when you move, you are moving disconnected from the memory, when in fact, the memory is following the camera.
+		visionCaster.memoryUpdate(-cameraMovedAmount.x, -cameraMovedAmount.y);
 
 		sf::Sprite memorySprite;
 		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
+		memorySprite.setOrigin(sf::Vector2f(visionCaster.renderTextureGet().getSize()) / 2.f);
+		memorySprite.setPosition(gameViewPanel.viewGet().getCenter() + visionCaster.memoryPositionOffset);
 
 		gameViewPanel.objectDraw(memorySprite);
 		
@@ -281,8 +293,32 @@ void ComponentViewFollow::system(Entity& entity) {
 		
 		auto& panel = PanelManager::panelGet(panelViewToFollow);
 		
+		// camera position prior to movement
+		sf::Vector2f cameraPositionPrev = panel.viewRect.getPosition();
+		// camera position prior to movement,
+		sf::Vector2f cameraPositionPrevNaturalized = cameraPositionPrev;
+
+		// has the entity moved?
 		if (entity.entityEventHas<EventMoved>()) {
+			// if yes, move the camera by the unnatural axis of movement,
+			// making a seamless and smooth movement when the entity is traveling through distortions.
+			// if this wasn't done, then the camera would quickly launch towards the entity if they travel through a portal, or other distortions,
+			// giving away the effect
 			panel.viewMove(entity.entityEventGet<EventMoved>()->unnaturalAxis);
+			panel.viewUpdate();
+
+			// move the naturalized camera position by the unnatural axis to naturalize it.
+			// 
+			// this works because:
+			// 
+			// say the entity moves 500 pixels to the right,
+			// 5 of those pixels were a natural movement of the entity, but the other 495 were caused by a teleportation distortion.
+			// now if we get the amount the camera moved, by doing "posCur - posPrev" it will say the camera moved by 500 pixels to the right.
+			// but if we get it by doing "posCur - (posPrev + unnaturalAxis)", then we will get a movement of only 5 pixels,
+			// because posPrev was moved by 495 pixels, which is obviously the unnatural movement.
+			// 
+			// and so we get the amount the entity moved naturally
+			cameraPositionPrevNaturalized += entity.entityEventGet<EventMoved>()->unnaturalAxis;
 		}
 
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
@@ -292,6 +328,7 @@ void ComponentViewFollow::system(Entity& entity) {
 		float lerp = 0.15f;
 
 		panel.viewMove(posDiff * lerp);
+		panel.viewUpdate();
 
 		sf::Vector2f mousePos = panel.viewMousePositionGet();
 
@@ -303,6 +340,13 @@ void ComponentViewFollow::system(Entity& entity) {
 		mouseDiff.y *= lerp * panel.viewAspectRatioGet();
 
 		panel.viewMove(mouseDiff);
+		panel.viewUpdate();
+
+		auto* viewMovedEvent = entity.entityEventAddAndGet<EventViewMoved>();
+		// get the amount the camera moved
+		viewMovedEvent->movedAxis = Vector2fMath::axis(cameraPositionPrev, panel.viewRect.getPosition());
+		// get the amount the camera moved naturally
+		viewMovedEvent->naturalMovedAxis = Vector2fMath::axis(cameraPositionPrevNaturalized, panel.viewRect.getPosition());
 	}
 }
 void ComponentDistortionRadius::system(Entity& entity) {

@@ -25,13 +25,14 @@ struct VisionCaster : public RayCaster {
 	const sf::RenderTexture& visionTextureGet();
 	const sf::RenderTexture& renderTextureGet();
 
-	void memoryUpdate(float centerX, float centerY, float moveX, float moveY);
+	void memoryUpdate(float mememoryOffsetX, float mememoryOffsetY);
+
+	// offset for the memory texture from it's center
+	sf::Vector2f memoryPositionOffset;
 protected:
 	
 	sf::RenderTexture visionTexture;
 	sf::RenderTexture memoryTexture;
-
-	sf::Vector2f movedSinceBeginning;
 
 	Cooldown blurCooldown = Cooldown(0.1f);
 

@@ -1,5 +1,5 @@
 #include "LevelGenerator.hpp"
-
+#include <iostream>
 
 
 void LevelGenerator::roomHallwayCarve(Room& room, sf::Vector2i side, uint16_t size) {
@@ -62,46 +62,144 @@ void LevelGenerator::roomSideSolidify(Room& room, sf::Vector2i side) {
 	}
 }
 
-void LevelGenerator::roomGridGenerate(RoomGrid& roomGrid) {
+void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t size, WorldDistortionGrid& distortionGrid) {
+	
+	uint16_t xFromStart = sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0;
+	uint16_t xFromEnd = sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX();
+
+	uint16_t yFromStart = sideFrom.y > 0 ? roomFrom.gridGetSizeY() - 1 : 0;
+	uint16_t yFromEnd = sideFrom.y < 0 ? 1 : roomFrom.gridGetSizeY();
+
+	uint16_t xToStart = sideTo.x > 0 ? roomTo.gridGetSizeX() - 1 : 0;
+	uint16_t xToEnd = sideTo.x < 0 ? 1 : roomTo.gridGetSizeX();
+
+	uint16_t yToStart = sideTo.y > 0 ? roomTo.gridGetSizeY() - 1 : 0;
+	uint16_t yToEnd = sideTo.y < 0 ? 1 : roomTo.gridGetSizeY();
+
+	// we get the cell size only from roomFrom because the cell size must be the same for rooms in the same roomGrid
+	sf::Vector2f cellSize = roomFrom.cellsGetSize();
+
+	int16_t xFrom = xFromStart - 1;
+	int16_t xTo = xToStart - 1;
+	while ((xFrom < xFromEnd - 1) && (xTo < xToEnd - 1)) {
+		xFrom++;
+		xTo++;
+
+		int16_t yFrom = yFromStart - 1;
+		int16_t yTo = yToStart - 1;
+		while ((yFrom < yFromEnd - 1) && (yTo < yToEnd - 1)) {
+			yFrom++;
+			yTo++;
+
+			// bool representing whether the sideFrom is on the X or Y axis, true if on the X axis.
+			bool fromAxis = sideFrom.x != 0 ? true : false;
+			// bool representing whether the sideTo is on the X or Y axis, true if on the X axis.
+			bool toAxis = sideTo.x != 0 ? true : false;
+
+			std::vector<Distortion> cellDistortions;
+
+			sf::Vector2f cellToCenter = roomTo.cellGet(xTo, yTo).worldPos.position + (cellSize / 2.f);
+
+			sf::Vector2i cellTeleportSide = sf::Vector2i(cellToCenter - (sf::Vector2f(sideTo.x * (cellSize.x / 2.f), sideTo.y * (cellSize.y / 2.f))) / 4.f);
+			sf::Vector2i portalDirection = Vector2iMath::rotate(Vector2iMath::abs(sideTo), Mathf::PI / 2.f);
+
+			// offset for the teleporter to teleport to.
+			// this is necessary because we are iterating over cells,
+			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
+			int32_t cellToAxisSize = (toAxis ? cellSize.x : cellSize.y);
+			for (int32_t subCellOffset = 0; subCellOffset < cellToAxisSize; subCellOffset++) {
+
+				sf::Vector2i portalOffset = portalDirection * (subCellOffset - (cellToAxisSize / 2));
+
+				sf::Vector2f teleportToLocation = sf::Vector2f(cellTeleportSide + portalOffset - sideTo);
+
+				cellDistortions.push_back(
+					Distortion([teleportToLocation](sf::Vector2f& heading, sf::Vector2f& position) {
+						position = teleportToLocation;
+						position -= heading;
+					}, Cooldown(INFINITY)));
+			}
+
+			sf::Vector2f cellFromCenter = roomFrom.cellGet(xFrom, yFrom).worldPos.position + (cellSize / 2.f);
+
+			sf::Vector2i cellDistortionSide = sf::Vector2i(cellFromCenter - (sf::Vector2f(sideFrom.x * (cellSize.x / 2.f), sideFrom.y * (cellSize.y / 2.f)) / 4.f));
+			sf::Vector2i distortionDirection = Vector2iMath::rotate(Vector2iMath::abs(sideFrom), Mathf::PI / 2.f);
+
+			// offset for the distortionCell to be placed at.
+			// this is necessary because we are iterating over cells,
+			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
+			int32_t cellFromAxisSize = (fromAxis ? cellSize.x : cellSize.y);
+			for (int32_t subCellOffset = 0; subCellOffset < cellFromAxisSize; subCellOffset++) {
+
+				sf::Vector2i distortionOffset = distortionDirection * (subCellOffset - (cellFromAxisSize / 2));
+
+				sf::Vector2f distortionCellLocation = sf::Vector2f(cellDistortionSide + distortionOffset);
+
+				distortionGrid.cellGetFromWorld(distortionCellLocation).distortionAdd(cellDistortions[subCellOffset]);
+			}
+		}
+	}
+}
+
+
+void LevelGenerator::roomGridGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
 	for (uint16_t x = 0; x < roomGrid.gridGetSizeX(); x++) {
 		for (uint16_t y = 0; y < roomGrid.gridGetSizeY(); y++) {
-			roomGenerate(roomGrid.cellGet(x, y));
+			roomGenerate(roomGrid.cellGet(x, y), roomGrid, distortionGrid);
 		}
 	}
 	ConsoleHandler::consolePrintLoadingGame("RoomGrid generation finished");
 }
-void LevelGenerator::roomGridConnectionsGenerate(RoomGrid& roomGrid) {
+void LevelGenerator::roomGridConnectionsGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
 	for (uint16_t x = 0; x < roomGrid.gridGetSizeX(); x++) {
 		for (uint16_t y = 0; y < roomGrid.gridGetSizeY(); y++) {
-			roomConnectionsGenerate(roomGrid.cellGet(x, y), roomGrid);
+			roomConnectionsGenerate(roomGrid.cellGet(x, y), roomGrid, distortionGrid);
 		}
 	}
 	ConsoleHandler::consolePrintLoadingGame("RoomGrid connections generation finished");
 }
-void LevelGenerator::roomGenerate(Room& room) {
+void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
 
 	roomSolidify(room);
 
-	roomHallwayCarve(room, sf::Vector2i(1, 0), 4);
-	roomHallwayCarve(room, sf::Vector2i(-1, 0), 4);
-	roomHallwayCarve(room, sf::Vector2i(0, 1), 4);
-	roomHallwayCarve(room, sf::Vector2i(0, -1), 4);
+	if (room.connectionLeft != INVALID_ROOM_POSITION) {
+		roomHallwayCarve(room, sf::Vector2i(-1, 0), 4);
+		roomDoorCarve(room, sf::Vector2i(-1, 0), 2);
+		roomToRoomPortalCreate(room, sf::Vector2i(-1, 0), roomGrid.cellGet(room.connectionLeft.x, room.connectionLeft.y), sf::Vector2i(1, 0), 4, distortionGrid);
+	}
+	if (room.connectionRight != INVALID_ROOM_POSITION) {
+		roomHallwayCarve(room, sf::Vector2i(1, 0), 4);
+		roomDoorCarve(room, sf::Vector2i(1, 0), 2);
+		roomToRoomPortalCreate(room, sf::Vector2i(1, 0), roomGrid.cellGet(room.connectionRight.x, room.connectionRight.y), sf::Vector2i(-1, 0), 4, distortionGrid);
+	}
+	if (room.connectionTop != INVALID_ROOM_POSITION) {
+		roomHallwayCarve(room, sf::Vector2i(0, -1), 4);
+		roomDoorCarve(room, sf::Vector2i(0, -1), 2);
+		roomToRoomPortalCreate(room, sf::Vector2i(0, -1), roomGrid.cellGet(room.connectionTop.x, room.connectionTop.y), sf::Vector2i(0, 1), 4, distortionGrid);
+	}
+	if (room.connectionBottom != INVALID_ROOM_POSITION) {
+		roomHallwayCarve(room, sf::Vector2i(0, 1), 4);
+		roomDoorCarve(room, sf::Vector2i(0, 1), 2);
+		roomToRoomPortalCreate(room, sf::Vector2i(0, 1), roomGrid.cellGet(room.connectionBottom.x, room.connectionBottom.y), sf::Vector2i(0, -1), 4, distortionGrid);
+	}
 
-	roomDoorCarve(room, sf::Vector2i(1, 0), 2);
-	roomDoorCarve(room, sf::Vector2i(-1, 0), 2);
-	roomDoorCarve(room, sf::Vector2i(0, 1), 2);
-	roomDoorCarve(room, sf::Vector2i(0, -1), 2);
+	sf::Color roomColor = sf::Color(rand(), rand(), rand(), 255);
 
+	for (uint16_t x = 0; x < room.gridGetSizeX(); x++) {
+		for (uint16_t y = 0; y < room.gridGetSizeY(); y++) {
+			room.cellGet(x, y).color = roomColor;
+		}
+	}
 }
-void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid) {
+void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
+	if (room.positionGrid.x < roomGrid.gridGetSizeX() - 2) {
+		room.connectionRight = room.positionGrid + RoomGridPosition(2, 0);
+	}
 	if (room.positionGrid.x > 0) {
 		room.connectionLeft = room.positionGrid + RoomGridPosition(-1, 0);
 	}
 	if (room.positionGrid.y > 0) {
 		room.connectionTop = room.positionGrid + RoomGridPosition(0, -1);
-	}
-	if (room.positionGrid.x < roomGrid.gridGetSizeX() - 1) {
-		room.connectionRight = room.positionGrid + RoomGridPosition(1, 0);
 	}
 	if (room.positionGrid.y < roomGrid.gridGetSizeY() - 1) {
 		room.connectionBottom = room.positionGrid + RoomGridPosition(0, 1);

@@ -31,6 +31,24 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventMove());
 		};
 	};
+	// event created after an update has been made to a ComponentPosition's position.
+	// contains data for the actual movement, along with the unnatural movement.
+	struct EventMoved final : public Event {
+
+		EventMoved() {};
+
+		sf::Vector2f movedAxis{ 0,0 };
+		sf::Vector2f naturalMovedAxis{ 0,0 };
+		sf::Vector2f unnaturalAxis{ 0,0 };
+
+		void clear() final {
+			movedAxis *= 0.f;
+			unnaturalAxis *= 0.f;
+		}
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventMoved());
+		};
+	};
 	struct EventRotate final : public Event {
 
 		EventRotate() {};

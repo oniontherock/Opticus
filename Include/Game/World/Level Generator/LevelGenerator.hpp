@@ -1,6 +1,10 @@
 #ifndef __LEVEL_GENERATOR_H__
 #define __LEVEL_GENERATOR_H__
 
+#include "../../../Common/VectorMath.hpp"
+#include "../../../Common/Math.hpp"
+#include "../Distortions/WorldDistortion.hpp"
+#include "../Distortions/WorldDistortionGrid.hpp"
 #include "../Room Grid/RoomGrid.hpp"
 #include "../Room Grid/Rooms/Room.hpp"
 #include <Auxiliary/ConsoleHandler.hpp>
@@ -16,12 +20,14 @@ protected:
 	void roomSolidify(Room& room);
 	// solidifies the specified side of a room
 	void roomSideSolidify(Room& room, sf::Vector2i side);
+	// creates a portal between roomFrom to roomTo
+	void roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t size, WorldDistortionGrid& distortionGrid);
 
 public:
-	void roomGridGenerate(RoomGrid& roomGrid);
-	void roomGridConnectionsGenerate(RoomGrid& roomGrid);
-	void roomGenerate(Room& room);
-	void roomConnectionsGenerate(Room& room, RoomGrid& roomGrid);
+	void roomGridGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid);
+	void roomGridConnectionsGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid);
+	void roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid);
+	void roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid);
 
 
 };

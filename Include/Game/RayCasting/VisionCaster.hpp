@@ -15,6 +15,7 @@
 struct VisionCaster : public RayCaster {
 
 	VisionCaster();
+	VisionCaster(sf::Vector2f _castPosition);
 	VisionCaster(const VisionCaster& other);
 	void operator= (const VisionCaster& other);
 
@@ -24,15 +25,17 @@ struct VisionCaster : public RayCaster {
 	const sf::RenderTexture& visionTextureGet();
 	const sf::RenderTexture& renderTextureGet();
 
+	void memoryUpdate(float centerX, float centerY, float moveX, float moveY);
 protected:
 	
 	sf::RenderTexture visionTexture;
 	sf::RenderTexture memoryTexture;
 
+	sf::Vector2f movedSinceBeginning;
+
 	Cooldown blurCooldown = Cooldown(0.1f);
 
 	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
-	void memoryUpdate();
 	void memoryBlur();
 };
 

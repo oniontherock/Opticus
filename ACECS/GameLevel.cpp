@@ -5,10 +5,10 @@
 #include "ECSRegistry.hpp"
 
 GameLevel::GameLevel() :
-	levelSize(sf::Vector2u(10000, 10000)),
+	levelSize(sf::Vector2u(2500, 2500)),
 	imageGrid(WorldImageGrid(1, 1, float(levelSize.x), float(levelSize.y))),
 	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
-	roomGrid(RoomGrid(16, 16, 32, 32, 16.f, 16.f)),
+	roomGrid(RoomGrid(4, 4, 32, 32, 16.f, 16.f)),
 	levelGenerator(LevelGenerator())
 {
 	entities = std::vector<EntityId>();
@@ -25,6 +25,6 @@ GameLevel::GameLevel(LevelPosition _id) :
 {}
 
 void GameLevel::roomGridGenerate() {
-	levelGenerator.roomGridConnectionsGenerate(roomGrid);
-	levelGenerator.roomGridGenerate(roomGrid);
+	levelGenerator.roomGridConnectionsGenerate(roomGrid, distortionGrid);
+	levelGenerator.roomGridGenerate(roomGrid, distortionGrid);
 }

@@ -28,6 +28,7 @@ void EntityEvents::eventIDsInitialize() {
 
 	EventRegistry::typeRegister<EventIDs<EventMove>>();
 	EventRegistry::typeRegister<EventIDs<EventRotate>>();
+	EventRegistry::typeRegister<EventIDs<EventMoved>>();
 }
 
 #pragma endregion Events
@@ -45,8 +46,8 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 }
 
 #pragma endregion Components
@@ -92,7 +93,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
 			//createComponentPairFromType<ComponentSprite>("Art/Character.png"),
-			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster()),
+			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
@@ -190,12 +191,34 @@ void ComponentRotateToMouse::system(Entity& entity) {
 }
 void ComponentPosition::system(Entity& entity) {
 	if (entity.entityEventHas<EventMove>()) {
+		auto* movedEvent = entity.entityEventAddAndGet<EventMoved>();
 
 		auto moveEvents = entity.entityEventGetAllOfType<EventMove>();
 	
+		sf::Vector2f heading;
+
 		for (uint32_t i = 0; i < moveEvents.size(); i++) {
-			position += moveEvents[i]->moveAxis;
+			heading += moveEvents[i]->moveAxis;
 		}
+
+		sf::Vector2f positionPrev = position;
+
+		// position moved by the heading without applying distortions
+		sf::Vector2f positionNatural = position + heading;
+		// amount the ray would have moved naturally
+		movedEvent->naturalMovedAxis = heading;
+
+		GameLevelGrid::levelGet(worldPosition.level)->distortionGrid.cellGetFromWorld(position).headingApplyDistortion(heading, position);
+		
+		position += heading;
+
+		// amount the position has unnaturally changed (I.E. by distortions)
+		sf::Vector2f axisUnnatural = Vector2fMath::axis(positionNatural, position);
+		// amount the ray moved unnaturally
+		movedEvent->unnaturalAxis = axisUnnatural;
+
+		// amount the ray moved by the heading
+		movedEvent->movedAxis = Vector2fMath::axis(positionPrev, position);
 	}
 }
 void ComponentRotation::system(Entity& entity) {
@@ -236,6 +259,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
+		visionCaster.memoryUpdate()
 
 		sf::Sprite memorySprite;
 		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
@@ -254,9 +278,14 @@ void ComponentViewFollow::system(Entity& entity) {
 	
 	if (entity.entityComponentHas<ComponentPosition>()) {
 		
-		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 		
 		auto& panel = PanelManager::panelGet(panelViewToFollow);
+		
+		if (entity.entityEventHas<EventMoved>()) {
+			panel.viewMove(entity.entityEventGet<EventMoved>()->unnaturalAxis);
+		}
+
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		sf::Vector2f posDiff = positionComponent->position - panel.viewGet().getCenter();
 

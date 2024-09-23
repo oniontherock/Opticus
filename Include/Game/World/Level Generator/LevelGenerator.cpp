@@ -64,17 +64,17 @@ void LevelGenerator::roomSideSolidify(Room& room, sf::Vector2i side) {
 
 void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t size, WorldDistortionGrid& distortionGrid) {
 	
-	uint16_t xFromStart = sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0;
-	uint16_t xFromEnd = sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX();
-
-	uint16_t yFromStart = sideFrom.y > 0 ? roomFrom.gridGetSizeY() - 1 : 0;
-	uint16_t yFromEnd = sideFrom.y < 0 ? 1 : roomFrom.gridGetSizeY();
-
-	uint16_t xToStart = sideTo.x > 0 ? roomTo.gridGetSizeX() - 1 : 0;
-	uint16_t xToEnd = sideTo.x < 0 ? 1 : roomTo.gridGetSizeX();
-
-	uint16_t yToStart = sideTo.y > 0 ? roomTo.gridGetSizeY() - 1 : 0;
-	uint16_t yToEnd = sideTo.y < 0 ? 1 : roomTo.gridGetSizeY();
+	const uint16_t xFromStart = sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0;
+	const uint16_t xFromEnd = sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX();
+	
+	const uint16_t yFromStart = sideFrom.y > 0 ? roomFrom.gridGetSizeY() - 1 : 0;
+	const uint16_t yFromEnd = sideFrom.y < 0 ? 1 : roomFrom.gridGetSizeY();
+	
+	const uint16_t xToStart = sideTo.x > 0 ? roomTo.gridGetSizeX() - 1 : 0;
+	const uint16_t xToEnd = sideTo.x < 0 ? 1 : roomTo.gridGetSizeX();
+	
+	const uint16_t yToStart = sideTo.y > 0 ? roomTo.gridGetSizeY() - 1 : 0;
+	const uint16_t yToEnd = sideTo.y < 0 ? 1 : roomTo.gridGetSizeY();
 
 	// we get the cell size only from roomFrom because the cell size must be the same for rooms in the same roomGrid
 	sf::Vector2f cellSize = roomFrom.cellsGetSize();
@@ -92,26 +92,26 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 			yTo++;
 
 			// bool representing whether the sideFrom is on the X or Y axis, true if on the X axis.
-			bool fromAxis = sideFrom.x != 0 ? true : false;
+			const bool fromAxis = sideFrom.x != 0 ? true : false;
 			// bool representing whether the sideTo is on the X or Y axis, true if on the X axis.
-			bool toAxis = sideTo.x != 0 ? true : false;
+			const bool toAxis = sideTo.x != 0 ? true : false;
 
 			std::vector<Distortion> cellDistortions;
 
-			sf::Vector2f cellToCenter = roomTo.cellGet(xTo, yTo).worldPos.position + (cellSize / 2.f);
+			const sf::Vector2f cellToCenter = roomTo.cellGet(xTo, yTo).worldPos.position + (cellSize / 2.f);
 
-			sf::Vector2i cellTeleportSide = sf::Vector2i(cellToCenter - (sf::Vector2f(sideTo.x * (cellSize.x / 2.f), sideTo.y * (cellSize.y / 2.f))) / 4.f);
-			sf::Vector2i portalDirection = Vector2iMath::rotate(Vector2iMath::abs(sideTo), Mathf::PI / 2.f);
+			const sf::Vector2i cellTeleportSide = sf::Vector2i(cellToCenter - (sf::Vector2f(sideTo.x * (cellSize.x / 2.f), sideTo.y * (cellSize.y / 2.f))) / 4.f);
+			const sf::Vector2i portalDirection = Vector2iMath::rotate(Vector2iMath::abs(sideTo), Mathf::PI / 2.f);
 
 			// offset for the teleporter to teleport to.
 			// this is necessary because we are iterating over cells,
 			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
-			int32_t cellToAxisSize = (toAxis ? cellSize.x : cellSize.y);
+			const int32_t cellToAxisSize = (toAxis ? cellSize.x : cellSize.y);
 			for (int32_t subCellOffset = 0; subCellOffset < cellToAxisSize; subCellOffset++) {
 
-				sf::Vector2i portalOffset = portalDirection * (subCellOffset - (cellToAxisSize / 2));
+				const sf::Vector2i portalOffset = portalDirection * (subCellOffset - (cellToAxisSize / 2));
 
-				sf::Vector2f teleportToLocation = sf::Vector2f(cellTeleportSide + portalOffset - sideTo);
+				const sf::Vector2f teleportToLocation = sf::Vector2f(cellTeleportSide + portalOffset - sideTo);
 
 				cellDistortions.push_back(
 					Distortion([teleportToLocation](sf::Vector2f& heading, sf::Vector2f& position) {
@@ -120,20 +120,20 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 					}, Cooldown(INFINITY)));
 			}
 
-			sf::Vector2f cellFromCenter = roomFrom.cellGet(xFrom, yFrom).worldPos.position + (cellSize / 2.f);
+			const sf::Vector2f cellFromCenter = roomFrom.cellGet(xFrom, yFrom).worldPos.position + (cellSize / 2.f);
 
-			sf::Vector2i cellDistortionSide = sf::Vector2i(cellFromCenter - (sf::Vector2f(sideFrom.x * (cellSize.x / 2.f), sideFrom.y * (cellSize.y / 2.f)) / 4.f));
-			sf::Vector2i distortionDirection = Vector2iMath::rotate(Vector2iMath::abs(sideFrom), Mathf::PI / 2.f);
+			const sf::Vector2i cellDistortionSide = sf::Vector2i(cellFromCenter - (sf::Vector2f(sideFrom.x * (cellSize.x / 2.f), sideFrom.y * (cellSize.y / 2.f)) / 4.f));
+			const sf::Vector2i distortionDirection = Vector2iMath::rotate(Vector2iMath::abs(sideFrom), Mathf::PI / 2.f);
 
 			// offset for the distortionCell to be placed at.
 			// this is necessary because we are iterating over cells,
 			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
-			int32_t cellFromAxisSize = (fromAxis ? cellSize.x : cellSize.y);
+			const int32_t cellFromAxisSize = (fromAxis ? cellSize.x : cellSize.y);
 			for (int32_t subCellOffset = 0; subCellOffset < cellFromAxisSize; subCellOffset++) {
 
-				sf::Vector2i distortionOffset = distortionDirection * (subCellOffset - (cellFromAxisSize / 2));
+				const sf::Vector2i distortionOffset = distortionDirection * (subCellOffset - (cellFromAxisSize / 2));
 
-				sf::Vector2f distortionCellLocation = sf::Vector2f(cellDistortionSide + distortionOffset);
+				const sf::Vector2f distortionCellLocation = sf::Vector2f(cellDistortionSide + distortionOffset);
 
 				distortionGrid.cellGetFromWorld(distortionCellLocation).distortionAdd(cellDistortions[subCellOffset]);
 			}

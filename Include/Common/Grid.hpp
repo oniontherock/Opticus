@@ -24,6 +24,8 @@ protected:
 	// size of the whole grid, including the size of the cells
 	sf::Vector2f gridSizeFull;
 
+public:
+
 	void cellsInitialize() {
 		cells = std::vector<std::vector<C>>(gridSize.x, std::vector<C>(gridSize.y, C()));
 	}
@@ -32,7 +34,37 @@ protected:
 		cells = std::vector<std::vector<C>>(gridSize.x, std::vector<C>(gridSize.y, C(args...)));
 	}
 
-public:
+	void cellsInitializeNoCopy() {
+		std::vector<std::vector<C>> rows(gridSize.x);
+
+		for (uint32_t x = 0; x < gridSize.x; x++) {
+
+			std::vector<C> columns(gridSize.y);
+			for (uint32_t y = 0; y < gridSize.y; y++) {
+				columns[y] = C();
+			}
+
+			rows[x] = std::move(columns);
+		}
+
+		cells = std::move(rows);
+	}
+	template <typename... Args>
+	void cellsInitializeNoCopy(Args... args) {
+		std::vector<std::vector<C>> rows(gridSize.x);
+
+		for (uint32_t x = 0; x < gridSize.x; x++) {
+
+			std::vector<C> columns(gridSize.y);
+			for (uint32_t y = 0; y < gridSize.y; y++) {
+				columns[y] = C(args...);
+			}
+
+			rows[x] = std::move(columns);
+		}
+
+		cells = std::move(rows);
+	}
 
 	Grid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
 		gridSize(sf::Vector2u(gridSizeX, gridSizeY)),

@@ -65,15 +65,19 @@ public:
 
 		cells = std::move(rows);
 	}
+	
+	Grid() :
+		gridSize(sf::Vector2u(0, 0)),
+		cellCount(gridSize.x * gridSize.y),
+		cellSize(sf::Vector2f(0, 0)),
+		gridSizeFull(sf::Vector2f(gridSize.x * cellSize.x, gridSize.y * cellSize.y))
+	{}
 
 	Grid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
 		gridSize(sf::Vector2u(gridSizeX, gridSizeY)),
-		cellCount(gridSizeX * gridSizeY),
+		cellCount(gridSize.x * gridSize.y ),
 		cellSize(sf::Vector2f(cellSizeX, cellSizeY)),
-		gridSizeFull(sf::Vector2f(gridSizeX * cellSize.x, gridSizeY * cellSize.y))
-	{}
-	Grid(uint32_t gridSizeX, uint32_t gridSizeY) :
-		Grid(gridSizeX, gridSizeY, 1.f, 1.f)
+		gridSizeFull(sf::Vector2f(gridSize.x * cellSize.x, gridSize.y * cellSize.y))
 	{}
 
 	CellVector coordinatesWorldToCell(WorldCoordinate worldX, WorldCoordinate worldY) {

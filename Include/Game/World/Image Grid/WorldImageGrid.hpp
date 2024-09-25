@@ -11,7 +11,6 @@ typedef std::vector<WorldImageGrid1D> WorldImageGrid2D;
 struct WorldImageGrid : Grid<WorldTexture> {
 
 	WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
-	WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY);
 
 	void imagesAllReadSet(const bool state);
 	void imagesAllWriteSet(const bool state);

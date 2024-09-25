@@ -18,23 +18,7 @@ WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cel
 
 	cells = std::move(rows);
 }
-WorldImageGrid::WorldImageGrid(uint32_t gridSizeX, uint32_t gridSizeY) :
-	Grid<WorldTexture>::Grid(gridSizeX, gridSizeY, 1.f, 1.f)
-{
-	WorldImageGrid2D rows(gridSize.x);
 
-	for (uint32_t x = 0; x < gridSize.x; x++) {
-
-		WorldImageGrid1D columns(gridSize.y);
-		for (uint32_t y = 0; y < gridSize.y; y++) {
-			columns[y].create(uint32_t(cellSize.x), uint32_t(cellSize.y));
-		}
-
-		rows[x] = std::move(columns);
-	}
-
-	cells = std::move(rows);
-}
 
 void WorldImageGrid::imagesAllReadSet(const bool state) {
 	for (uint16_t x = 0; x < gridSize.x; x++) {

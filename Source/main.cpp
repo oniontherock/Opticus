@@ -10,6 +10,10 @@
 
 int main() {
 
+	TimeHandler::deltaCompute();
+
+	srand(TimeHandler::timeRealGet());
+
 	// setup window
 	WindowHolder::windowInitialize(sf::VideoMode(1280, 720), "Window");
 	//WindowHolder::windowGet().setFramerateLimit(60);

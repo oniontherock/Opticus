@@ -92,7 +92,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
-			createComponentPairFromType<ComponentRotateToMouse>(0.2f),
+			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
@@ -165,28 +165,35 @@ void ComponentRotateToMouse::system(Entity& entity) {
 
 		float delta = float(TimeHandler::deltaSimulatedGet());
 
+		float deltaLerp = 1.f - powf(1.f - lerpSpeed, delta);
+
 		auto& gameViewPanel = PanelManager::panelGet(PanelName::GameView);
 
 		float angle = Vector2fMath::angle(entity.entityComponentGet<ComponentPosition>()->position, gameViewPanel.viewMousePositionGet());
 
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 
+		// wrap rotation between -PI and +PI
+		if (rotationComponent->rotation >= +Mathf::PI) rotationComponent->rotation -= Mathf::TAU;
+		if (rotationComponent->rotation <= -Mathf::PI) rotationComponent->rotation += Mathf::TAU;
+		
 		float angleDiff = angle - rotationComponent->rotation;
 
 		float rotateAngle = angleDiff;
-		// wrap rotation between -PI and +PI
-		if (rotateAngle > +Mathf::PI) rotateAngle -= Mathf::TAU;
-		if (rotateAngle < -Mathf::PI) rotateAngle += Mathf::TAU;
+		// wrap rotateAngle between -PI and +PI
+		if (rotateAngle >= +Mathf::PI) rotateAngle -= Mathf::TAU;
+		if (rotateAngle <= -Mathf::PI) rotateAngle += Mathf::TAU;
+
 
 		// limit the speed of the rotation;
-		float rotLimit = Mathf::TAU * 2.f / delta;
-		rotateAngle *= lerpSpeed / delta;
+		float rotLimit = Mathf::TAU;
+		rotateAngle *= deltaLerp;
 		if (rotateAngle > +rotLimit) rotateAngle = +rotLimit;
 		if (rotateAngle < -rotLimit) rotateAngle = -rotLimit;
 
 		auto* rotateEvent = entity.entityEventAddAndGet<EventRotate>();
 
-		rotateEvent->rotateAmount = rotateAngle * delta;
+		rotateEvent->rotateAmount = rotateAngle;
 	}
 }
 void ComponentPosition::system(Entity& entity) {

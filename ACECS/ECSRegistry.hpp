@@ -129,6 +129,7 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentSprite(texture));
 		};
 	};
+	// creates an EventRotate every frame that linearly interpolates towards the mouse
 	struct ComponentRotateToMouse final : public Component {
 
 		void system(Entity& entity) final;
@@ -142,6 +143,8 @@ namespace EntityComponents {
 			lerpSpeed = _lerpSpeed;
 		};
 
+		// speed of linear interpolation towards mouse.
+		// note that this is in seconds, so a speed of 0.5 means it will reach halfway in one second
 		float lerpSpeed = 0.5f;
 
 		std::unique_ptr<Duplicatable> duplicate() override {

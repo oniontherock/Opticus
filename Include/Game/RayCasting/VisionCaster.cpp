@@ -204,6 +204,9 @@ void VisionCaster::memoryUpdate(float mememoryOffsetX, float mememoryOffsetY) {
 	// load the grayscale shader
 	sf::Shader grayscaleShader;
 	grayscaleShader.loadFromFile("Include/Shaders/Grayscale.glsl", sf::Shader::Fragment);
+	grayscaleShader.setUniform("divider", 2.0f);
+	grayscaleShader.setUniform("lerp", 0.9f);
+
 
 	// draw the visionSprite to the memoryTexture with a grayscale applied
 	memoryTexture.draw(visionSprite, &grayscaleShader);

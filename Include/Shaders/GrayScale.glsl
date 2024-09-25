@@ -1,4 +1,6 @@
 uniform sampler2D texture;
+uniform float lerp;
+uniform float divider;
 
 void main() {
 		
@@ -6,9 +8,9 @@ void main() {
 
 	float avgColor = (pixel.r * 0.2126) + (pixel.g * 0.7152) + (pixel.b * 0.0722);
 
-	avgColor /= 2.0;
-
 	vec4 grayColor = vec4(avgColor, avgColor, avgColor, pixel.a);
 
-	gl_FragColor = grayColor;
+	vec4 colorDist = grayColor - pixel;
+
+	gl_FragColor = (pixel + (colorDist * lerp)) / divider;
 }

@@ -60,14 +60,6 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 	raysCast(angleTo, coneSize, rayCount);
 }
 
-std::pair<int, int> getClosestFactors(int input) {
-	int testNum = (int)sqrt(input);
-	while (input % testNum != 0) {
-		testNum--;
-	}
-	return { testNum, input / testNum };
-}
-
 void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);

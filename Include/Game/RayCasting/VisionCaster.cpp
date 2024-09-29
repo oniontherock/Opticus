@@ -4,20 +4,36 @@ VisionCaster::VisionCaster() {
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
 	visionTexture.create(panelSize.x, panelSize.y);
 
-	sf::Vector2u roomSize = GameLevelGrid::levelGet(castPosition.level)->levelSize;
-	memoryTexture.create(roomSize.x, roomSize.y);
-	memoryTexture.clear(sf::Color(90, 90, 90, 255));
+	//sf::Vector2u roomSize = GameLevelGrid::levelGet(castPosition.level)->levelSize;
+	//memoryTexture.create(roomSize.x, roomSize.y);
+	//memoryTexture.clear(sf::Color(90, 90, 90, 255));
 
-	sf::Texture noiseTexture;
-	noiseTexture.loadFromFile("Art/Cobweb Noise.jpg");
-	noiseTexture.setRepeated(true);
+	//sf::Texture noiseTexture;
+	//noiseTexture.loadFromFile("Art/Cobweb Noise.jpg");
+	//noiseTexture.setRepeated(true);
 
-	sf::Sprite noiseSprite(noiseTexture);
-	noiseSprite.setColor(sf::Color(130, 130, 130, 75));
-	noiseSprite.setScale(2.f, 2.f);
-	noiseSprite.setTextureRect(sf::IntRect(0, 0, roomSize.x, roomSize.y));
+	//sf::Sprite noiseSprite(noiseTexture);
+	//noiseSprite.setColor(sf::Color(130, 130, 130, 75));
+	//noiseSprite.setScale(2.f, 2.f);
+	//noiseSprite.setTextureRect(sf::IntRect(0, 0, roomSize.x, roomSize.y));
 
-	memoryTexture.draw(noiseSprite);
+	//memoryTexture.draw(noiseSprite);
+
+	memoryTextures.push_back(std::vector<sf::RenderTexture>(4));
+	memoryTextures.push_back(std::vector<sf::RenderTexture>(4));
+	memoryTextures.push_back(std::vector<sf::RenderTexture>(4));
+	memoryTextures.push_back(std::vector<sf::RenderTexture>(4));
+
+	for (uint16_t x = 0; x < 4; x++) {
+		for (uint16_t y = 0; y < 4; y++) {
+			memoryTextures[x][y].create(640, 360);
+		}
+	}
+	
+	memoryPosition = sf::Vector2u(256, 256);
+
+	memoryTexture = &memoryTextures[0][0];
+
 }
 VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 	VisionCaster()
@@ -29,8 +45,8 @@ VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 VisionCaster::VisionCaster(const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
-	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
-	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
+	//memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
+	//memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 
 	castPosition = other.castPosition;
 	memoryPositionOffset = other.memoryPositionOffset;
@@ -38,8 +54,8 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 void VisionCaster::operator= (const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
-	memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
-	memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
+	//memoryTexture.create(other.memoryTexture.getSize().x, other.memoryTexture.getSize().y);
+	//memoryTexture.draw(sf::Sprite(other.memoryTexture.getTexture()));
 
 	castPosition = other.castPosition;
 	memoryPositionOffset = other.memoryPositionOffset;
@@ -49,7 +65,7 @@ const sf::RenderTexture& VisionCaster::visionTextureGet() {
 	return visionTexture;
 }
 const sf::RenderTexture& VisionCaster::renderTextureGet() {
-	return memoryTexture;
+	return *memoryTexture;
 }
 
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
@@ -187,11 +203,17 @@ void VisionCaster::memoryUpdate(float mememoryOffsetX, float mememoryOffsetY) {
 	memoryPositionOffset.x += mememoryOffsetX;
 	memoryPositionOffset.y += mememoryOffsetY;
 
+	memoryPosition = sf::Vector2u(memoryPositionOffset.x / 320.f, memoryPositionOffset.y / 180.f);
+
+	std::cout << memoryPosition.x << " " << memoryPosition.y << std::endl;
+
+	memoryTexture = &memoryTextures[memoryPosition.x][memoryPosition.y];
+
 	// create a sprite from the visionTexture
 	sf::Sprite visionSprite(visionTexture.getTexture());
 	visionSprite.setOrigin(sf::Vector2f(visionTexture.getSize()) / 2.f);
 	// set the visionSprite's position to the center of the memoryTexture, minus the memoryPositionOffset
-	visionSprite.setPosition((sf::Vector2f(memoryTexture.getSize()) / 2.f) - memoryPositionOffset);
+	visionSprite.setPosition((sf::Vector2f(memoryTexture->getSize()) / 2.f) + (memoryPositionOffset - sf::Vector2f(memoryPosition.x * 640, memoryPosition.y * 360)));
 
 	// load the grayscale shader
 	sf::Shader grayscaleShader;
@@ -201,9 +223,9 @@ void VisionCaster::memoryUpdate(float mememoryOffsetX, float mememoryOffsetY) {
 
 
 	// draw the visionSprite to the memoryTexture with a grayscale applied
-	memoryTexture.draw(visionSprite, &grayscaleShader);
+	memoryTexture->draw(visionSprite, &grayscaleShader);
 	// display the memoryTexture
-	memoryTexture.display();
+	memoryTexture->display();
 }
 void VisionCaster::memoryBlur() {
 
@@ -213,7 +235,7 @@ void VisionCaster::memoryBlur() {
 	// update the blurCooldown, if it is ready, blur the memoryTexture a bit
 	if (blurCooldown.updateAutoReset(delta)) {
 		// create a sprite from the memoryTexture
-		sf::Sprite memorySprite(memoryTexture.getTexture());
+		sf::Sprite memorySprite(memoryTexture->getTexture());
 
 		// load the blur shader
 		sf::Shader blurShader;
@@ -223,7 +245,7 @@ void VisionCaster::memoryBlur() {
 		blurShader.setUniform("size", 1.f);
 
 		// draw to the memoryTexture with the memorySprite with the blur shader applied, effectively blurring the memory.
-		memoryTexture.draw(memorySprite, &blurShader);
+		memoryTexture->draw(memorySprite, &blurShader);
 	}
 }
 

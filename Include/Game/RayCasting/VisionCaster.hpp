@@ -29,15 +29,10 @@ struct VisionCaster : public RayCaster {
 
 	// offset for the memory texture from it's center
 	sf::Vector2f memoryPositionOffset;
-	sf::Vector2u memoryPosition;
 protected:
 	
 	sf::RenderTexture visionTexture;
-
-	std::vector<std::vector<sf::RenderTexture>> memoryTextures;
-
-	sf::RenderTexture* memoryTexture;
-
+	sf::RenderTexture memoryTexture;
 
 	Cooldown blurCooldown = Cooldown(0.1f);
 

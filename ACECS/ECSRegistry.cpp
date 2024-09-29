@@ -276,15 +276,12 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		// we do this because, when drawing the memory sprite, we center it on the camera, and offset it by it's offset,
 		// and since we update the memory with the inverted movement of the camera,
 		// it gives the affect that when you move, you are moving disconnected from the memory, when in fact, the memory is following the camera.
-		visionCaster.memoryUpdate(cameraMovedAmount.x, cameraMovedAmount.y);
+		visionCaster.memoryUpdate(-cameraMovedAmount.x, -cameraMovedAmount.y);
 
 		sf::Sprite memorySprite;
 		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
 		memorySprite.setOrigin(sf::Vector2f(visionCaster.renderTextureGet().getSize()) / 2.f);
-		memorySprite.setPosition(
-			gameViewPanel.viewGet().getCenter() -
-			(visionCaster.memoryPositionOffset - sf::Vector2f(visionCaster.memoryPosition.x * 640, visionCaster.memoryPosition.y * 360))
-		);
+		memorySprite.setPosition(gameViewPanel.viewGet().getCenter() + visionCaster.memoryPositionOffset);
 
 		gameViewPanel.objectDraw(memorySprite);
 		

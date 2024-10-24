@@ -109,20 +109,6 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
 		}
 	);
-	ComponentTemplateManager::componentTemplateAdd(
-
-		/// template name
-		"Skipper",
-		{
-		},
-		/// list of components in template
-		{
-			createComponentPairFromType<ComponentPosition>(WorldPosition(0, 0, 0, 64.f, 64.f)),
-			createComponentPairFromType<ComponentDistortionRadius>(16.f, Distortion([](sf::Vector2f& heading, sf::Vector2f& position) {
-			position += heading * 17.f;
-				}, Cooldown(0.1f))),
-		}
-		);
 
 }
 
@@ -371,10 +357,6 @@ void ComponentDistortionRadius::system(Entity& entity) {
 			distortionGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).distortionAdd(distortion);
 		}
 	}
-
-	positionComponent->position.x += 30.f * TimeHandler::deltaSimulatedGet();
-	positionComponent->position.y += 30.f * TimeHandler::deltaSimulatedGet();
-
 }
 
 #pragma endregion Systems

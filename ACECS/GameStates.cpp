@@ -69,22 +69,8 @@ void GameStatePlay::gameStateStart() {
 			}
 		}
 	}
-	//worldImage.display();
-
-	//Distortion distortion = Distortion([](sf::Vector2f& heading, sf::Vector2f&) {
-	//	heading *= 0.99f;
-	//	}, Cooldown(INFINITY));
-
-	//for (uint32_t x = 320; x < 1280; x++) {
-	//	for (uint32_t y = 0; y < 720; y++) {
-
-
-	//		gameLevel->distortionGrid.cellSet(x, y, WorldDistortion(distortion));
-	//	}
-	//}
 
 	EntityManager::entityCreate(0, 0, 0, "Player");
-	EntityManager::entityCreate(0, 0, 0, "Skipper");
 
 	EntityId spriteId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
 	Entity& sprite = EntityManager::entityGet(spriteId);

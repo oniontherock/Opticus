@@ -192,8 +192,8 @@ void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortio
 	}
 }
 void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
-	if (room.positionGrid.x < roomGrid.gridGetSizeX() - 2) {
-		room.connectionRight = room.positionGrid + RoomGridPosition(2, 0);
+	if (room.positionGrid.x < roomGrid.gridGetSizeX() - 1) {
+		room.connectionRight = room.positionGrid + RoomGridPosition(1, 0);
 	}
 	if (room.positionGrid.x > 0) {
 		room.connectionLeft = room.positionGrid + RoomGridPosition(-1, 0);

@@ -25,7 +25,7 @@ struct MemoryHolderVision {
 	// update the offsetCenter with offsetX and offsetY
 	void offsetCenterUpdate(float offsetX, float offsetY);
 	// update the memory textures with textureUpdate
-	void memoryUpdate(sf::Texture& textureUpdate);
+	void memoryUpdate(const sf::Texture& textureUpdate);
 
 protected:
 

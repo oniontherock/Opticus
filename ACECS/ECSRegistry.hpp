@@ -3,6 +3,7 @@
 
 #include "../Include/Common/Math.hpp"
 #include "../Include/Game/RayCasting/Sight/VisionCaster.hpp"
+#include "../Include/Game/RayCasting/Sight/MemoryHolderVision.hpp"
 #include "../ACECS/Panels.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
@@ -198,16 +199,19 @@ namespace EntityComponents {
 		ComponentVisionDrawer() {
 			hasSystem = true;
 		};
-		ComponentVisionDrawer(VisionCaster _visionCaster) :
+		ComponentVisionDrawer(VisionCaster _visionCaster, MemoryHolderVision _memoryHolder) :
 			ComponentVisionDrawer()
 		{
 			visionCaster = _visionCaster;
+			memoryHolder = _memoryHolder;
 		};
 
 		VisionCaster visionCaster;
+		MemoryHolderVision memoryHolder;
+
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(visionCaster));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(visionCaster, memoryHolder));
 		};
 	};
 	struct ComponentViewFollow final : public Component {

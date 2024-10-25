@@ -93,7 +93,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
-			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f))),
+			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision()),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
@@ -263,12 +263,13 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		// we do this because, when drawing the memory sprite, we center it on the camera, and offset it by it's offset,
 		// and since we update the memory with the inverted movement of the camera,
 		// it gives the affect that when you move, you are moving disconnected from the memory, when in fact, the memory is following the camera.
-		visionCaster.memoryUpdate(-cameraMovedAmount.x, -cameraMovedAmount.y);
+		memoryHolder.offsetCenterUpdate(-cameraMovedAmount.x, -cameraMovedAmount.y);
+		memoryHolder.memoryUpdate(visionCaster.visionTextureGet().getTexture());
 
 		sf::Sprite memorySprite;
-		memorySprite.setTexture(visionCaster.renderTextureGet().getTexture());
-		memorySprite.setOrigin(sf::Vector2f(visionCaster.renderTextureGet().getSize()) / 2.f);
-		memorySprite.setPosition(gameViewPanel.viewGet().getCenter() + visionCaster.memoryPositionOffset);
+		memorySprite.setTexture(memoryHolder.textureMemoryGet().getTexture());
+		memorySprite.setOrigin(sf::Vector2f(memoryHolder.textureMemoryGet().getSize()) / 2.f);
+		memorySprite.setPosition(gameViewPanel.viewGet().getCenter() + memoryHolder.offsetCenter);
 
 		gameViewPanel.objectDraw(memorySprite);
 		

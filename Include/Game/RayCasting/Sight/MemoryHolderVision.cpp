@@ -21,10 +21,9 @@ MemoryHolderVision::MemoryHolderVision(const MemoryHolderVision& other) {
 
 	texturesMemorySizeEach = other.texturesMemorySizeEach;
 
+	texturesMemoryVector = std::vector<sf::RenderTexture>(4);
 	for (uint8_t i = 0; i < 4; i++) {
 		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
-		texturesMemoryVector[i].draw(sf::Sprite(other.texturesMemoryVector[i].getTexture()));
-		texturesMemoryVector[i].display();
 	}
 
 	textureMemoryConcatenated.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
@@ -35,11 +34,9 @@ void MemoryHolderVision::operator= (const MemoryHolderVision& other) {
 
 	texturesMemorySizeEach = other.texturesMemorySizeEach;
 
-	texturesMemoryVector.clear();
+	texturesMemoryVector = std::vector<sf::RenderTexture>(4);
 	for (uint8_t i = 0; i < 4; i++) {
 		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
-		texturesMemoryVector[i].draw(sf::Sprite(other.texturesMemoryVector[i].getTexture()));
-		texturesMemoryVector[i].display();
 	}
 
 	textureMemoryConcatenated.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
@@ -54,7 +51,7 @@ void MemoryHolderVision::offsetCenterUpdate(float offsetX, float offsetY) {
 	offsetCenter.y += offsetY;
 }
 
-void MemoryHolderVision::memoryUpdate(sf::Texture& textureUpdate) {
+void MemoryHolderVision::memoryUpdate(const sf::Texture& textureUpdate) {
 	// blur the memory
 	memoryBlur();
 

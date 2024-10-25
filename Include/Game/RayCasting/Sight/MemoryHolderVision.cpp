@@ -5,7 +5,12 @@ MemoryHolderVision::MemoryHolderVision() {
 	positionCenter = sf::Vector2f(0.f, 0.f);
 	offsetCenter = sf::Vector2f(0.f, 0.f);
 
+	texturesMemorySizeEach = sf::Vector2f(500.f, 500.f);
+
 	texturesMemoryVector = std::vector<sf::RenderTexture>(4);
+	for (uint8_t i = 0; i < 4; i++) {
+		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
+	}
 }
 
 MemoryHolderVision::MemoryHolderVision(const MemoryHolderVision& other) {
@@ -27,7 +32,30 @@ void MemoryHolderVision::operator= (const MemoryHolderVision& other) {
 	}
 }
 
-////////////////////
+sf::RenderTexture MemoryHolderVision::textureMemoryGet() {
+	sf::RenderTexture textureMemory;
+	textureMemory.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
+
+
+	sf::Sprite sprite0(texturesMemoryVector[0].getTexture());
+	
+	sf::Sprite sprite1(texturesMemoryVector[1].getTexture());
+	sprite1.setPosition(texturesMemorySizeEach.x, 0.f);
+
+	sf::Sprite sprite2(texturesMemoryVector[2].getTexture());
+	sprite2.setPosition(0.f, texturesMemorySizeEach.y);
+
+	sf::Sprite sprite3(texturesMemoryVector[3].getTexture());
+	sprite3.setPosition(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
+
+
+	textureMemory.draw(sprite0);
+	textureMemory.draw(sprite1);
+	textureMemory.draw(sprite2);
+	textureMemory.draw(sprite3);
+
+	return textureMemory;
+}
 
 void MemoryHolderVision::offsetCenterUpdate(float offsetX, float offsetY) {
 	offsetCenter.x += offsetX;

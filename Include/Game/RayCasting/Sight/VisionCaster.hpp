@@ -23,21 +23,12 @@ struct VisionCaster : public RayCaster {
 	void update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) override;
 
 	const sf::RenderTexture& visionTextureGet();
-	const sf::RenderTexture& renderTextureGet();
 
-	void memoryUpdate(float mememoryOffsetX, float mememoryOffsetY);
-
-	// offset for the memory texture from it's center
-	sf::Vector2f memoryPositionOffset;
 protected:
 	
 	sf::RenderTexture visionTexture;
-	sf::RenderTexture memoryTexture;
-
-	Cooldown blurCooldown = Cooldown(0.1f);
 
 	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
-	void memoryBlur();
 };
 
 #endif

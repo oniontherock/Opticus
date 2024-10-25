@@ -254,25 +254,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
 
-		// amount the camera has moved this frame
-		sf::Vector2f cameraMovedAmount;
-		if (entity.entityEventHas<EventViewMoved>()) {
-			cameraMovedAmount = entity.entityEventGet<EventViewMoved>()->naturalMovedAxis;
-		}
-		// update the memory, offsetting it by the inverted natural movement of the camera.
-		// we do this because, when drawing the memory sprite, we center it on the camera, and offset it by it's offset,
-		// and since we update the memory with the inverted movement of the camera,
-		// it gives the affect that when you move, you are moving disconnected from the memory, when in fact, the memory is following the camera.
-		memoryHolder.offsetCenterUpdate(-cameraMovedAmount.x, -cameraMovedAmount.y);
-		memoryHolder.memoryUpdate(visionCaster.visionTextureGet().getTexture());
 
-		sf::Sprite memorySprite;
-		memorySprite.setTexture(memoryHolder.textureMemoryGet().getTexture());
-		memorySprite.setOrigin(sf::Vector2f(memoryHolder.textureMemoryGet().getSize()) / 2.f);
-		memorySprite.setPosition(gameViewPanel.viewGet().getCenter() + memoryHolder.offsetCenter);
-
-		gameViewPanel.objectDraw(memorySprite);
-		
 		sf::Sprite visionSprite;
 		visionSprite.setTexture(visionCaster.visionTextureGet().getTexture());
 		visionSprite.setPosition(gameViewPanel.viewRect.getPosition());

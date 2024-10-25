@@ -121,6 +121,7 @@ using namespace EntityEvents;
 // if you need to include a certain file for a system, include it here.
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Common/TimeHandler.hpp"
+#include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include <iostream>

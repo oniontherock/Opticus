@@ -142,7 +142,8 @@
     <ClCompile Include="ACECS\Panels.cpp" />
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
-    <ClCompile Include="Include\Game\RayCasting\VisionCaster.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\Sight\MemoryHolderVision.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\Sight\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
     <ClCompile Include="Include\Game\World\Level Generator\LevelGenerator.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\RoomGrid.cpp" />
@@ -186,7 +187,8 @@
     <ClInclude Include="Include\Common\NumberGenerator.hpp" />
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
-    <ClInclude Include="Include\Game\RayCasting\VisionCaster.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\Sight\MemoryHolderVision.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\Sight\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortion.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />

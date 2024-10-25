@@ -1,7 +1,8 @@
 #include "ACECS.hpp"
 
-#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
+#include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "GameState.hpp"
@@ -84,6 +85,8 @@ void Engine::gameStateRegister() {
 // initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 // of course, certain modules do not have to be initialized if the user does not want them to be
 void Engine::engineInitialize() {
+
+	RNGf::initialize();
 
 	GameLevelGrid::levelGridInitialize(1, 1, 1);
 	GameLevelGrid::levelAdd(new GameLevel(0, 0, 0), true);

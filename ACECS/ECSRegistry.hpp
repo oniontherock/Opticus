@@ -2,7 +2,7 @@
 #define __ECS_REGISTRY_H__
 
 #include "../Include/Common/Math.hpp"
-#include "../Include/Game/RayCasting/VisionCaster.hpp"
+#include "../Include/Game/RayCasting/Sight/VisionCaster.hpp"
 #include "../ACECS/Panels.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"

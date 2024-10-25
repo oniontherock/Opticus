@@ -4,7 +4,7 @@ VisionCaster::VisionCaster() {
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
 	visionTexture.create(panelSize.x, panelSize.y);
 
-	sf::Vector2u roomSize = GameLevelGrid::levelGet(castPosition.level)->levelSize;
+	sf::Vector2u roomSize = sf::Vector2u(500, 500);//GameLevelGrid::levelGet(castPosition.level)->levelSize;
 	memoryTexture.create(roomSize.x, roomSize.y);
 	memoryTexture.clear(sf::Color(90, 90, 90, 255));
 

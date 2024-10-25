@@ -20,7 +20,7 @@ struct MemoryHolderVision {
 	// offset for the four textures from the center
 	sf::Vector2f offsetCenter;
 
-	sf::RenderTexture textureMemoryGet();
+	sf::RenderTexture& textureMemoryGet();
 
 	// update the offsetCenter with offsetX and offsetY
 	void offsetCenterUpdate(float offsetX, float offsetY);
@@ -36,7 +36,11 @@ protected:
 
 	Cooldown blurCooldown = Cooldown(0.1f);
 
+	// concatenation of the texturesMemoryVector
+	sf::RenderTexture textureMemoryConcatenated;
+
 	void memoryBlur();
+	void textureMemoryConcatenatedUpdate();
 };
 
 

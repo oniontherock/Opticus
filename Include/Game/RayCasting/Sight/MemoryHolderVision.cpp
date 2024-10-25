@@ -5,56 +5,48 @@ MemoryHolderVision::MemoryHolderVision() {
 	positionCenter = sf::Vector2f(0.f, 0.f);
 	offsetCenter = sf::Vector2f(0.f, 0.f);
 
-	texturesMemorySizeEach = sf::Vector2f(500.f, 500.f);
+	texturesMemorySizeEach = sf::Vector2i(500.f, 500.f);
 
 	texturesMemoryVector = std::vector<sf::RenderTexture>(4);
 	for (uint8_t i = 0; i < 4; i++) {
 		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
 	}
+
+	textureMemoryConcatenated.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
 }
 
 MemoryHolderVision::MemoryHolderVision(const MemoryHolderVision& other) {
 	positionCenter = other.positionCenter;
 	offsetCenter = other.offsetCenter;
 
-	texturesMemoryVector.clear();
+	texturesMemorySizeEach = other.texturesMemorySizeEach;
+
 	for (uint8_t i = 0; i < 4; i++) {
-		texturesMemoryVector.push_back(std::move(other.texturesMemoryVector[i]));
+		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
+		texturesMemoryVector[i].draw(sf::Sprite(other.texturesMemoryVector[i].getTexture()));
+		texturesMemoryVector[i].display();
 	}
+
+	textureMemoryConcatenated.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
 }
 void MemoryHolderVision::operator= (const MemoryHolderVision& other) {
 	positionCenter = other.positionCenter;
 	offsetCenter = other.offsetCenter;
 
+	texturesMemorySizeEach = other.texturesMemorySizeEach;
+
 	texturesMemoryVector.clear();
 	for (uint8_t i = 0; i < 4; i++) {
-		texturesMemoryVector.push_back(std::move(other.texturesMemoryVector[i]));
+		texturesMemoryVector[i].create(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
+		texturesMemoryVector[i].draw(sf::Sprite(other.texturesMemoryVector[i].getTexture()));
+		texturesMemoryVector[i].display();
 	}
+
+	textureMemoryConcatenated.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
 }
 
-sf::RenderTexture MemoryHolderVision::textureMemoryGet() {
-	sf::RenderTexture textureMemory;
-	textureMemory.create(texturesMemorySizeEach.x * 2.f, texturesMemorySizeEach.y * 2.f);
-
-
-	sf::Sprite sprite0(texturesMemoryVector[0].getTexture());
-	
-	sf::Sprite sprite1(texturesMemoryVector[1].getTexture());
-	sprite1.setPosition(texturesMemorySizeEach.x, 0.f);
-
-	sf::Sprite sprite2(texturesMemoryVector[2].getTexture());
-	sprite2.setPosition(0.f, texturesMemorySizeEach.y);
-
-	sf::Sprite sprite3(texturesMemoryVector[3].getTexture());
-	sprite3.setPosition(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
-
-
-	textureMemory.draw(sprite0);
-	textureMemory.draw(sprite1);
-	textureMemory.draw(sprite2);
-	textureMemory.draw(sprite3);
-
-	return textureMemory;
+sf::RenderTexture& MemoryHolderVision::textureMemoryGet() {
+	return textureMemoryConcatenated;
 }
 
 void MemoryHolderVision::offsetCenterUpdate(float offsetX, float offsetY) {
@@ -87,7 +79,10 @@ void MemoryHolderVision::memoryUpdate(sf::Texture& textureUpdate) {
 		// display the memoryTexture
 		textureMemory.display();
 	}
+
+	textureMemoryConcatenatedUpdate();
 }
+
 void MemoryHolderVision::memoryBlur() {
 
 	// get simulated delta
@@ -112,8 +107,32 @@ void MemoryHolderVision::memoryBlur() {
 
 			// draw to the memoryTexture with the memorySprite with the blur shader applied, effectively blurring the memory.
 			textureMemory.draw(memorySprite, &blurShader);
+			// display the memoryTexture
+			textureMemory.display();
 		}
 	}
+}
+
+void MemoryHolderVision::textureMemoryConcatenatedUpdate() {
+
+	sf::Sprite sprite0(texturesMemoryVector[0].getTexture());
+
+	sf::Sprite sprite1(texturesMemoryVector[1].getTexture());
+	sprite1.setPosition(texturesMemorySizeEach.x, 0.f);
+
+	sf::Sprite sprite2(texturesMemoryVector[2].getTexture());
+	sprite2.setPosition(0.f, texturesMemorySizeEach.y);
+
+	sf::Sprite sprite3(texturesMemoryVector[3].getTexture());
+	sprite3.setPosition(texturesMemorySizeEach.x, texturesMemorySizeEach.y);
+
+
+	textureMemoryConcatenated.clear();
+	textureMemoryConcatenated.draw(sprite0);
+	textureMemoryConcatenated.draw(sprite1);
+	textureMemoryConcatenated.draw(sprite2);
+	textureMemoryConcatenated.draw(sprite3);
+	textureMemoryConcatenated.display();
 }
 
 

@@ -93,7 +93,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
-			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision()),
+			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(1280, 720))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);
@@ -253,6 +253,22 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
+
+		// amount the camera has moved this frame
+		sf::Vector2f cameraMovedAmount;
+		if (entity.entityEventHas<EventViewMoved>()) {
+			cameraMovedAmount = entity.entityEventGet<EventViewMoved>()->naturalMovedAxis;
+		}
+
+		memoryHolder.memoryUpdate(-cameraMovedAmount, visionCaster.visionTextureGet().getTexture());
+
+		sf::Sprite memorySprite;
+		memorySprite.setTexture(memoryHolder.memoryGet().getTexture());
+		memorySprite.setOrigin(memoryHolder.memorySize / 2.f);
+		memorySprite.setPosition(gameViewPanel.viewGet().getCenter());
+
+		gameViewPanel.objectDraw(memorySprite);
+
 
 
 		sf::Sprite visionSprite;

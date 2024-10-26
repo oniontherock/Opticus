@@ -12,6 +12,9 @@ public:
 	static bool approxEquals(T a, T b, float epsilon) {
 		return std::abs(a - b) < epsilon;
 	}
+	static int sign(T v) {
+		return (T(0) < v) - (v < T(0));
+	}
 };
 
 using Mathf = Math<float>;

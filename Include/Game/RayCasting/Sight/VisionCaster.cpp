@@ -3,21 +3,6 @@
 VisionCaster::VisionCaster() {
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
 	visionTexture.create(panelSize.x, panelSize.y);
-
-	//sf::Vector2u roomSize = sf::Vector2u(500, 500);//GameLevelGrid::levelGet(castPosition.level)->levelSize;
-	//memoryTexture.create(roomSize.x, roomSize.y);
-	//memoryTexture.clear(sf::Color(90, 90, 90, 255));
-
-	//sf::Texture noiseTexture;
-	//noiseTexture.loadFromFile("Art/Cobweb Noise.jpg");
-	//noiseTexture.setRepeated(true);
-
-	//sf::Sprite noiseSprite(noiseTexture);
-	//noiseSprite.setColor(sf::Color(130, 130, 130, 75));
-	//noiseSprite.setScale(2.f, 2.f);
-	//noiseSprite.setTextureRect(sf::IntRect(0, 0, roomSize.x, roomSize.y));
-
-	//memoryTexture.draw(noiseSprite);
 }
 VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 	VisionCaster()

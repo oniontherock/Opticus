@@ -93,7 +93,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
-			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(1280, 720))),
+			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 		}
 		);

@@ -81,7 +81,8 @@ void MemoryHolderVision::memoryUpdate(sf::Vector2f memoryMovement, sf::Texture t
 
 	// draw vision to memory
 	sf::Sprite visionSprite(textureVision);
-	visionSprite.setPosition(sf::Vector2f(textureVision.getSize()) / 2.f);
+	visionSprite.setOrigin(sf::Vector2f(textureVision.getSize()) / 2.f);
+	visionSprite.setPosition(sf::Vector2f(textureMemory.getSize()) / 2.f);
 
 	// draw the visionSprite with the grayscaleShader applied
 	textureMemory.draw(visionSprite, &grayscaleShader);

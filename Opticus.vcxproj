@@ -146,6 +146,8 @@
     <ClCompile Include="Include\Game\RayCasting\Sight\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
     <ClCompile Include="Include\Game\World\Level Generator\LevelGenerator.cpp" />
+    <ClCompile Include="Include\Game\World\Object Grid\ObjectCell.cpp" />
+    <ClCompile Include="Include\Game\World\Object Grid\ObjectGrid.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\RoomGrid.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\Room.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\RoomCell.cpp" />
@@ -195,6 +197,8 @@
     <ClInclude Include="Include\Game\World\Image Grid\WorldImageGrid.hpp" />
     <ClInclude Include="Include\Game\World\Image Grid\WorldTexture.hpp" />
     <ClInclude Include="Include\Game\World\Level Generator\LevelGenerator.hpp" />
+    <ClInclude Include="Include\Game\World\Object Grid\ObjectCell.hpp" />
+    <ClInclude Include="Include\Game\World\Object Grid\ObjectGrid.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\RoomGrid.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\Room.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\RoomCell.hpp" />

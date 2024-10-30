@@ -1,15 +1,27 @@
 #ifndef __OBJECT_GRID_H__
 #define __OBJECT_GRID_H__
 
+#include "../../../../Common/Grid.hpp"
+#include "../ObjectTypes.hpp"
 #include "ObjectCell.hpp"
 #include <vector>
-#include "../../../../Common/Grid.hpp"
 
 typedef std::vector<ObjectCell> ObjectGrid1D;
 typedef std::vector<ObjectGrid1D> ObjectGrid2D;
 
 struct ObjectGrid : Grid<ObjectCell> {
 	ObjectGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
+
+	const std::set<EntityId>& cellIdsGet(CellCoordinate cellX, CellCoordinate cellY);
+	const std::set<EntityId>& cellIdsGet(CellVector cellPos);
+	const std::set<EntityId>& cellIdsGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
+	const std::set<EntityId>& cellIdsGetFromWorld(WorldVector worldPos);
+
+	const std::set<ObjectTypes> cellTypesGet(CellCoordinate cellX, CellCoordinate cellY);
+	const std::set<ObjectTypes> cellTypesGet(CellVector cellPos);
+	const std::set<ObjectTypes> cellTypesGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
+	const std::set<ObjectTypes> cellTypesGetFromWorld(WorldVector worldPos);
+
 };
 
 #endif

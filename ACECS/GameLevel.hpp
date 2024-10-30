@@ -2,6 +2,7 @@
 #define __GAME_LEVEL_H__
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
 #include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
@@ -26,6 +27,7 @@ struct GameLevel : public BaseLevel {
 
 	WorldDistortionGrid distortionGrid;
 	WorldImageGrid imageGrid;
+	ObjectGrid objectGrid;
 	RoomGrid roomGrid;
 	LevelGenerator levelGenerator;
 

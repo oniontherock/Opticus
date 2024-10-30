@@ -3,7 +3,7 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 9;
+uint16_t MAX_COMPONENT_TYPES = 13;
 uint16_t MAX_EVENT_TYPES = 4;
 
 void ECSRegistry::ECSInitialize() {
@@ -41,9 +41,13 @@ void EntityComponents::componentIDsInitialize() {
 
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridDepopulatorRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridPopulatorRadius>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
@@ -95,6 +99,8 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectTypes::Player),
+			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -121,6 +127,7 @@ using namespace EntityEvents;
 // if you need to include a certain file for a system, include it here.
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Common/TimeHandler.hpp"
+#include "../Include/Game/World/Objects/ObjectRegistry.hpp"
 #include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
@@ -357,6 +364,112 @@ void ComponentDistortionRadius::system(Entity& entity) {
 			distortionGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).distortionAdd(distortion);
 		}
 	}
+}
+void ComponentObjectTypeAssigner::system(Entity& entity) {
+	ObjectRegistry::entityObjectTypeAssign(entity.Id, objectType);
+
+	entity.entityComponentTerminate<ComponentObjectTypeAssigner>();
+}
+void ComponentObjectGridDepopulatorRadius::system(Entity& entity) {
+	// check that entity has ComponentPosition
+	if (!entity.entityComponentHas<ComponentPosition>()) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridDepopulatorRadius placed on an entity without a ComponentPosition!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+	// check that entity has ObjectType
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridDepopulatorRadius placed on an entity without an ObjectType!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+
+	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+	auto& objectGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
+
+	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
+		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
+
+			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
+
+			objectGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).idRemove(entity.Id);
+		}
+	}
+}
+void ComponentObjectGridPopulatorRadius::system(Entity& entity) {
+	// check that entity has ComponentPosition
+	if (!entity.entityComponentHas<ComponentPosition>()) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridPopulatorRadius placed on an entity without a ComponentPosition!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+	// check that entity has ObjectType
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridPopulatorRadius placed on an entity without an ObjectType!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+
+	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+	auto& objectGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
+
+	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
+		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
+
+			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
+
+			objectGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).idAdd(entity.Id);
+		}
+	}
+}
+void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
+	// check that entity has ComponentPosition
+	if (!entity.entityComponentHas<ComponentPosition>()) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius placed on an entity without a ComponentPosition!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+
+	// check that entity has ObjectType
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius placed on an entity without an ObjectType!");
+
+		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+	}
+
+	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+	if (positionPrev == WorldPosition(0, 0, 0, 0, 0)) {
+		positionPrev = positionComponent->worldPosition;
+	}
+
+	// note that two separate objectGrid references are used because an entity could travel to a different level.
+	
+	auto& objectGridDepopulation = GameLevelGrid::levelGet(positionPrev.level)->objectGrid;
+
+	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
+		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
+
+			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
+
+			objectGridDepopulation.cellGetFromWorld(positionPrev.position.x + offsetX, positionPrev.position.y + offsetY).idRemove(entity.Id);
+		}
+	};
+
+	auto& objectGridPopulation = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
+
+	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
+		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
+
+			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
+
+			objectGridPopulation.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).idAdd(entity.Id);
+		}
+	};
+
+	positionPrev = positionComponent->worldPosition;
 }
 
 #pragma endregion Systems

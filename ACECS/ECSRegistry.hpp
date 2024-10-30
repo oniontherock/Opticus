@@ -1,10 +1,11 @@
 #ifndef __ECS_REGISTRY_H__
 #define __ECS_REGISTRY_H__
 
-#include "../Include/Common/Math.hpp"
-#include "../Include/Game/RayCasting/Sight/VisionCaster.hpp"
-#include "../Include/Game/RayCasting/Sight/MemoryHolderVision.hpp"
 #include "../ACECS/Panels.hpp"
+#include "../Include/Common/Math.hpp"
+#include "../Include/Game/RayCasting/Sight/MemoryHolderVision.hpp"
+#include "../Include/Game/RayCasting/Sight/VisionCaster.hpp"
+#include "../Include/Game/World/Objects/ObjectTypes.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -253,6 +254,103 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentDistortionRadius(distortionRadius, distortion));
+		};
+	};
+	// assigns the ObjectType in the ObjectRegistry for the entity to be the specified objectType, then deletes itself
+	struct ComponentObjectTypeAssigner final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectTypeAssigner() {
+			hasSystem = true;
+		};
+		ComponentObjectTypeAssigner(ObjectTypes _objectType) :
+			ComponentObjectTypeAssigner()
+		{
+			objectType = _objectType;
+		};
+		// ObjectType to assign to the entity
+		ObjectTypes objectType;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectTypeAssigner(objectType));
+		};
+	};
+	// depopulates the ObjectGrid with an entity's id in a radius.
+	// entity must have ObjectType for this component to function, object type can be assigned with the ComponentObjectTypeAssigner.
+	//
+	// depopulation occurs in a radius around the entity, if the entity does not have a position component, this Component will not function, and will terminate itself.
+	// 
+	// NOTE: this component should be ordered BEFORE any movement components.
+	struct ComponentObjectGridDepopulatorRadius final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectGridDepopulatorRadius() {
+			hasSystem = true;
+		};
+		ComponentObjectGridDepopulatorRadius(float _radius) :
+			ComponentObjectGridDepopulatorRadius()
+		{
+			radius = _radius;
+		};
+
+		float radius;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectGridDepopulatorRadius(radius));
+		};
+	};
+	// populates the ObjectGrid with an entity's id in a radius.
+	// entity must have ObjectType for this component to function, object type can be assigned with the ComponentObjectTypeAssigner.
+	//
+	// population occurs in a radius around the entity, if the entity does not have a position component, this Component will not function, and will terminate itself.
+	// 
+	// NOTE: this component should be ordered AFTER any movement components.
+	struct ComponentObjectGridPopulatorRadius final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectGridPopulatorRadius() {
+			hasSystem = true;
+		};
+		ComponentObjectGridPopulatorRadius(float _radius) :
+			ComponentObjectGridPopulatorRadius()
+		{
+			radius = _radius;
+		};
+
+		float radius;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectGridPopulatorRadius(radius));
+		};
+	};
+	// similar to the ComponentObjectGridPopulatorRadius and the ComponentObjectGridDepopulatorRadius,
+	// but it performs the functions of both components on it's own.
+	// 
+	// should generally be prefered over using the manual populator/depopulator components unless they are needed for special purposes.
+	// 
+	// NOTE: this component should be ordered AFTER any movement components.
+	struct ComponentObjectGridInhabiterRadius final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectGridInhabiterRadius() {
+			hasSystem = true;
+		};
+		ComponentObjectGridInhabiterRadius(float _radius) :
+			ComponentObjectGridInhabiterRadius()
+		{
+			radius = _radius;
+		};
+
+		float radius;
+		// previous WorldPosition of population, used for depopulation.
+		WorldPosition positionPrev;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectGridInhabiterRadius(radius));
 		};
 	};
 }

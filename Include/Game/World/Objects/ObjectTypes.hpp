@@ -4,6 +4,7 @@
 #include <cstdint>
 
 enum class ObjectTypes : uint16_t {
+	Null, // no object type
 	Player,
 	SquadMember1, // squad member 1, A.K.A. Bravo
 	SquadMember2, // squad member 2, A.K.A. Charlie

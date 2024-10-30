@@ -20,6 +20,7 @@ void Engine::inputsRegister() {
 	InputInterface::inputRegister("Move Left", KeySet{ KeyEvent("A", Held), KeyEvent("Left", Held) }, InputKeyLogic::Or);
 	InputInterface::inputRegister("Move Down", KeySet{ KeyEvent("S", Held), KeyEvent("Down", Held) }, InputKeyLogic::Or);
 
+	InputInterface::inputRegister("Toggle ObjectGrid Rendering", KeySet{ KeyEvent("F1", Pressed) }, InputKeyLogic::Or);
 
 }
 

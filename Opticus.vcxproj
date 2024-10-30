@@ -142,6 +142,7 @@
     <ClCompile Include="ACECS\Panels.cpp" />
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
+    <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Sight\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Sight\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
@@ -191,6 +192,7 @@
     <ClInclude Include="Include\Common\NumberGenerator.hpp" />
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
+    <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Sight\MemoryHolderVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Sight\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortion.hpp" />

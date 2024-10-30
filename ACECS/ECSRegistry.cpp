@@ -113,6 +113,8 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectTypes::Door),
+			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
 		}
 	);
 

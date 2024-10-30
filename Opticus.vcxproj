@@ -143,8 +143,8 @@
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
-    <ClCompile Include="Include\Game\RayCasting\Sight\MemoryHolderVision.cpp" />
-    <ClCompile Include="Include\Game\RayCasting\Sight\VisionCaster.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
+    <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
     <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
     <ClCompile Include="Include\Game\World\Level Generator\LevelGenerator.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectCell.cpp" />
@@ -193,8 +193,8 @@
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
     <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
-    <ClInclude Include="Include\Game\RayCasting\Sight\MemoryHolderVision.hpp" />
-    <ClInclude Include="Include\Game\RayCasting\Sight\VisionCaster.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.hpp" />
+    <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortion.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />

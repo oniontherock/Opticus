@@ -3,8 +3,8 @@
 
 #include "../ACECS/Panels.hpp"
 #include "../Include/Common/Math.hpp"
-#include "../Include/Game/RayCasting/Sight/MemoryHolderVision.hpp"
-#include "../Include/Game/RayCasting/Sight/VisionCaster.hpp"
+#include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
+#include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"
 #include "../Include/Game/World/Objects/ObjectTypes.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"

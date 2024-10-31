@@ -19,7 +19,7 @@ void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSiz
 	raysCast(angleTo, coneSize, rayMaxDist, rayCount);
 }
 
-const std::set<EntityIdObjectTypePair>& ObjectVision::objectsSeenGet() {
+std::set<EntityIdObjectTypePair>& ObjectVision::objectsSeenGet() {
 	return objectsSeenSet;
 }
 

@@ -316,12 +316,12 @@ void ComponentObjectVision::system(Entity& entity) {
 
 			objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 475.f, 32);
 
-			const auto& objectsSeenSet = objectVision.objectsSeenGet();
+			auto& objectsSeenSet = objectVision.objectsSeenGet();
 
 			if (objectsSeenSet.size() <= 0) return;
 
 			auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
-			eventObjectSeen->objectsSeen = objectsSeenSet;
+			eventObjectSeen->objectsSeen = &objectsSeenSet;
 		}
 	}
 }
@@ -533,7 +533,7 @@ void ComponentDebug::system(Entity& entity) {
 
 			auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
 
-			std::vector<EntityIdObjectTypePair> objectsSeenVector(eventObjectSeen->objectsSeen.begin(), eventObjectSeen->objectsSeen.end());
+			std::vector<EntityIdObjectTypePair> objectsSeenVector(eventObjectSeen->objectsSeen->begin(), eventObjectSeen->objectsSeen->end());
 
 			std::cout << "[";
 			for (uint16_t i = 0; i < objectsSeenVector.size(); i++) {

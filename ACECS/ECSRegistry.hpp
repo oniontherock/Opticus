@@ -88,10 +88,10 @@ namespace EntityEvents {
 
 		EventObjectSeen() {};
 
-		std::set<EntityIdObjectTypePair> objectsSeen;
+		std::set<EntityIdObjectTypePair>* objectsSeen;
 
 		void clear() final {
-			objectsSeen.clear();
+			objectsSeen = nullptr;
 		}
 
 		std::unique_ptr<Duplicatable> duplicate() override {

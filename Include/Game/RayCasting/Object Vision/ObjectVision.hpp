@@ -20,7 +20,7 @@ struct ObjectVision : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
-	const std::set<EntityIdObjectTypePair>& objectsSeenGet();
+	std::set<EntityIdObjectTypePair>& objectsSeenGet();
 
 protected:
 

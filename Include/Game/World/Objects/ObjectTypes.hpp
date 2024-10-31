@@ -3,7 +3,7 @@
 
 #include <cstdint>
 
-enum class ObjectTypes : uint16_t {
+enum class ObjectType : uint16_t {
 	Null, // no object type
 	Player,
 	SquadMember1, // squad member 1, A.K.A. Bravo

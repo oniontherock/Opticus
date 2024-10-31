@@ -7,7 +7,8 @@
 
 // casts a series of rays out from a position
 struct RayCaster {
-	// update the RayCaster, calls raysCast()
+	// update the RayCaster, calls raysCast().
+	// also updates castPosition with fromX and fromY
 	virtual void update(float fromX, float fromY, float toAngle, float coneSize, uint32_t rayCount);
 
 protected:

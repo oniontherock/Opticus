@@ -1,7 +1,7 @@
 #include "ObjectGridRenderer.hpp"
 
 ObjectGridRenderer::ObjectGridRenderer() {
-	for (uint16_t i = 0; i < uint16_t(ObjectTypes::SIZE); i++) {
+	for (uint16_t i = 0; i < uint16_t(ObjectType::SIZE); i++) {
 		objectTypeColors.push_back(sf::Color(((i * 1000) % 127) * 2, (((i * 9999) % 255) * 72) % 255, (i * 99999) % 255, 255));
 	}
 }
@@ -26,7 +26,7 @@ void ObjectGridRenderer::objectGridRender(ObjectGrid& objectGrid) {
 
 			if (idsSet.size() <= 0) continue;
 
-			std::vector<ObjectTypes> idsVector(idsSet.begin(), idsSet.end());
+			std::vector<ObjectType> idsVector(idsSet.begin(), idsSet.end());
 
 			uint16_t r = 0;
 			uint16_t g = 0;

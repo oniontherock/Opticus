@@ -17,10 +17,10 @@ struct ObjectGrid : Grid<ObjectCell> {
 	const std::set<EntityId>& cellIdsGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
 	const std::set<EntityId>& cellIdsGetFromWorld(WorldVector worldPos);
 
-	const std::set<ObjectTypes> cellTypesGet(CellCoordinate cellX, CellCoordinate cellY);
-	const std::set<ObjectTypes> cellTypesGet(CellVector cellPos);
-	const std::set<ObjectTypes> cellTypesGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
-	const std::set<ObjectTypes> cellTypesGetFromWorld(WorldVector worldPos);
+	const std::set<ObjectType> cellTypesGet(CellCoordinate cellX, CellCoordinate cellY);
+	const std::set<ObjectType> cellTypesGet(CellVector cellPos);
+	const std::set<ObjectType> cellTypesGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
+	const std::set<ObjectType> cellTypesGetFromWorld(WorldVector worldPos);
 
 };
 

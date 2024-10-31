@@ -1,0 +1,99 @@
+#include "ObjectVision.hpp"
+
+
+
+
+ObjectVision::ObjectVision() {
+
+}
+ObjectVision::ObjectVision(sf::Vector2f _castPosition) {
+	castPosition = _castPosition;
+}
+
+
+void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
+
+	castPosition.position = sf::Vector2f(fromX, fromY);
+
+	// cast the rays, updating the objectsSeenVector
+	raysCast(angleTo, coneSize, rayCount);
+}
+
+const std::set<EntityIdObjectTypePair>& ObjectVision::objectsSeenGet() {
+	return objectsSeenSet;
+}
+
+void ObjectVision::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
+
+	objectsSeenSet.clear();
+
+	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
+
+	// the angular difference (in radians) between two rays.
+	const float rayAngleDifference = coneSize / rayCount;
+
+	if (castPosition.position.x < 0 || castPosition.position.x >= gameLevel->levelSize.x || castPosition.position.y < 0 || castPosition.position.y >= gameLevel->levelSize.y) {
+		return;
+	}
+
+	// the maximum assumed distance a ray can travel
+	// note the "assumed", because the ray may have moved more or less, due to distortions.
+	constexpr float maxDist = 525;
+
+	auto& objectGrid = gameLevel->objectGrid;
+
+	auto& distortionGrid = gameLevel->distortionGrid;
+
+	constexpr double posMultiplier = 1.0 / 255.0;
+
+	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
+
+		// the rotation (in radians) of the current ray.
+		const float rayRotation = angleTo + (float(curRayInd) * rayAngleDifference);
+
+		sf::Vector2f rayPosition = castPosition.position;
+		sf::Vector2f rayHeading = sf::Vector2f(cos(rayRotation), sin(rayRotation));
+
+
+		// the assumed dist that the ray has moved.
+		// note the "assumed", because the ray may have moved more or less, due to distortions.
+		float curDist = 0.f;
+		while (curDist < maxDist) {
+			curDist += 1.f;
+
+			auto& distortion = distortionGrid.cellGet(
+				uint16_t(rayPosition.x * distortionGrid.distortionCellMultiplierX),
+				uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
+			);
+
+			// check if there are any distortions at the ray's position
+			if (distortion.distortions.size() > 0) {
+				// apply the distortion at the rayPosition to the ray.
+				distortion.headingApplyDistortion(rayHeading, rayPosition);
+
+				if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
+			}
+
+			// move the rayPosition by the rayHeading.
+			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
+			rayPosition += rayHeading;
+			// make sure the rayPosition is in the bounds of the level.
+			if (rayPosition.x < 0 || rayPosition.x >= gameLevel->levelSize.x || rayPosition.y < 0 || rayPosition.y >= gameLevel->levelSize.y) break;
+
+			// set of EntityIds in this cell
+			std::set<EntityId> cellIdsSet = objectGrid.cellIdsGetFromWorld(rayPosition);
+
+			std::vector<EntityId> cellIdsVector(cellIdsSet.begin(), cellIdsSet.end());
+
+			for (uint16_t i = 0; i < cellIdsVector.size(); i++) {
+				objectsSeenSet.insert(EntityIdObjectTypePair(cellIdsVector[i], ObjectRegistry::entityObjectTypeGet(cellIdsVector[i])));
+			}
+		}
+	}
+}
+
+
+
+
+
+

@@ -72,9 +72,13 @@ void GameStatePlay::gameStateStart() {
 
 	EntityManager::entityCreate(0, 0, 0, "Player");
 
-	EntityId spriteId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
-	Entity& sprite = EntityManager::entityGet(spriteId);
-	sprite.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(150, 150);
+	EntityId spriteAId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
+	Entity& spriteA = EntityManager::entityGet(spriteAId);
+	spriteA.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(150, 150);
+
+	EntityId spriteBId = EntityManager::entityCreate(0, 0, 0, "Static Sprite");
+	Entity& spriteB = EntityManager::entityGet(spriteBId);
+	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(150, 300);
 }
 void GameStatePlay::levelGenerate() {
 

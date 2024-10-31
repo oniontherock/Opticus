@@ -11,7 +11,6 @@
 #include <SFML/Graphics.hpp>
 
 // casts a series of rays and records the colors they land on at each step.
-// also records the previously recorded colors to a memory texture.
 struct VisionCaster : public RayCaster {
 
 	VisionCaster();

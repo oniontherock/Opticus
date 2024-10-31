@@ -6,6 +6,7 @@
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"
 #include "../Include/Game/World/Objects/ObjectTypes.hpp"
+#include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -82,7 +83,21 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventRotate());
 		};
 	};
+	// contains a list of EntityIds and ObjectTypes that were seen this update.
+	struct EventObjectSeen final : public Event {
 
+		EventObjectSeen() {};
+
+		std::set<EntityIdObjectTypePair> objectsSeen;
+
+		void clear() final {
+			objectsSeen.clear();
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventObjectSeen());
+		};
+	};
 }
 namespace EntityComponents {
 
@@ -264,13 +279,13 @@ namespace EntityComponents {
 		ComponentObjectTypeAssigner() {
 			hasSystem = true;
 		};
-		ComponentObjectTypeAssigner(ObjectTypes _objectType) :
+		ComponentObjectTypeAssigner(ObjectType _objectType) :
 			ComponentObjectTypeAssigner()
 		{
 			objectType = _objectType;
 		};
 		// ObjectType to assign to the entity
-		ObjectTypes objectType;
+		ObjectType objectType;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectTypeAssigner(objectType));
@@ -351,6 +366,39 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectGridInhabiterRadius(radius));
+		};
+	};
+	// gets a list of seen objects using an ObjectVision and creates an EventObjectSeen with them.
+	struct ComponentObjectVision final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectVision() {
+			hasSystem = true;
+		};
+		ComponentObjectVision(ObjectVision _objectVision) :
+			ComponentObjectVision()
+		{
+			objectVision = _objectVision;
+		};
+
+		ObjectVision objectVision;
+
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectVision(objectVision));
+		};
+	};
+	struct ComponentDebug final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentDebug() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentDebug());
 		};
 	};
 }

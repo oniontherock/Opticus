@@ -1,14 +1,14 @@
 #include "ObjectRegistry.hpp"
 
 
-std::vector<ObjectTypes> ObjectRegistry::objectsVector = std::vector<ObjectTypes>(MAX_ENTITIES);
+std::vector<ObjectType> ObjectRegistry::objectsVector = std::vector<ObjectType>(MAX_ENTITIES);
 
-void ObjectRegistry::entityObjectTypeAssign(EntityId id, ObjectTypes objectType) {
+void ObjectRegistry::entityObjectTypeAssign(EntityId id, ObjectType objectType) {
 	objectsVector[id] = objectType;
 }
 void ObjectRegistry::entityObjectTypeRemove(EntityId id) {
-	entityObjectTypeAssign(id, ObjectTypes::Null);
+	entityObjectTypeAssign(id, ObjectType::Null);
 }
-const ObjectTypes ObjectRegistry::entityObjectTypeGet(EntityId id) {
+const ObjectType ObjectRegistry::entityObjectTypeGet(EntityId id) {
 	return objectsVector[id];
 }

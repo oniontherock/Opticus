@@ -3,8 +3,8 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 13;
-uint16_t MAX_EVENT_TYPES = 4;
+uint16_t MAX_COMPONENT_TYPES = 15;
+uint16_t MAX_EVENT_TYPES = 5;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -30,6 +30,7 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventRotate>>();
 	EventRegistry::typeRegister<EventIDs<EventMoved>>();
 	EventRegistry::typeRegister<EventIDs<EventViewMoved>>();
+	EventRegistry::typeRegister<EventIDs<EventObjectSeen>>();
 }
 
 #pragma endregion Events
@@ -42,17 +43,29 @@ void EntityComponents::componentIDsInitialize() {
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridDepopulatorRadius>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridPopulatorRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
+
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVision>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
+
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentDebug>>();
+
 }
 
 #pragma endregion Components
@@ -99,8 +112,10 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
-			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectTypes::Player),
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Player),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			createComponentPairFromType<ComponentObjectVision>(),
+			createComponentPairFromType<ComponentDebug>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -113,7 +128,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
-			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectTypes::Door),
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Door),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
 		}
 	);
@@ -380,7 +395,7 @@ void ComponentObjectGridDepopulatorRadius::system(Entity& entity) {
 		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
 	}
 	// check that entity has ObjectType
-	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
 		ConsoleHandler::consolePrintErr("ComponentObjectGridDepopulatorRadius placed on an entity without an ObjectType!");
 
 		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
@@ -407,7 +422,7 @@ void ComponentObjectGridPopulatorRadius::system(Entity& entity) {
 		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
 	}
 	// check that entity has ObjectType
-	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
 		ConsoleHandler::consolePrintErr("ComponentObjectGridPopulatorRadius placed on an entity without an ObjectType!");
 
 		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
@@ -435,7 +450,7 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 	}
 
 	// check that entity has ObjectType
-	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectTypes::Null) {
+	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
 		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius placed on an entity without an ObjectType!");
 
 		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
@@ -473,6 +488,60 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 
 	positionPrev = positionComponent->worldPosition;
 }
+void ComponentObjectVision::system(Entity& entity) {
 
+	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
+
+		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+		objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
+
+		const auto& objectsSeenSet = objectVision.objectsSeenGet();
+
+		if (objectsSeenSet.size() <= 0) return;
+
+		auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
+		eventObjectSeen->objectsSeen = objectsSeenSet;
+	}
+}
+void ComponentDebug::system(Entity& entity) {
+	
+	static Cooldown printCooldown(0.25f);
+
+	if (printCooldown.updateAutoReset(TimeHandler::deltaRealGet())) {
+		constexpr const char* objectTypesNames[] = {
+		   "Null",
+		   "Player",
+		   "SquadMember1",
+		   "SquadMember2",
+		   "SquadMember3",
+		   "Door",
+		   "Skipper",
+		   "Wall",
+		   "SIZE",
+		};
+
+		if (entity.entityEventHas<EventObjectSeen>()) {
+
+			auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
+
+			std::vector<EntityIdObjectTypePair> objectsSeenVector(eventObjectSeen->objectsSeen.begin(), eventObjectSeen->objectsSeen.end());
+
+			std::cout << "[";
+			for (uint16_t i = 0; i < objectsSeenVector.size(); i++) {
+				std::cout << objectTypesNames[uint16_t(objectsSeenVector[i].second)];
+
+				if (i == objectsSeenVector.size() - 1) {
+					std::cout << "]" << std::endl;
+				}
+				else {
+					std::cout << ", ";
+				}
+			}
+
+		}
+	}
+}
 #pragma endregion Systems
 

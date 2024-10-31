@@ -36,12 +36,12 @@ const std::set<EntityId>& ObjectGrid::cellIdsGetFromWorld(WorldVector worldPos) 
 }
 
 
-const std::set<ObjectTypes> ObjectGrid::cellTypesGet(CellCoordinate cellX, CellCoordinate cellY) {
+const std::set<ObjectType> ObjectGrid::cellTypesGet(CellCoordinate cellX, CellCoordinate cellY) {
 
 	const std::set<EntityId>& ids = cellIdsGet(cellX, cellY);
 	std::set<EntityId>::iterator idsItr;
 
-	std::set<ObjectTypes> types;
+	std::set<ObjectType> types;
 
 	for (idsItr = ids.begin(); idsItr != ids.end(); idsItr++) {
 		types.insert(ObjectRegistry::entityObjectTypeGet(*idsItr));
@@ -49,13 +49,13 @@ const std::set<ObjectTypes> ObjectGrid::cellTypesGet(CellCoordinate cellX, CellC
 
 	return types;
 }
-const std::set<ObjectTypes> ObjectGrid::cellTypesGet(CellVector cellPos) {
+const std::set<ObjectType> ObjectGrid::cellTypesGet(CellVector cellPos) {
 	return cellTypesGet(cellPos.x, cellPos.y);
 }
-const std::set<ObjectTypes> ObjectGrid::cellTypesGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY) {
+const std::set<ObjectType> ObjectGrid::cellTypesGetFromWorld(WorldCoordinate worldX, WorldCoordinate worldY) {
 	return cellTypesGet(coordinatesWorldToCell(worldX, worldY));
 
 }
-const std::set<ObjectTypes> ObjectGrid::cellTypesGetFromWorld(WorldVector worldPos) {
+const std::set<ObjectType> ObjectGrid::cellTypesGetFromWorld(WorldVector worldPos) {
 	return cellTypesGetFromWorld(worldPos.x, worldPos.y);
 }

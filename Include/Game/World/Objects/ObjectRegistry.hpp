@@ -9,16 +9,16 @@
 // if an entity doesn't have a type, it is marked as ObjectTypes::Null.
 struct ObjectRegistry {
 	// assigns an ObjectType to an EntityId
-	static void entityObjectTypeAssign(EntityId id, ObjectTypes objectType);
+	static void entityObjectTypeAssign(EntityId id, ObjectType objectType);
 	// sets an entity's ObjectType to ObjectTypes::Null
 	static void entityObjectTypeRemove(EntityId id);
 	// assigns an ObjectType to an EntityId
-	static const ObjectTypes entityObjectTypeGet(EntityId id);
+	static const ObjectType entityObjectTypeGet(EntityId id);
 private:
 	// list of ObjectTypes accessed by EntityIds.
 	// each entity can have only one ObjectType, not every entity must have an ObjectType.
 	// objectsVector is of size MAX_ENTITIES
-	static std::vector<ObjectTypes> objectsVector;
+	static std::vector<ObjectType> objectsVector;
 };
 
 

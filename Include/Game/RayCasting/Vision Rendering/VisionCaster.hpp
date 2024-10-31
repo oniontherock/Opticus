@@ -19,7 +19,7 @@ struct VisionCaster : public RayCaster {
 	void operator= (const VisionCaster& other);
 
 
-	void update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) override;
+	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
 	const sf::RenderTexture& visionTextureGet();
 
@@ -27,7 +27,7 @@ protected:
 	
 	sf::RenderTexture visionTexture;
 
-	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
+	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };
 
 #endif

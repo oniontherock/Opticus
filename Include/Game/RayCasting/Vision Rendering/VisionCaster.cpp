@@ -25,15 +25,15 @@ void VisionCaster::operator= (const VisionCaster& other) {
 const sf::RenderTexture& VisionCaster::visionTextureGet() {
 	return visionTexture;
 }
-void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
+void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	castPosition.position = sf::Vector2f(fromX, fromY);
 
 	// cast the rays, updating the visionImage
-	raysCast(angleTo, coneSize, rayCount);
+	raysCast(angleTo, coneSize, rayMaxDist, rayCount);
 }
 
-void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
+void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
@@ -65,11 +65,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	sf::Uint8 yChunk = 1;
 	sf::Uint8 yPoint = 1;
 
-	// the maximum assumed distance a ray can travel
-	// note the "assumed", because the ray may have moved more or less, due to distortions.
-	// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
-	constexpr float maxDist = 525;
-
 	auto* worldImage = &gameLevel->imageGrid.cellGetFromWorld(castPosition.position.x, castPosition.position.y);
 
 	auto& distortionGrid = gameLevel->distortionGrid;
@@ -93,7 +88,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
 		float curDist = 0.f;
-		while (curDist < maxDist) {
+		while (curDist < rayMaxDist) {
 			curDist += 1.f;
 
 			auto& distortion = distortionGrid.cellGet(

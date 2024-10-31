@@ -376,17 +376,25 @@ namespace EntityComponents {
 		ComponentObjectVision() {
 			hasSystem = true;
 		};
-		ComponentObjectVision(ObjectVision _objectVision) :
+		ComponentObjectVision(Cooldown _updateCooldown) :
 			ComponentObjectVision()
+		{
+			cooldownVisionUpdate = _updateCooldown;
+		};
+		ComponentObjectVision(ObjectVision _objectVision, Cooldown _updateCooldown) :
+			ComponentObjectVision(_updateCooldown)
 		{
 			objectVision = _objectVision;
 		};
 
 		ObjectVision objectVision;
 
+		// cooldown for when the finish updates
+		Cooldown cooldownVisionUpdate;
+
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentObjectVision(objectVision));
+			return std::unique_ptr<Duplicatable>(new ComponentObjectVision(objectVision, cooldownVisionUpdate));
 		};
 	};
 	struct ComponentDebug final : public Component {
@@ -396,6 +404,8 @@ namespace EntityComponents {
 		ComponentDebug() {
 			hasSystem = true;
 		};
+
+		Cooldown cooldownPrint = Cooldown(0.25f);
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentDebug());

@@ -18,7 +18,7 @@ struct ObjectVision : public RayCaster {
 	ObjectVision();
 	ObjectVision(sf::Vector2f _castPosition);
 
-	void update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) override;
+	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
 	const std::set<EntityIdObjectTypePair>& objectsSeenGet();
 
@@ -27,7 +27,7 @@ protected:
 	// set of EntityIdObjectTypePairs
 	std::set<EntityIdObjectTypePair> objectsSeenSet;
 
-	void raysCast(float angleTo, float coneSize, uint32_t rayCount) override;
+	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };
 
 #endif

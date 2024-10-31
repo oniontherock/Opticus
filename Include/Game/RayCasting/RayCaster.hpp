@@ -9,7 +9,7 @@
 struct RayCaster {
 	// update the RayCaster, calls raysCast().
 	// also updates castPosition with fromX and fromY
-	virtual void update(float fromX, float fromY, float toAngle, float coneSize, uint32_t rayCount);
+	virtual void update(float fromX, float fromY, float toAngle, float coneSize, float rayMaxDist, uint32_t rayCount);
 
 protected:
 
@@ -27,7 +27,7 @@ protected:
 		@param coneSize: the angular size of the cone to cast rays in.
 		@param rayCount: the amount of rays to cast.
 	*/
-	virtual void raysCast(float angleTo, float coneSize, uint32_t rayCount) = 0;
+	virtual void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) = 0;
 };
 
 

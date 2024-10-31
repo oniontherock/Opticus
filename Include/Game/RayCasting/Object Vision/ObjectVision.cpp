@@ -11,19 +11,19 @@ ObjectVision::ObjectVision(sf::Vector2f _castPosition) {
 }
 
 
-void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSize, uint32_t rayCount) {
+void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	castPosition.position = sf::Vector2f(fromX, fromY);
 
 	// cast the rays, updating the objectsSeenVector
-	raysCast(angleTo, coneSize, rayCount);
+	raysCast(angleTo, coneSize, rayMaxDist, rayCount);
 }
 
 const std::set<EntityIdObjectTypePair>& ObjectVision::objectsSeenGet() {
 	return objectsSeenSet;
 }
 
-void ObjectVision::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
+void ObjectVision::raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	objectsSeenSet.clear();
 
@@ -35,10 +35,6 @@ void ObjectVision::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 	if (castPosition.position.x < 0 || castPosition.position.x >= gameLevel->levelSize.x || castPosition.position.y < 0 || castPosition.position.y >= gameLevel->levelSize.y) {
 		return;
 	}
-
-	// the maximum assumed distance a ray can travel
-	// note the "assumed", because the ray may have moved more or less, due to distortions.
-	constexpr float maxDist = 525;
 
 	auto& objectGrid = gameLevel->objectGrid;
 
@@ -54,11 +50,13 @@ void ObjectVision::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = sf::Vector2f(cos(rayRotation), sin(rayRotation));
 
+		sf::Vector2u rayPositionCell = objectGrid.coordinatesWorldToCell(rayPosition.x, rayPosition.y);
+		sf::Vector2u rayPositionCellPrev;
 
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		float curDist = 0.f;
-		while (curDist < maxDist) {
+		while (curDist < rayMaxDist) {
 			curDist += 1.f;
 
 			auto& distortion = distortionGrid.cellGet(
@@ -80,13 +78,21 @@ void ObjectVision::raysCast(float angleTo, float coneSize, uint32_t rayCount) {
 			// make sure the rayPosition is in the bounds of the level.
 			if (rayPosition.x < 0 || rayPosition.x >= gameLevel->levelSize.x || rayPosition.y < 0 || rayPosition.y >= gameLevel->levelSize.y) break;
 
-			// set of EntityIds in this cell
-			std::set<EntityId> cellIdsSet = objectGrid.cellIdsGetFromWorld(rayPosition);
+			rayPositionCell = objectGrid.coordinatesWorldToCell(rayPosition.x, rayPosition.y);
 
-			std::vector<EntityId> cellIdsVector(cellIdsSet.begin(), cellIdsSet.end());
+			// check if we have changed cells before getting ids, for the sake of performance
+			if (rayPositionCell != rayPositionCellPrev) {
 
-			for (uint16_t i = 0; i < cellIdsVector.size(); i++) {
-				objectsSeenSet.insert(EntityIdObjectTypePair(cellIdsVector[i], ObjectRegistry::entityObjectTypeGet(cellIdsVector[i])));
+				rayPositionCellPrev = rayPositionCell;
+
+				// set of EntityIds in this cell
+				std::set<EntityId> cellIdsSet = objectGrid.cellIdsGet(rayPositionCell);
+
+				std::vector<EntityId> cellIdsVector(cellIdsSet.begin(), cellIdsSet.end());
+
+				for (uint16_t i = 0; i < cellIdsVector.size(); i++) {
+					objectsSeenSet.insert(EntityIdObjectTypePair(cellIdsVector[i], ObjectRegistry::entityObjectTypeGet(cellIdsVector[i])));
+				}
 			}
 		}
 	}

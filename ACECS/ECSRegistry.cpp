@@ -114,7 +114,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Player),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
-			createComponentPairFromType<ComponentObjectVision>(),
+			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentDebug>(),
 		}
 		);
@@ -130,6 +130,10 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Door),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			//createComponentPairFromType<ComponentObjectVision>(0.1f),
+			//createComponentPairFromType<ComponentDebug>(),
+
+
 		}
 	);
 
@@ -276,7 +280,7 @@ void ComponentVisionDrawer::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 512);
 
 		// amount the camera has moved this frame
 		sf::Vector2f cameraMovedAmount;
@@ -301,6 +305,24 @@ void ComponentVisionDrawer::system(Entity& entity) {
 
 		gameViewPanel.objectDraw(visionSprite);
 
+	}
+}
+void ComponentObjectVision::system(Entity& entity) {
+	if (cooldownVisionUpdate.updateAutoReset(TimeHandler::deltaSimulatedGet())) {
+		if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
+
+			auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+			auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+			objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 475.f, 32);
+
+			const auto& objectsSeenSet = objectVision.objectsSeenGet();
+
+			if (objectsSeenSet.size() <= 0) return;
+
+			auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
+			eventObjectSeen->objectsSeen = objectsSeenSet;
+		}
 	}
 }
 void ComponentViewFollow::system(Entity& entity) {
@@ -488,28 +510,12 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 
 	positionPrev = positionComponent->worldPosition;
 }
-void ComponentObjectVision::system(Entity& entity) {
-
-	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
-
-		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
-		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-		objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 512);
-
-		const auto& objectsSeenSet = objectVision.objectsSeenGet();
-
-		if (objectsSeenSet.size() <= 0) return;
-
-		auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
-		eventObjectSeen->objectsSeen = objectsSeenSet;
-	}
-}
 void ComponentDebug::system(Entity& entity) {
-	
-	static Cooldown printCooldown(0.25f);
 
-	if (printCooldown.updateAutoReset(TimeHandler::deltaRealGet())) {
+	cooldownPrint.update(TimeHandler::deltaRealGet());
+
+	if (cooldownPrint.ready()) {
+
 		constexpr const char* objectTypesNames[] = {
 		   "Null",
 		   "Player",
@@ -523,6 +529,7 @@ void ComponentDebug::system(Entity& entity) {
 		};
 
 		if (entity.entityEventHas<EventObjectSeen>()) {
+			cooldownPrint.reset();
 
 			auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
 
@@ -539,7 +546,6 @@ void ComponentDebug::system(Entity& entity) {
 					std::cout << ", ";
 				}
 			}
-
 		}
 	}
 }

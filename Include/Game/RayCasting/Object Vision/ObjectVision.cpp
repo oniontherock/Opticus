@@ -4,12 +4,24 @@
 
 
 ObjectVision::ObjectVision() {
-
+	objectsSeenCreate();
 }
-ObjectVision::ObjectVision(sf::Vector2f _castPosition) {
+ObjectVision::ObjectVision(sf::Vector2f _castPosition) :
+	ObjectVision()
+{
 	castPosition = _castPosition;
 }
 
+void ObjectVision::objectsSeenCreate() {
+	for (uint16_t i = 0; i < static_cast<uint16_t>(ObjectType::SIZE); i++) {
+		objectsSeenVector.push_back(std::vector<EntityId>());
+	}
+}
+void ObjectVision::objectsSeenClear() {
+	for (uint16_t i = 0; i < static_cast<uint16_t>(ObjectType::SIZE); i++) {
+		objectsSeenVector.at(i).clear();
+	}
+}
 
 void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
@@ -19,13 +31,13 @@ void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSiz
 	raysCast(angleTo, coneSize, rayMaxDist, rayCount);
 }
 
-std::set<EntityIdObjectTypePair>& ObjectVision::objectsSeenGet() {
-	return objectsSeenSet;
+ObjectIdVector& ObjectVision::objectsSeenGet() {
+	return objectsSeenVector;
 }
 
 void ObjectVision::raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
-	objectsSeenSet.clear();
+	objectsSeenClear();
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
@@ -91,7 +103,13 @@ void ObjectVision::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 				std::vector<EntityId> cellIdsVector(cellIdsSet.begin(), cellIdsSet.end());
 
 				for (uint16_t i = 0; i < cellIdsVector.size(); i++) {
-					objectsSeenSet.insert(EntityIdObjectTypePair(cellIdsVector[i], ObjectRegistry::entityObjectTypeGet(cellIdsVector[i])));
+
+					uint16_t objectType = static_cast<uint16_t>(ObjectRegistry::entityObjectTypeGet(cellIdsVector[i]));
+
+					// only add the object to the objectsSeenVector if it's not already in it
+					if (std::count(objectsSeenVector[objectType].begin(), objectsSeenVector[objectType].end(), cellIdsVector[i]) <= 0) {
+						objectsSeenVector[objectType].push_back(cellIdsVector[i]);
+					}
 				}
 			}
 		}

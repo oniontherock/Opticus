@@ -88,7 +88,7 @@ namespace EntityEvents {
 
 		EventObjectSeen() {};
 
-		std::set<EntityIdObjectTypePair>* objectsSeen;
+		ObjectIdVector* objectsSeen;
 
 		void clear() final {
 			objectsSeen = nullptr;

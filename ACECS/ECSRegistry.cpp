@@ -316,7 +316,7 @@ void ComponentObjectVision::system(Entity& entity) {
 
 			objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 475.f, 32);
 
-			auto& objectsSeenSet = objectVision.objectsSeenGet();
+			ObjectIdVector& objectsSeenSet = objectVision.objectsSeenGet();
 
 			if (objectsSeenSet.size() <= 0) return;
 
@@ -533,19 +533,16 @@ void ComponentDebug::system(Entity& entity) {
 
 			auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
 
-			std::vector<EntityIdObjectTypePair> objectsSeenVector(eventObjectSeen->objectsSeen->begin(), eventObjectSeen->objectsSeen->end());
+			const ObjectIdVector* objectsSeenVector = eventObjectSeen->objectsSeen;
 
 			std::cout << "[";
-			for (uint16_t i = 0; i < objectsSeenVector.size(); i++) {
-				std::cout << objectTypesNames[uint16_t(objectsSeenVector[i].second)];
+			for (uint16_t i = 0; i < objectsSeenVector->size(); i++) {
 
-				if (i == objectsSeenVector.size() - 1) {
-					std::cout << "]" << std::endl;
-				}
-				else {
-					std::cout << ", ";
+				for (uint16_t j = 0; j < objectsSeenVector->at(i).size(); j++) {
+					std::cout << objectTypesNames[i] << ", ";
 				}
 			}
+			std::cout << "]" << std::endl;
 		}
 	}
 }

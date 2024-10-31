@@ -10,8 +10,10 @@
 #include <set>
 #include <vector>
 
-// pair of an EntityId and an ObjectType
-typedef std::pair<EntityId, ObjectType> EntityIdObjectTypePair;
+// vector of vectors of EntityIds,
+// entities are placed into the sub-vectors based off of their ObjectType.
+// so if an entity is an object of type Door, which is, for example, at position 4 in the ObjectType enum, the entity's Id will be placed in sub-vector 4.
+typedef std::vector<std::vector<EntityId>> ObjectIdVector;
 
 struct ObjectVision : public RayCaster {
 
@@ -20,12 +22,15 @@ struct ObjectVision : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
-	std::set<EntityIdObjectTypePair>& objectsSeenGet();
+	ObjectIdVector& objectsSeenGet();
 
 protected:
 
 	// set of EntityIdObjectTypePairs
-	std::set<EntityIdObjectTypePair> objectsSeenSet;
+	ObjectIdVector objectsSeenVector;
+
+	void objectsSeenCreate();
+	void objectsSeenClear();
 
 	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };

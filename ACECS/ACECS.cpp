@@ -22,6 +22,7 @@ void Engine::inputsRegister() {
 
 	InputInterface::inputRegister("Toggle ObjectGrid Rendering", KeySet{ KeyEvent("F1", Pressed) }, InputKeyLogic::Or);
 
+	InputInterface::inputRegister("Toggle Timescale", KeySet{ KeyEvent("F2", Pressed) }, InputKeyLogic::Or);
 }
 
 // game states are registered here

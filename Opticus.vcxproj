@@ -143,6 +143,7 @@
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
+    <ClCompile Include="Include\Game\AI\Memory\ObjectMemoryHolder.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Object Vision\ObjectVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Include\Common\TimeHandler.hpp" />
     <ClInclude Include="Include\Common\VectorMath.hpp" />
     <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
+    <ClInclude Include="Include\Game\AI\Memory\ObjectMemoryHolder.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Object Vision\ObjectVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />

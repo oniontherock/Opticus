@@ -3,8 +3,8 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 15;
-uint16_t MAX_EVENT_TYPES = 5;
+uint16_t MAX_COMPONENT_TYPES = 17;
+uint16_t MAX_EVENT_TYPES = 6;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -62,10 +62,12 @@ void EntityComponents::componentIDsInitialize() {
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVision>>();
 
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemory>>();
+
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentDebug>>();
-
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemoryDebug>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVisionDebug>>();
 }
 
 #pragma endregion Components
@@ -101,21 +103,36 @@ void EntityComponents::componentTemplatesInitialize() {
 	ComponentTemplateManager::componentTemplateAdd(
 
 		/// template name
-		"Player",
+		"Cognizant",
 		{
-			"Input Controlled",
+			"Transform",
 		},
 		/// list of components in template
 		{
+			createComponentPairFromType<ComponentObjectVision>(0.1f),
+			createComponentPairFromType<ComponentObjectMemory>(),
+
+		}
+		);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
+		"Player",
+		{
+			"Input Controlled",
+			"Cognizant",
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Player),
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
-			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Player),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
-			createComponentPairFromType<ComponentObjectVision>(0.1f),
-			createComponentPairFromType<ComponentDebug>(),
+			createComponentPairFromType<ComponentObjectVisionDebug>(),
+			createComponentPairFromType<ComponentObjectMemoryDebug>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -510,7 +527,48 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 
 	positionPrev = positionComponent->worldPosition;
 }
-void ComponentDebug::system(Entity& entity) {
+void ComponentObjectMemoryDebug::system(Entity& entity) {
+
+	if (entity.entityComponentHas<ComponentObjectMemory>()) {
+
+		cooldownPrint.update(TimeHandler::deltaRealGet());
+
+		if (cooldownPrint.ready()) {
+
+			constexpr const char* objectTypesNames[] = {
+			   "Null",
+			   "Player",
+			   "SquadMember",
+			   "Door",
+			   "Skipper",
+			   "Wall",
+			   "SIZE",
+			};
+
+			auto* componentObjectMemory = entity.entityComponentGet<ComponentObjectMemory>();
+
+			std::string string;
+
+			cooldownPrint.reset();
+
+			string += "[";
+			for (uint16_t i = 0; i < uint16_t(ObjectType::SIZE); i++) {
+
+				std::vector<ObjectMemory>& memoryVector = componentObjectMemory->objectMemoryHolder.memoriesGetOfType(i);
+				for (uint16_t j = 0; j < memoryVector.size(); j++) {
+					string += "(";
+					string += objectTypesNames[i];
+					string += ", ";
+					string += std::to_string(memoryVector[j].second.value);
+					string += "), ";
+				}
+			}
+			string += "]";
+			ConsoleHandler::consolePrintColor(string, 3);
+		}
+	}
+}
+void ComponentObjectVisionDebug::system(Entity& entity) {
 
 	cooldownPrint.update(TimeHandler::deltaRealGet());
 
@@ -519,14 +577,14 @@ void ComponentDebug::system(Entity& entity) {
 		constexpr const char* objectTypesNames[] = {
 		   "Null",
 		   "Player",
-		   "SquadMember1",
-		   "SquadMember2",
-		   "SquadMember3",
+		   "SquadMember",
 		   "Door",
 		   "Skipper",
 		   "Wall",
 		   "SIZE",
 		};
+
+		std::string string;
 
 		if (entity.entityEventHas<EventObjectSeen>()) {
 			cooldownPrint.reset();
@@ -535,16 +593,27 @@ void ComponentDebug::system(Entity& entity) {
 
 			const ObjectIdVector* objectsSeenVector = eventObjectSeen->objectsSeen;
 
-			std::cout << "[";
+			string += "[";
 			for (uint16_t i = 0; i < objectsSeenVector->size(); i++) {
 
 				for (uint16_t j = 0; j < objectsSeenVector->at(i).size(); j++) {
-					std::cout << objectTypesNames[i] << ", ";
+					string += objectTypesNames[i];
+					string += ", ";
 				}
 			}
-			std::cout << "]" << std::endl;
+			string += "]";
+			ConsoleHandler::consolePrintColor(string, 6);
 		}
 	}
 }
+void ComponentObjectMemory::system(Entity& entity) {
+	if (entity.entityEventHas<EventObjectSeen>()) {
+		auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
+
+		objectMemoryHolder.memoryUpdate(*eventObjectSeen->objectsSeen);
+
+	}
+}
+
 #pragma endregion Systems
 

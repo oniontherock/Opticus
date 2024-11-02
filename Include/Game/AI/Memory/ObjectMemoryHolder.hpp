@@ -2,6 +2,7 @@
 #define __OBJECT_MEMORY_HOLDER_H__
 
 #include "../../../Common/Cooldown.hpp"
+#include "../../../Common/TimeHandler.hpp"
 #include "../../World/Objects/ObjectTypes.hpp"
 #include "../../World/Objects/ObjectRegistry.hpp"
 #include <ECS/TypeDefinitions.hpp>
@@ -15,9 +16,13 @@ typedef std::pair<EntityId, Cooldown> ObjectMemory;
 typedef std::vector<std::vector<ObjectMemory>> ObjectMemoryVector;
 
 struct ObjectMemoryHolder {
+
+	ObjectMemoryHolder();
+
 	ObjectMemoryVector objectMemoriesVector;
 
 	void memoryUpdate(std::vector<std::vector<EntityId>> objectsToMemorize);
+	//void memoryUpdate(std::vector<std::vector<EntityId>>* objectsToMemorize);
 
 	// gets every EntityId of the specified ObjectType
 	std::vector<EntityId> objectIdsGetOfType(uint16_t objectType);
@@ -53,6 +58,10 @@ struct ObjectMemoryHolder {
 private:
 	void objectMemoriesCreate();
 	void objectMemoriesClear();
+
+	// the time of the last update in milliseconds,
+	// based off of simulated time
+	uint32_t updateTimeLast;
 
 	// how long until a memory is deleted
 	float memoryMaxLife = 120.f;

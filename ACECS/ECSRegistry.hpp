@@ -6,6 +6,7 @@
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"
 #include "../Include/Game/World/Objects/ObjectTypes.hpp"
+#include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
@@ -397,18 +398,52 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectVision(objectVision, cooldownVisionUpdate));
 		};
 	};
-	struct ComponentDebug final : public Component {
+	struct ComponentObjectMemory final : public Component {
 
 		void system(Entity& entity) final;
 
-		ComponentDebug() {
+		ComponentObjectMemory() {
+			hasSystem = true;
+		};
+		
+		ComponentObjectMemory(ObjectMemoryHolder _objectMemoryHolder) :
+			ComponentObjectMemory()
+		{
+			objectMemoryHolder = _objectMemoryHolder;
+		};
+
+
+		ObjectMemoryHolder objectMemoryHolder;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectMemory(objectMemoryHolder));
+		};
+	};
+	struct ComponentObjectMemoryDebug final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectMemoryDebug() {
 			hasSystem = true;
 		};
 
 		Cooldown cooldownPrint = Cooldown(0.25f);
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentDebug());
+			return std::unique_ptr<Duplicatable>(new ComponentObjectMemoryDebug());
+		};
+	};	struct ComponentObjectVisionDebug final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectVisionDebug() {
+			hasSystem = true;
+		};
+
+		Cooldown cooldownPrint = Cooldown(0.25f);
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectVisionDebug());
 		};
 	};
 }

@@ -1,0 +1,113 @@
+#ifndef __ACTOR_DATA_HOLDER_H__
+#define __ACTOR_DATA_HOLDER_H__
+
+#include <vector>
+#include <map>
+#include <cstdint>
+#include <string>
+#include <variant>
+#include <any>
+
+// value for scales, like the fear scale that is from 0-100
+typedef uint8_t ScaleValue;
+
+// variant of data types that can be contained in an ActorDataMap.
+typedef std::any ActorDataType;
+// name of an ActorDataType, used in ActorDataMap.
+typedef std::string ActorDataName;
+// map of names and data.
+typedef std::map<ActorDataName, ActorDataType> ActorDataMap;
+
+enum class ActorTrait : uint8_t {
+	Courageousness, // high Courageousness means an actor is less likely to feel fear or panic in times of stress.
+	Cooperativeness, // high Cooperativeness means an actor is more likely to follow orders or requests
+	Ruthlessness, // high Ruthlessness means an actor is more likely to kill or harm when alternatives are available
+	// high Control means an actor is less likely to break under pressure when in high stress situations,
+	// this is different from Courageousness, where Courageousness makes an actor less likely to feel fear, Control just changes the way the actor responds to fear.
+	// Control makes it so the actor is less likely to, for example, run away just because they are afraid
+	Control,
+	SIZE, // size of Trait enum
+};
+typedef std::vector<ScaleValue> TraitVector;
+
+enum class ActorEmotion : uint8_t {
+	Fear, // a creatures level of fear
+	SIZE, // size of Emotion enum
+};
+typedef std::vector<ScaleValue> EmotionVector;
+	
+
+// holds data about actors, like their traits and emotions, can be inherited so custom data like HP or speed can be added.
+struct ActorDataHolder {
+
+	ActorDataHolder();
+	ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector);
+
+	// returns the ScaleValue for the specified trait.
+	ScaleValue traitGet(uint8_t trait);
+	// returns the ScaleValue for the specified trait.
+	ScaleValue traitGet(ActorTrait trait);
+	
+	// sets the specified trait's ScaleValue to the value.
+	void traitSet(uint8_t trait, ScaleValue value);
+	// sets the specified trait's ScaleValue to the value.
+	void traitSet(ActorTrait trait, ScaleValue value);
+
+
+	// returns the ScaleValue for the specified emotion.
+	ScaleValue emotionGet(uint8_t emotion);
+	// returns the ScaleValue for the specified emotion.
+	ScaleValue emotionGet(ActorEmotion emotion);
+
+	// sets the specified emotion's ScaleValue to the value.
+	void emotionSet(uint8_t emotion, ScaleValue value);
+	// sets the specified emotion's ScaleValue to the value.
+	void emotionSet(ActorEmotion emotion, ScaleValue value);
+
+	// increments the specified emotion by the value, note that the value can be negative.
+	void emotionIncrement(uint8_t emotion, int8_t value);
+	// increments the specified emotion by the value, note that the value can be negative.
+	void emotionIncrement(ActorEmotion emotion, int8_t value);
+
+	// adds new data of type T with name dataName.
+	template <typename T>
+	void dataAdd(const ActorDataName& dataName, T data) {
+		actorDataMap[dataName] = ActorDataType(data);
+	}
+	// removes the element from the actorDataMap whose key is dataName
+	void dataRemove(const ActorDataName& dataName);
+	// gets the data associated with dataName, T is the type of the data that is being obtained.
+	template <typename T>
+	T dataGet(const ActorDataName& dataName) {
+		return std::any_cast<T>(actorDataMap[dataName]);
+	}
+	// sets the data associated with dataName to value.
+	template <typename T>
+	void dataSet(const ActorDataName& dataName, T value) {
+		actorDataMap[dataName] = value;
+	}
+private:
+
+	// vector of traits, trait values range from 0-100
+	TraitVector traitsVector;
+
+	// vector of emotions, emotion values range from 0-100
+	EmotionVector emotionsVector;
+
+	// map of custom data unique to this actor.
+	// this is used for things like HP or speed of an actor, as not every actor will have these states,
+	// whereas every actor WILL have all the emotions and traits, so those do not need to be unique.
+	ActorDataMap actorDataMap;
+
+	// initialize every element in the traitsVector to zero
+	void traitsInitialize();
+	// initialize the traitsVector with _traitsVector, _traitsVector must be the size of ActorTraits::SIZE.
+	void traitsInitialize(TraitVector _traitsVector);
+	// initialize every element in the emotionsVector to zero
+	void emotionsInitialize();
+	// initialize the emotionsVector with _emotionsVector, _emotionsVector must be the size of ActorEmotions::SIZE.
+	void emotionsInitialize(EmotionVector _emotionsVector);
+};
+
+
+#endif

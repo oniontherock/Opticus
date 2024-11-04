@@ -2,10 +2,23 @@
 #include <Auxiliary/ConsoleHandler.hpp>
 
 ActorDataHolder::ActorDataHolder() {
+
+	emotionUpdateFunction = ActorEmotionUpdateFunction();
+
 	traitsInitialize();
 	emotionsInitialize();
 }
-ActorDataHolder::ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector) {
+
+ActorDataHolder::ActorDataHolder(ActorEmotionUpdateFunction _emotionUpdateFunction) {
+
+	emotionUpdateFunction = _emotionUpdateFunction;
+
+	traitsInitialize();
+	emotionsInitialize();
+}
+ActorDataHolder::ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector, ActorEmotionUpdateFunction _emotionUpdateFunction) {
+	emotionUpdateFunction = _emotionUpdateFunction;
+
 	traitsInitialize(_traitsVector);
 	emotionsInitialize(_emotionsVector);
 }
@@ -31,7 +44,6 @@ ScaleValue ActorDataHolder::emotionGet(uint8_t emotion) {
 ScaleValue ActorDataHolder::emotionGet(ActorEmotion emotion) {
 	return emotionGet(uint8_t(emotion));
 }
-
 void ActorDataHolder::emotionSet(uint8_t emotion, ScaleValue value) {
 	emotionsVector[emotion] = value;
 
@@ -40,19 +52,20 @@ void ActorDataHolder::emotionSet(ActorEmotion emotion, ScaleValue value) {
 	emotionSet(uint8_t(emotion), value);
 }
 
-void ActorDataHolder::emotionIncrement(uint8_t emotion, int8_t value) {
+void ActorDataHolder::emotionIncrement(uint8_t emotion, ScaleValue value) {
 	emotionsVector[emotion] += value;
 
 }
-void ActorDataHolder::emotionIncrement(ActorEmotion emotion, int8_t value) {
+void ActorDataHolder::emotionIncrement(ActorEmotion emotion, ScaleValue value) {
 	emotionIncrement(uint8_t(emotion), value);
 }
-
+void ActorDataHolder::emotionsUpdate(const ActorBlackboard& actorBlackboard) {
+	std::invoke(emotionUpdateFunction, actorBlackboard, *this);
+}
 
 void ActorDataHolder::dataRemove(const ActorDataName& dataName) {
 	actorDataMap.erase(dataName);
 }
-
 
 void ActorDataHolder::traitsInitialize() {
 	traitsVector.resize(uint8_t(ActorTrait::SIZE));
@@ -65,10 +78,10 @@ void ActorDataHolder::traitsInitialize(TraitVector _traitsVector) {
 	try {
 
 		if (_traitsVector.size() < uint8_t(ActorTrait::SIZE)) {
-			throw "Exception: vector too small";
+			throw std::string("Exception: vector too small");
 		}
-		else {
-			throw "Exception: vector too large";
+		else if (_traitsVector.size() > uint8_t(ActorTrait::SIZE)) {
+			throw std::string("Exception: vector too large");
 		}
 
 		traitsVector = _traitsVector;
@@ -90,7 +103,7 @@ void ActorDataHolder::emotionsInitialize(EmotionVector _emotionsVector) {
 		if (_emotionsVector.size() < uint8_t(ActorEmotion::SIZE)) {
 			throw "Exception: vector too small";
 		}
-		else {
+		else if (_emotionsVector.size() > uint8_t(ActorEmotion::SIZE)) {
 			throw "Exception: vector too large";
 		}
 

@@ -6,10 +6,11 @@
 #include <cstdint>
 #include <string>
 #include <variant>
+#include <functional>
 #include <any>
 
 // value for scales, like the fear scale that is from 0-100
-typedef uint8_t ScaleValue;
+typedef float ScaleValue;
 
 // variant of data types that can be contained in an ActorDataMap.
 typedef std::any ActorDataType;
@@ -35,13 +36,17 @@ enum class ActorEmotion : uint8_t {
 	SIZE, // size of Emotion enum
 };
 typedef std::vector<ScaleValue> EmotionVector;
-	
+
+using ActorBlackboard = bool; // placeholder
 
 // holds data about actors, like their traits and emotions, can be inherited so custom data like HP or speed can be added.
 struct ActorDataHolder {
+	
+	typedef std::function<void(const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData)> ActorEmotionUpdateFunction;
 
 	ActorDataHolder();
-	ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector);
+	ActorDataHolder(ActorEmotionUpdateFunction _emotionUpdateFunction);
+	ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector, ActorEmotionUpdateFunction _emotionUpdateFunction);
 
 	// returns the ScaleValue for the specified trait.
 	ScaleValue traitGet(uint8_t trait);
@@ -65,9 +70,12 @@ struct ActorDataHolder {
 	void emotionSet(ActorEmotion emotion, ScaleValue value);
 
 	// increments the specified emotion by the value, note that the value can be negative.
-	void emotionIncrement(uint8_t emotion, int8_t value);
+	void emotionIncrement(uint8_t emotion, ScaleValue value);
 	// increments the specified emotion by the value, note that the value can be negative.
-	void emotionIncrement(ActorEmotion emotion, int8_t value);
+	void emotionIncrement(ActorEmotion emotion, ScaleValue value);
+
+	// update the emotions based off the contents of the blackboard using the emotionUpdateFunction
+	void emotionsUpdate(const ActorBlackboard& actorBlackboard);
 
 	// adds new data of type T with name dataName.
 	template <typename T>
@@ -107,6 +115,8 @@ private:
 	void emotionsInitialize();
 	// initialize the emotionsVector with _emotionsVector, _emotionsVector must be the size of ActorEmotions::SIZE.
 	void emotionsInitialize(EmotionVector _emotionsVector);
+
+	ActorEmotionUpdateFunction emotionUpdateFunction;
 };
 
 

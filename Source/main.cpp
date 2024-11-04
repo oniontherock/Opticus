@@ -11,14 +11,6 @@
 
 int main() {
 
-	//ActorDataHolder dataHolder;
-
-	//dataHolder.dataAdd("HP", uint16_t(4));
-	//dataHolder.dataAdd("Speed", float(120.f));
-
-	//std::cout << dataHolder.dataGet<uint16_t>("HP") << std::endl;
-	//std::cout << dataHolder.dataGet<float>("Speed") << std::endl;
-
 	TimeHandler::deltaCompute();
 
 	srand(TimeHandler::timeRealGet());

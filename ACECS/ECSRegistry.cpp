@@ -47,12 +47,10 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
 
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridDepopulatorRadius>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridPopulatorRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 
@@ -60,12 +58,15 @@ void EntityComponents::componentIDsInitialize() {
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 
+	// senses/memory
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVision>>();
-
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemory>>();
+
+
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 
+	// debug
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemoryDebug>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVisionDebug>>();
 }
@@ -426,73 +427,21 @@ void ComponentObjectTypeAssigner::system(Entity& entity) {
 
 	entity.entityComponentTerminate<ComponentObjectTypeAssigner>();
 }
-void ComponentObjectGridDepopulatorRadius::system(Entity& entity) {
-	// check that entity has ComponentPosition
-	if (!entity.entityComponentHas<ComponentPosition>()) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridDepopulatorRadius placed on an entity without a ComponentPosition!");
-
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
-	}
-	// check that entity has ObjectType
-	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridDepopulatorRadius placed on an entity without an ObjectType!");
-
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
-	}
-
-	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-	auto& objectGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
-
-	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
-		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
-
-			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
-
-			objectGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).idRemove(entity.Id);
-		}
-	}
-}
-void ComponentObjectGridPopulatorRadius::system(Entity& entity) {
-	// check that entity has ComponentPosition
-	if (!entity.entityComponentHas<ComponentPosition>()) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridPopulatorRadius placed on an entity without a ComponentPosition!");
-
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
-	}
-	// check that entity has ObjectType
-	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridPopulatorRadius placed on an entity without an ObjectType!");
-
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
-	}
-
-	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-	auto& objectGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
-
-	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
-		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
-
-			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
-
-			objectGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).idAdd(entity.Id);
-		}
-	}
-}
 void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 	// check that entity has ComponentPosition
 	if (!entity.entityComponentHas<ComponentPosition>()) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius placed on an entity without a ComponentPosition!");
+		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius assigned to an entity without a ComponentPosition!");
 
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+		entity.entityComponentTerminate<ComponentObjectGridInhabiterRadius>();
+		return;
 	}
 
 	// check that entity has ObjectType
 	if (ObjectRegistry::entityObjectTypeGet(entity.Id) == ObjectType::Null) {
-		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius placed on an entity without an ObjectType!");
+		ConsoleHandler::consolePrintErr("ComponentObjectGridInhabiterRadius assigned to an entity without an ObjectType!");
 
-		entity.entityComponentTerminate<ComponentObjectGridDepopulatorRadius>();
+		entity.entityComponentTerminate<ComponentObjectGridInhabiterRadius>();
+		return;
 	}
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();

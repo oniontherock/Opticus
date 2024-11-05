@@ -3,12 +3,13 @@
 
 #include "../ACECS/Panels.hpp"
 #include "../Include/Common/Math.hpp"
+#include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
+#include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
+#include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
+#include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"
 #include "../Include/Game/World/Objects/ObjectTypes.hpp"
-#include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
-#include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
-#include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <functional>
@@ -412,6 +413,25 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorData(actorDataHolder));
+		};
+	};
+	struct ComponentActorBlackboard final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentActorBlackboard() {
+			hasSystem = true;
+		};
+		ComponentActorBlackboard(ActorBlackboard _actorBlackboard) :
+			ComponentActorBlackboard()
+		{
+			actorBlackboard = _actorBlackboard;
+		}
+
+		ActorBlackboard actorBlackboard;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorBlackboard(actorBlackboard));
 		};
 	};
 }

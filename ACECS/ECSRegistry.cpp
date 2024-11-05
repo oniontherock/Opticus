@@ -63,6 +63,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemory>>();
 
 	// Actor/AI
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorBlackboard>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorData>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
@@ -113,10 +114,14 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
-			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 1, 50, 25, 75}, EmotionVector{ 0 },
+			createComponentPairFromType<ComponentActorBlackboard>(),
+			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 50, 50, 25, 75}, EmotionVector{ 0 },
 				[](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
-					if (actorBlackboard) {
-						actorData.emotionIncrement(ActorEmotion::Fear, 1.f / actorData.traitGet(ActorTrait::Courageousness));
+
+					const float delta = TimeHandler::deltaSimulatedGet();
+
+					if (actorBlackboard.dataGet<bool>("Door Seen") == true) {
+						actorData.emotionIncrement(ActorEmotion::Fear, (60.f * delta) - (actorData.traitGet(ActorTrait::Courageousness)) * delta);
 					}
 				})
 				),
@@ -570,16 +575,23 @@ void ComponentObjectMemory::system(Entity& entity) {
 		objectMemoryHolder.memoryUpdate(*eventObjectSeen->objectsSeen);
 	}
 }
-void ComponentActorData::system(Entity& entity) {
+void ComponentActorBlackboard::system(Entity& entity) {
 	if (entity.entityEventHas<EventObjectSeen>()) {
 
-		ActorBlackboard seesDoor = false;
+		auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
 
-		if (entity.entityEventGet<EventObjectSeen>()->objectsSeen->at(uint8_t(ObjectType::Door)).size() > 0) {
-			seesDoor = true;
+		if (eventObjectSeen->objectsSeen->at(uint8_t(ObjectType::Door)).size() > 0) {
+			actorBlackboard.dataSet("Door Seen", true);
 		}
+		else {
+			actorBlackboard.dataSet("Door Seen", false);
+		}
+	}
+}
+void ComponentActorData::system(Entity& entity) {
+	if (entity.entityComponentHas<ComponentActorBlackboard>()) {
 
-		actorDataHolder.emotionsUpdate(seesDoor);
+		actorDataHolder.emotionsUpdate(entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard);
 
 		std::cout << actorDataHolder.emotionGet(ActorEmotion::Fear) << std::endl;
 	}

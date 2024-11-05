@@ -7,34 +7,30 @@
 
 // variant of data types that can be contained in an BlackboardDataMap.
 typedef std::any BlackboardDataType;
-// name of an BlackboardDataType, used in BlackboardDataMap.
-typedef std::string BlackboardDataName;
+// key of an BlackboardDataType, used in BlackboardDataMap.
+typedef const char* BlackboardDataKey;
 // map of names and data.
-typedef std::unordered_map<BlackboardDataName, BlackboardDataType> BlackboardDataMap;
+typedef std::unordered_map<BlackboardDataKey, BlackboardDataType> BlackboardDataMap;
 
 struct ActorBlackboard {
-	// adds new data of type T with name dataName.
+	// removes the element from the blackboardDataMap whose key is dataKey
+	void dataRemove(BlackboardDataKey dataKey);
+	// gets the data associated with dataKey, T is the type of the data that is being obtained.
 	template <typename T>
-	void dataAdd(const BlackboardDataName& dataName, T data) {
-		blackboardDataMap[dataName] = BlackboardDataType(data);
+	T dataGet(BlackboardDataKey dataKey) const {
+		return std::any_cast<T>(blackboardDataMap.at(dataKey));
 	}
-	// removes the element from the blackboardDataMap whose key is dataName
-	void dataRemove(const BlackboardDataName& dataName);
-	// gets the data associated with dataName, T is the type of the data that is being obtained.
+	// sets the value of dataKey to value.
 	template <typename T>
-	T dataGet(const BlackboardDataName& dataName) {
-		return std::any_cast<T>(blackboardDataMap[dataName]);
+	void dataSet(BlackboardDataKey dataKey, T value) {
+		blackboardDataMap[dataKey] = value;
 	}
-	// sets the data associated with dataName to value.
-	template <typename T>
-	void dataSet(const BlackboardDataName& dataName, T value) {
-		blackboardDataMap[dataName] = value;
-	}
-
+	// returns whether the specified dataKey exists in the blackboardDataMap.
+	bool dataHas(BlackboardDataKey dataKey) const;
 private:
 
 	// map of all data contained in the blackboard
-	BlackboardDataName blackboardDataMap;
+	BlackboardDataMap blackboardDataMap;
 };
 
 #endif

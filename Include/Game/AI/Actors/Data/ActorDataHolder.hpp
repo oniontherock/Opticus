@@ -1,23 +1,24 @@
 #ifndef __ACTOR_DATA_HOLDER_H__
 #define __ACTOR_DATA_HOLDER_H__
 
-#include <vector>
-#include <unordered_map>
-#include <cstdint>
-#include <string>
-#include <variant>
-#include <functional>
+#include "../Blackboard/ActorBlackboard.hpp"
 #include <any>
+#include <cstdint>
+#include <functional>
+#include <string>
+#include <unordered_map>
+#include <variant>
+#include <vector>
 
 // value for scales, like the fear scale that is from 0-100
 typedef float ScaleValue;
 
-// variant of data types that can be contained in an ActorDataMap.
+// variant of data types that can be contained in an actorDataUMap.
 typedef std::any ActorDataType;
-// name of an ActorDataType, used in ActorDataMap.
-typedef std::string ActorDataName;
-// map of names and data.
-typedef std::unordered_map<ActorDataName, ActorDataType> ActorDataMap;
+// key of an ActorDataType, used in actorDataUMap.
+typedef const char* ActorDataKey;
+// map of keys and data.
+typedef std::unordered_map<ActorDataKey, ActorDataType> ActorDataUMap;
 
 enum class ActorTrait : uint8_t {
 	Courageousness, // high Courageousness means an actor is less likely to feel fear or panic in times of stress.
@@ -37,8 +38,6 @@ enum class ActorEmotion : uint8_t {
 };
 typedef std::vector<ScaleValue> EmotionVector;
 
-using ActorBlackboard = bool; // placeholder
-
 // holds data about actors, like their traits and emotions, can be inherited so custom data like HP or speed can be added.
 struct ActorDataHolder {
 	
@@ -49,9 +48,9 @@ struct ActorDataHolder {
 	ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector, ActorEmotionUpdateFunction _emotionUpdateFunction);
 
 	// returns the ScaleValue for the specified trait.
-	ScaleValue traitGet(uint8_t trait);
+	ScaleValue traitGet(uint8_t trait) const;
 	// returns the ScaleValue for the specified trait.
-	ScaleValue traitGet(ActorTrait trait);
+	ScaleValue traitGet(ActorTrait trait) const;
 	
 	// sets the specified trait's ScaleValue to the value.
 	void traitSet(uint8_t trait, ScaleValue value);
@@ -60,9 +59,9 @@ struct ActorDataHolder {
 
 
 	// returns the ScaleValue for the specified emotion.
-	ScaleValue emotionGet(uint8_t emotion);
+	ScaleValue emotionGet(uint8_t emotion) const;
 	// returns the ScaleValue for the specified emotion.
-	ScaleValue emotionGet(ActorEmotion emotion);
+	ScaleValue emotionGet(ActorEmotion emotion) const;
 
 	// sets the specified emotion's ScaleValue to the value.
 	void emotionSet(uint8_t emotion, ScaleValue value);
@@ -77,23 +76,20 @@ struct ActorDataHolder {
 	// update the emotions based off the contents of the blackboard using the emotionUpdateFunction
 	void emotionsUpdate(const ActorBlackboard& actorBlackboard);
 
-	// adds new data of type T with name dataName.
+	// removes the element from the actorDataUMap whose key is dataKey
+	void dataRemove(ActorDataKey dataKey);
+	// gets the data for dataKey, T is the type of the data that is being obtained.
 	template <typename T>
-	void dataAdd(const ActorDataName& dataName, T data) {
-		actorDataMap[dataName] = ActorDataType(data);
+	T dataGet(ActorDataKey dataKey) const {
+		return std::any_cast<T>(actorDataUMap[dataKey]);
 	}
-	// removes the element from the actorDataMap whose key is dataName
-	void dataRemove(const ActorDataName& dataName);
-	// gets the data associated with dataName, T is the type of the data that is being obtained.
+	// sets the value of dataKey to value.
 	template <typename T>
-	T dataGet(const ActorDataName& dataName) {
-		return std::any_cast<T>(actorDataMap[dataName]);
+	void dataSet(ActorDataKey dataKey, T value) {
+		actorDataUMap[dataKey] = value;
 	}
-	// sets the data associated with dataName to value.
-	template <typename T>
-	void dataSet(const ActorDataName& dataName, T value) {
-		actorDataMap[dataName] = value;
-	}
+	// returns whether the specified dataKey exists in the actorDataUMap.
+	bool dataHas(ActorDataKey dataKey) const;
 private:
 
 	// vector of traits, trait values range from 0-100
@@ -105,7 +101,7 @@ private:
 	// map of custom data unique to this actor.
 	// this is used for things like HP or speed of an actor, as not every actor will have these states,
 	// whereas every actor WILL have all the emotions and traits, so those do not need to be unique.
-	ActorDataMap actorDataMap;
+	ActorDataUMap actorDataUMap;
 
 	// initialize every element in the traitsVector to zero
 	void traitsInitialize();

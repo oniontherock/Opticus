@@ -32,6 +32,7 @@ ScaleValue ActorDataHolder::traitGet(ActorTrait trait) const {
 
 void ActorDataHolder::traitSet(uint8_t trait, ScaleValue value) {
 	traitsVector[trait] = value;
+	traitValidateScale(trait);
 }
 void ActorDataHolder::traitSet(ActorTrait trait, ScaleValue value) {
 	traitSet(uint8_t(trait), value);
@@ -46,6 +47,7 @@ ScaleValue ActorDataHolder::emotionGet(ActorEmotion emotion) const {
 }
 void ActorDataHolder::emotionSet(uint8_t emotion, ScaleValue value) {
 	emotionsVector[emotion] = value;
+	emotionValidateScale(emotion);
 
 }
 void ActorDataHolder::emotionSet(ActorEmotion emotion, ScaleValue value) {
@@ -54,6 +56,7 @@ void ActorDataHolder::emotionSet(ActorEmotion emotion, ScaleValue value) {
 
 void ActorDataHolder::emotionIncrement(uint8_t emotion, ScaleValue value) {
 	emotionsVector[emotion] += value;
+	emotionValidateScale(emotion);
 
 }
 void ActorDataHolder::emotionIncrement(ActorEmotion emotion, ScaleValue value) {
@@ -115,5 +118,26 @@ void ActorDataHolder::emotionsInitialize(EmotionVector _emotionsVector) {
 	}
 	catch (std::string error) {
 		ConsoleHandler::consolePrintErr("Failure to initialize an ActorDataHolder's emotions: " + error);
+	}
+}
+
+void ActorDataHolder::traitValidateScale(uint8_t trait) {
+	float traitValue = traitGet(trait);
+
+	if (traitValue > scaleMax) {
+		traitSet(trait, scaleMax);
+	}
+	else if (traitValue < scaleMin) {
+		traitSet(trait, scaleMin);
+	}
+}
+void ActorDataHolder::emotionValidateScale(uint8_t emotion) {
+	float emotionValue = emotionGet(emotion);
+
+	if (emotionValue > scaleMax) {
+		emotionSet(emotion, scaleMax);
+	}
+	else if (emotionValue < scaleMin) {
+		emotionSet(emotion, scaleMin);
 	}
 }

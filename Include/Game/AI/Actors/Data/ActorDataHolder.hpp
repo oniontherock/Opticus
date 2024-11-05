@@ -47,6 +47,11 @@ struct ActorDataHolder {
 	ActorDataHolder(ActorEmotionUpdateFunction _emotionUpdateFunction);
 	ActorDataHolder(TraitVector _traitsVector, EmotionVector _emotionsVector, ActorEmotionUpdateFunction _emotionUpdateFunction);
 
+	// minimum value of a trait or emotion
+	static constexpr float scaleMin = 0.f;
+	// maximum value of a trait or emotion
+	static constexpr float scaleMax = 100.f;
+
 	// returns the ScaleValue for the specified trait.
 	ScaleValue traitGet(uint8_t trait) const;
 	// returns the ScaleValue for the specified trait.
@@ -111,6 +116,11 @@ private:
 	void emotionsInitialize();
 	// initialize the emotionsVector with _emotionsVector, _emotionsVector must be the size of ActorEmotions::SIZE.
 	void emotionsInitialize(EmotionVector _emotionsVector);
+
+	// ensures the given trait is within the scale
+	void traitValidateScale(uint8_t trait);
+	// ensures the given emotion is within the scale
+	void emotionValidateScale(uint8_t emotion);
 
 	ActorEmotionUpdateFunction emotionUpdateFunction;
 };

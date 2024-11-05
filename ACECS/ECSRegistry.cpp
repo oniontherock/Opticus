@@ -115,13 +115,26 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
 			createComponentPairFromType<ComponentActorBlackboard>(),
-			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 50, 50, 25, 75}, EmotionVector{ 0 },
+			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 50.f, 50, 25, 75}, EmotionVector{ 0 },
 				[](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
 
 					const float delta = TimeHandler::deltaSimulatedGet();
+					
+					const float courageousness = actorData.traitGet(ActorTrait::Courageousness);
 
-					if (actorBlackboard.dataGet<bool>("Door Seen") == true) {
-						actorData.emotionIncrement(ActorEmotion::Fear, (60.f * delta) - (actorData.traitGet(ActorTrait::Courageousness)) * delta);
+					// the base speed fear increases
+					const float fearIncreaseSpeedBase = 101.f;
+
+					float fearIncreaseSpeedFinal = fearIncreaseSpeedBase - courageousness;
+					if (fearIncreaseSpeedFinal < 0.f) fearIncreaseSpeedFinal = 0.f;
+
+					const int doorSeenCount = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen")[uint8_t(ObjectType::Door)].size();
+
+					if (doorSeenCount > 0) {
+						actorData.emotionIncrement(ActorEmotion::Fear, (fearIncreaseSpeedFinal * delta) * doorSeenCount);
+					}
+					else {
+						actorData.emotionIncrement(ActorEmotion::Fear, -(courageousness / 10.f) * delta);
 					}
 				})
 				),
@@ -576,16 +589,19 @@ void ComponentObjectMemory::system(Entity& entity) {
 	}
 }
 void ComponentActorBlackboard::system(Entity& entity) {
+	// record seen objects to blackboard
 	if (entity.entityEventHas<EventObjectSeen>()) {
 
 		auto* eventObjectSeen = entity.entityEventGet<EventObjectSeen>();
 
-		if (eventObjectSeen->objectsSeen->at(uint8_t(ObjectType::Door)).size() > 0) {
-			actorBlackboard.dataSet("Door Seen", true);
-		}
-		else {
-			actorBlackboard.dataSet("Door Seen", false);
-		}
+		actorBlackboard.dataSet("ObjectsSeen", *eventObjectSeen->objectsSeen);
+	}
+	// record memory to blackboard
+	if (entity.entityComponentHas<ComponentObjectMemory>()) {
+
+		auto* componentObjectMemory = entity.entityComponentGet<ComponentObjectMemory>();
+		
+		actorBlackboard.dataSet("MemoryHolder", componentObjectMemory->objectMemoryHolder);
 	}
 }
 void ComponentActorData::system(Entity& entity) {

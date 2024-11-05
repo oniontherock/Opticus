@@ -2,7 +2,7 @@
 #define __ACTOR_DATA_HOLDER_H__
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <cstdint>
 #include <string>
 #include <variant>
@@ -17,7 +17,7 @@ typedef std::any ActorDataType;
 // name of an ActorDataType, used in ActorDataMap.
 typedef std::string ActorDataName;
 // map of names and data.
-typedef std::map<ActorDataName, ActorDataType> ActorDataMap;
+typedef std::unordered_map<ActorDataName, ActorDataType> ActorDataMap;
 
 enum class ActorTrait : uint8_t {
 	Courageousness, // high Courageousness means an actor is less likely to feel fear or panic in times of stress.

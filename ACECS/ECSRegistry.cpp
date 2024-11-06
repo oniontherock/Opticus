@@ -122,19 +122,28 @@ void EntityComponents::componentTemplatesInitialize() {
 					
 					const float courageousness = actorData.traitGet(ActorTrait::Courageousness);
 
-					// the base speed fear increases
-					const float fearIncreaseSpeedBase = 101.f;
+					auto memory = actorBlackboard.dataGet<ObjectMemoryHolder>("Memory");
 
-					float fearIncreaseSpeedFinal = fearIncreaseSpeedBase - courageousness;
-					if (fearIncreaseSpeedFinal < 0.f) fearIncreaseSpeedFinal = 0.f;
+					if (memory.memoryHasType(uint8_t(ObjectType::Door))) {
 
-					const int doorSeenCount = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen")[uint8_t(ObjectType::Door)].size();
+						float doorSoonestSeenValue = 9999.f;
+						uint16_t doorSoonestSeenInd = UINT16_MAX;
 
-					if (doorSeenCount > 0) {
-						actorData.emotionIncrement(ActorEmotion::Fear, (fearIncreaseSpeedFinal * delta) * doorSeenCount);
-					}
-					else {
-						actorData.emotionIncrement(ActorEmotion::Fear, -(courageousness / 10.f) * delta);
+						std::vector<ObjectMemory> memoriesDoors = memory.memoriesGetOfType(ObjectType::Door);
+
+						for (uint16_t i = 0; i < memoriesDoors.size(); i++) {
+							if (doorSoonestSeenValue > memoriesDoors[i].second.value) {
+								doorSoonestSeenValue = memoriesDoors[i].second.value;
+								doorSoonestSeenInd = i;
+							}
+						}
+						// seen door in the last 10 seconds
+						if (doorSoonestSeenValue <= 1.f) {
+							actorData.emotionIncrement(ActorEmotion::Fear, delta * (101.f - courageousness));
+						}
+						else {
+							actorData.emotionIncrement(ActorEmotion::Fear, -((doorSoonestSeenValue * doorSoonestSeenValue) * (delta * delta)));
+						}
 					}
 				})
 				),
@@ -601,7 +610,7 @@ void ComponentActorBlackboard::system(Entity& entity) {
 
 		auto* componentObjectMemory = entity.entityComponentGet<ComponentObjectMemory>();
 		
-		actorBlackboard.dataSet("MemoryHolder", componentObjectMemory->objectMemoryHolder);
+		actorBlackboard.dataSet("Memory", componentObjectMemory->objectMemoryHolder);
 	}
 }
 void ComponentActorData::system(Entity& entity) {

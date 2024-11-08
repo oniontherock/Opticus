@@ -509,21 +509,40 @@ namespace EntityComponents {
 	};
 	struct ComponentActorBlackboard final : public Component {
 
+		using BlackboardUpdateFunction = std::function<void(Entity& actor, ActorBlackboard& actorBlackboard)>;
+
 		void system(Entity& entity) final;
 
 		ComponentActorBlackboard() {
 			hasSystem = true;
+			updateFunc = [](Entity& actor, ActorBlackboard& actorBlackboard) {};
+
 		};
 		ComponentActorBlackboard(ActorBlackboard _actorBlackboard) :
 			ComponentActorBlackboard()
 		{
 			actorBlackboard = _actorBlackboard;
 		}
+		ComponentActorBlackboard(BlackboardUpdateFunction _updateFunc) :
+			ComponentActorBlackboard()
+		{
+			updateFunc = _updateFunc;
+		}
+		ComponentActorBlackboard(ActorBlackboard _actorBlackboard, BlackboardUpdateFunction _updateFunc) :
+			ComponentActorBlackboard()
+		{
+			actorBlackboard = _actorBlackboard;
+			updateFunc = _updateFunc;
+		}
 
 		ActorBlackboard actorBlackboard;
 
+		// special update function unique to each entity that handles data in the blackboard,
+		// for example, the player's updateFunc will check if any seen object is a squad member, and will assign them to "SeenSquadMembers" data.
+		BlackboardUpdateFunction updateFunc;
+
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentActorBlackboard(actorBlackboard));
+			return std::unique_ptr<Duplicatable>(new ComponentActorBlackboard(actorBlackboard, updateFunc));
 		};
 	};
 	struct ComponentActorStateManager final : public Component {

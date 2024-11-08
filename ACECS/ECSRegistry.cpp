@@ -138,7 +138,8 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
-			createComponentPairFromType<ComponentActorBlackboard>(),
+			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
+				}),
 			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 50.f, 50, 25, 75}, EmotionVector{ 0 },
 				[](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
 
@@ -652,6 +653,8 @@ void ComponentActorBlackboard::system(Entity& entity) {
 		
 		actorBlackboard.dataSet("Memory", componentObjectMemory->objectMemoryHolder);
 	}
+	// invoke updateFunc to do specialized data processing
+	std::invoke(updateFunc, entity, actorBlackboard);
 }
 void ComponentActorData::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentActorBlackboard>()) {

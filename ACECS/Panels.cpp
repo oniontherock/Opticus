@@ -15,7 +15,6 @@ void PanelGameView::panelUpdate() {
 	auto* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
 	if (mode == Normal || mode == ObjectGridRender) {
-
 		staticDraw(levelActive);
 		dynamicDraw(levelActive);
 		playerDraw(levelActive);
@@ -50,6 +49,8 @@ void PanelGameView::checkModeChange() {
 }
 
 void PanelGameView::staticDraw(GameLevel* levelActive) {
+	levelActive->worldTextureStatic.clear();
+
 	// draw white background
 	sf::RectangleShape rectangleBackground;
 	rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));

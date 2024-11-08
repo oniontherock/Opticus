@@ -195,7 +195,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMemoryVision>(MemoryHolderVision(sf::Vector2f(640 * 4, 360 * 4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
-			createComponentPairFromType<ComponentSprite>("Art/Character.png"),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
 			//createComponentPairFromType<ComponentObjectVisionDebug>(),
 			//createComponentPairFromType<ComponentObjectMemoryDebug>(),
 		}

@@ -1,9 +1,10 @@
+#include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 17;
+uint16_t MAX_COMPONENT_TYPES = 20;
 uint16_t MAX_EVENT_TYPES = 6;
 
 void ECSRegistry::ECSInitialize() {
@@ -43,11 +44,12 @@ void EntityComponents::componentIDsInitialize() {
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
+	
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateTicker>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
-
-
+	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 
@@ -65,6 +67,7 @@ void EntityComponents::componentIDsInitialize() {
 	// Actor/AI
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorBlackboard>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorData>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateManager>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
 
@@ -147,7 +150,11 @@ void EntityComponents::componentTemplatesInitialize() {
 					}
 				})
 				),
-
+			createComponentPairFromType<ComponentActorStateManager>(std::vector<UtilityStates::StateBase*>{
+				new UtilityStates::StateIdle(), 
+				new UtilityStates::StateWander()
+			}),
+			createComponentPairFromType<ComponentActorStateTicker>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -620,6 +627,51 @@ void ComponentActorData::system(Entity& entity) {
 
 		std::cout << actorDataHolder.emotionGet(ActorEmotion::Fear) << std::endl;
 	}
+}
+void ComponentActorStateManager::system(Entity& entity) {
+
+	try {
+		if (!entity.entityComponentHas<ComponentActorData>()) {
+			throw "Does not have ComponentActorData";
+		}
+		if (!entity.entityComponentHas<ComponentActorBlackboard>()) {
+			throw "Does not have ComponentActorBlackboard";
+		}
+		if (stateManager.statesCountGet() <= 0) {
+			throw "Does not have any states";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentActorStateManager system failed: Exception: " + std::string(e));
+		return;
+	}
+
+	auto* componentActorData = entity.entityComponentGet<ComponentActorData>();
+	auto* componentActorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>();
+
+	stateManager.statesUpdate(componentActorData->actorDataHolder, componentActorBlackboard->actorBlackboard);
+	stateManager.stateActiveSet(0);
+}
+
+void ComponentActorStateTicker::system(Entity& entity) {
+
+	try {
+		if (!entity.entityComponentHas<ComponentActorStateManager>()) {
+			throw "Does not have ComponentActorStateManager";
+		}
+		if (!entity.entityComponentHas<ComponentActorBlackboard>()) {
+			throw "Does not have ComponentActorBlackboard";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentActorStateTicker system failed: Exception: " + std::string(e));
+		return;
+	}
+
+	auto* componentActorStateManager = entity.entityComponentGet<ComponentActorStateManager>();
+	auto* componentActorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>();
+
+	componentActorStateManager->stateManager.stateActiveUpdate(entity, componentActorBlackboard->actorBlackboard);
 }
 
 #pragma endregion Systems

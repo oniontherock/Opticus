@@ -146,6 +146,8 @@
     <ClCompile Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Data\ActorDataHolder.cpp" />
     <ClCompile Include="Include\Game\AI\Memory\ObjectMemoryHolder.cpp" />
+    <ClCompile Include="Include\Game\AI\Utility AI\States\AIStates.cpp" />
+    <ClCompile Include="Include\Game\AI\Utility AI\UtilityStateManager.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Object Vision\ObjectVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
@@ -168,7 +170,6 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-audio-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-graphics-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-system-d-2.dll" />
-    <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-window-d-2.dll" />
     <None Include="Include\Shaders\Blur.glsl" />
     <None Include="Include\Shaders\Grayscale.glsl" />
     <None Include="Include\Shaders\Raycasting\RayPositionsToWorldColors.glsl" />
@@ -199,6 +200,9 @@
     <ClInclude Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Data\ActorDataHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Memory\ObjectMemoryHolder.hpp" />
+    <ClInclude Include="Include\Game\AI\Utility AI\States\AIStates.hpp" />
+    <ClInclude Include="Include\Game\AI\Utility AI\UtilityState.hpp" />
+    <ClInclude Include="Include\Game\AI\Utility AI\UtilityStateManager.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Object Vision\ObjectVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />

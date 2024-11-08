@@ -6,6 +6,7 @@
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
+#include "../Include/Game/AI/Utility AI/UtilityStateManager.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"
@@ -432,6 +433,38 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorBlackboard(actorBlackboard));
+		};
+	};
+	struct ComponentActorStateManager final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentActorStateManager() {
+			hasSystem = true;
+		};
+		ComponentActorStateManager(UtilityStateManager _stateManager) :
+			ComponentActorStateManager()
+		{
+			stateManager = _stateManager;
+		}
+
+		UtilityStateManager stateManager;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorStateManager(stateManager));
+		};
+	};
+	// calls the behavior function on the ComponentActorStateManager's active state
+	struct ComponentActorStateTicker final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentActorStateTicker() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorStateTicker());
 		};
 	};
 }

@@ -117,9 +117,36 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventVisionUpdated());
 		};
 	};
+	struct EventActorGoTo final : public Event {
+
+		EventActorGoTo() {};
+
+		sf::Vector2f positionTo;
+
+		void clear() final {
+			positionTo = sf::Vector2f(0.f, 0.f);
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventActorGoTo());
+		};
+	};
+	struct EventActorTurnTo final : public Event {
+
+		EventActorTurnTo() {};
+
+		sf::Vector2f positionTo;
+
+		void clear() final {
+			positionTo = sf::Vector2f(0.f, 0.f);
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventActorTurnTo());
+		};
+	};
 }
 namespace EntityComponents {
-
 	struct ComponentMoveByInput final : public Component {
 
 		void system(Entity& entity) final;
@@ -529,6 +556,70 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorStateTicker());
+		};
+	};
+	struct ComponentActorMovementHandler final : public Component {
+
+		using GoToFunction = std::function<void(Entity& actor, sf::Vector2f positionTo)>;
+		using TurnToFunction = std::function<void(Entity& actor, sf::Vector2f positionTo)>;
+
+		void system(Entity& entity) final;
+
+		ComponentActorMovementHandler() {
+			hasSystem = true;
+
+			// initialize functions to defaults
+			goToFunction = [](Entity& actor, sf::Vector2f positionTo) {
+				float delta = float(TimeHandler::deltaSimulatedGet());
+
+				constexpr float moveSpeed = 120.f;
+
+				auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
+
+				eventMove->moveAxis = Vector2fMath::dir(actor.entityComponentGet<ComponentPosition>()->position, positionTo) * moveSpeed * delta;
+				};
+			turnToFunction = [](Entity& actor, sf::Vector2f positionTo) {
+				const float delta = float(TimeHandler::deltaSimulatedGet());
+
+				constexpr float turnSpeed = 180.f * Mathf::PI / 180.f;
+
+				const float turnSpeedDelta = turnSpeed * delta;
+
+				const float angle = Vector2fMath::angle(actor.entityComponentGet<ComponentPosition>()->position, positionTo);
+
+				auto* rotationComponent = actor.entityComponentGet<ComponentRotation>();
+
+				// wrap rotation between -PI and +PI
+				if (rotationComponent->rotation >= +Mathf::PI) rotationComponent->rotation -= Mathf::TAU;
+				if (rotationComponent->rotation <= -Mathf::PI) rotationComponent->rotation += Mathf::TAU;
+
+				const float angleDiff = angle - rotationComponent->rotation;
+
+				auto* rotateEvent = actor.entityEventAddAndGet<EntityEvents::EventRotate>();
+
+				if (angleDiff > turnSpeedDelta) {
+					rotateEvent->rotateAmount = turnSpeedDelta;
+				}
+				else if (angleDiff < -turnSpeedDelta) {
+					rotateEvent->rotateAmount = -turnSpeedDelta;
+				}
+				else {
+					rotateEvent->rotateAmount = angleDiff;
+				}
+				};
+		};
+		ComponentActorMovementHandler(GoToFunction _goToFunction, TurnToFunction _turnToFunction) {
+			hasSystem = true;
+
+			goToFunction = _goToFunction;
+			turnToFunction = _turnToFunction;
+		};
+
+		GoToFunction goToFunction;
+		TurnToFunction turnToFunction;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorMovementHandler(goToFunction, turnToFunction));
 		};
 	};
 }

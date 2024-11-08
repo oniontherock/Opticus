@@ -62,9 +62,11 @@ public:
 		return lengthSet(vec.x, vec.y, len);
 	}
 
+	// gets the direction from (aX, aY) to (bX, bY)
 	static Vector2 dir(T aX, T aY, T bX, T bY) {
 		return normalize(axis(aX, aY, bX, bY));
 	}
+	// gets the direction from vecA to vecB
 	static Vector2 dir(Vector2 vecA, Vector2 vecB) {
 		return dir(vecA.x, vecA.y, vecB.x, vecB.y);
 	}

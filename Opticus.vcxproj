@@ -197,7 +197,6 @@
     <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Data\ActorDataHolder.hpp" />
-    <ClInclude Include="Include\Game\AI\Actors\Movement\ActorMovementHandler.hpp" />
     <ClInclude Include="Include\Game\AI\Memory\ObjectMemoryHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\States\AIStates.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\UtilityState.hpp" />

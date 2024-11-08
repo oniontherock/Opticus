@@ -4,8 +4,8 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 20;
-uint16_t MAX_EVENT_TYPES = 6;
+uint16_t MAX_COMPONENT_TYPES = 21;
+uint16_t MAX_EVENT_TYPES = 8;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -33,6 +33,8 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventViewMoved>>();
 	EventRegistry::typeRegister<EventIDs<EventObjectSeen>>();
 	EventRegistry::typeRegister<EventIDs<EventVisionUpdated>>();
+	EventRegistry::typeRegister<EventIDs<EventActorTurnTo>>();
+	EventRegistry::typeRegister<EventIDs<EventActorGoTo>>();
 }
 
 #pragma endregion Events
@@ -48,6 +50,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSpriteDynamicRegister>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateTicker>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorMovementHandler>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
@@ -163,9 +166,10 @@ void EntityComponents::componentTemplatesInitialize() {
 							actorData.emotionIncrement(ActorEmotion::Fear, delta * (101.f - courageousness));
 						}
 						else {
-							actorData.emotionIncrement(ActorEmotion::Fear, -((doorSoonestSeenValue * doorSoonestSeenValue) * (delta * delta)));
+							actorData.emotionIncrement(ActorEmotion::Fear, ((doorSoonestSeenValue * doorSoonestSeenValue) * (delta * delta)));
 						}
 					}
+							actorData.emotionIncrement(ActorEmotion::Fear, 10.f * delta);
 				})
 				),
 			createComponentPairFromType<ComponentActorStateManager>(std::vector<UtilityStates::StateBase*>{
@@ -173,6 +177,7 @@ void EntityComponents::componentTemplatesInitialize() {
 				new UtilityStates::StateWander()
 			}),
 			createComponentPairFromType<ComponentActorStateTicker>(),
+			createComponentPairFromType<ComponentActorMovementHandler>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -697,6 +702,24 @@ void ComponentActorStateTicker::system(Entity& entity) {
 	auto* componentActorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>();
 
 	componentActorStateManager->stateManager.stateActiveUpdate(entity, componentActorBlackboard->actorBlackboard);
+}
+void ComponentActorMovementHandler::system(Entity& entity) {
+	// handle EventActorGoTo
+	if (entity.entityEventHas<EventActorGoTo>()) {
+		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
+
+		for (uint16_t i = 0; i < events.size(); i++) {
+			std::invoke(goToFunction, entity, events[i]->positionTo);
+		}
+	}
+	// handle EventActorTurnTo
+	if (entity.entityEventHas<EventActorTurnTo>()) {
+		auto events = entity.entityEventGetAllOfType<EventActorTurnTo>();
+
+		for (uint16_t i = 0; i < events.size(); i++) {
+			std::invoke(turnToFunction, entity, events[i]->positionTo);
+		}
+	}
 }
 
 #pragma endregion Systems

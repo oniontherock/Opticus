@@ -2,6 +2,7 @@
 #define __PANELS_H__
 
 #include <Graphics.hpp>
+#include "GameLevel.hpp"
 
 enum PanelTypes : uint16_t {
 	GameView,
@@ -21,6 +22,13 @@ struct PanelGameView : public Panel {
 	
 private:
 	void checkModeChange();
+
+	// draws all static objects.
+	void staticDraw(GameLevel* levelActive);
+	// draws all dynamic objects
+	void dynamicDraw(GameLevel* levelActive);
+	// draws player related stuff like vision and memory
+	void playerDraw(GameLevel* levelActive);
 };
 
 

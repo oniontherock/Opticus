@@ -3,21 +3,25 @@
 #include "../Include/Common/Math.hpp"
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
-#include "GameLevel.hpp"
 #include "Input.hpp"
 
 void PanelGameView::panelUpdate() {
 
 	checkModeChange();
 
+	auto* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+
 	if (mode == Normal || mode == ObjectGridRender) {
+
+		staticDraw(levelActive);
+		dynamicDraw(levelActive);
+		playerDraw(levelActive);
 	}
 	if (mode == ObjectGridRender) {
-		ObjectGrid& objectGrid = GameLevelGrid::levelGet(0, 0, 0)->objectGrid;
+		ObjectGrid& objectGrid = levelActive->objectGrid;
 
 		static ObjectGridRenderer objectGridRenderer;
 
@@ -43,4 +47,59 @@ void PanelGameView::checkModeChange() {
 			mode = Normal;
 		}
 	}
+}
+
+void PanelGameView::staticDraw(GameLevel* levelActive) {
+	// draw white background
+	sf::RectangleShape rectangleBackground;
+	rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));
+	rectangleBackground.setFillColor(sf::Color::White);
+
+	levelActive->worldTextureStatic.draw(rectangleBackground);
+
+	levelActive->worldTextureStatic.display();
+}
+void PanelGameView::dynamicDraw(GameLevel* levelActive) {
+	levelActive->worldTextureDynamic.clear(sf::Color::Transparent);
+
+	for (uint32_t i = 0; i < levelActive->dynamicSpriteEntityIds.size(); i++) {
+		Entity& entityCur = EntityManager::entityGet(levelActive->dynamicSpriteEntityIds[i]);
+
+		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
+
+		levelActive->worldTextureDynamic.draw(componentSprite->sprite);
+	}
+
+	levelActive->worldTextureDynamic.display();
+}
+void PanelGameView::playerDraw(GameLevel* levelActive) {
+	// draw player memory
+	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
+
+	auto* playerMemoryHolder = player.entityComponentGet<EntityComponents::ComponentMemoryVision>();
+
+	sf::Sprite memorySprite;
+	memorySprite.setTexture(playerMemoryHolder->memoryHolder.memoryGet().getTexture());
+	memorySprite.setOrigin(playerMemoryHolder->memoryHolder.memorySize / 2.f);
+	memorySprite.setPosition(viewGet().getCenter());
+
+	objectDraw(memorySprite);
+
+	// draw player static vision
+	auto* playerVisionCasterStatic = player.entityComponentGet<EntityComponents::ComponentVisionCasterStatic>();
+
+	sf::Sprite visionSpriteStatic;
+	visionSpriteStatic.setTexture(playerVisionCasterStatic->visionCaster.visionTextureGet().getTexture());
+	visionSpriteStatic.setPosition(viewRect.getPosition());
+
+	objectDraw(visionSpriteStatic);
+
+	// draw player dynamic vision
+	auto* playerVisionCasterDynamic = player.entityComponentGet<EntityComponents::ComponentVisionCasterDynamic>();
+
+	sf::Sprite visionSpriteDynamic;
+	visionSpriteDynamic.setTexture(playerVisionCasterDynamic->visionCaster.visionTextureGet().getTexture());
+	visionSpriteDynamic.setPosition(viewRect.getPosition());
+
+	objectDraw(visionSpriteDynamic);
 }

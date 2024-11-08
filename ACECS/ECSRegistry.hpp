@@ -102,6 +102,21 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventObjectSeen());
 		};
 	};
+	// event for when a world vision component (I.E. a component that reads world textures) is updated.
+	struct EventVisionUpdated final : public Event {
+
+		EventVisionUpdated() {};
+
+		sf::Texture textureToMemorize;
+
+		void clear() final {
+			textureToMemorize.create(1, 1);
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventVisionUpdated());
+		};
+	};
 }
 namespace EntityComponents {
 
@@ -122,6 +137,19 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentMoveByInput(moveSpeed));
+		};
+	};
+	// registers this entity as having a sprite in the GameLevel then terminates itself
+	struct ComponentSpriteDynamicRegister final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentSpriteDynamicRegister() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentSpriteDynamicRegister());
 		};
 	};
 	struct ComponentSprite final : public Component {
@@ -145,6 +173,7 @@ namespace EntityComponents {
 		};
 
 		sf::Texture texture;
+		sf::Sprite sprite;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentSprite(texture));
@@ -212,26 +241,62 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentRotation(rotation));
 		};
 	};
-	struct ComponentVisionDrawer final : public Component {
+	struct ComponentVisionCasterStatic final : public Component {
 
 		void system(Entity& entity) final;
 
-		ComponentVisionDrawer() {
+		ComponentVisionCasterStatic() {
 			hasSystem = true;
 		};
-		ComponentVisionDrawer(VisionCaster _visionCaster, MemoryHolderVision _memoryHolder) :
-			ComponentVisionDrawer()
+		ComponentVisionCasterStatic(VisionCaster _visionCaster) :
+			ComponentVisionCasterStatic()
 		{
 			visionCaster = _visionCaster;
-			memoryHolder = _memoryHolder;
 		};
 
 		VisionCaster visionCaster;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterStatic(visionCaster));
+		};
+	};
+	struct ComponentVisionCasterDynamic final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentVisionCasterDynamic() {
+			hasSystem = true;
+		};
+		ComponentVisionCasterDynamic(VisionCaster _visionCaster) :
+			ComponentVisionCasterDynamic()
+		{
+			visionCaster = _visionCaster;
+		};
+
+		VisionCaster visionCaster;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterDynamic(visionCaster));
+		};
+	};
+	struct ComponentMemoryVision final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentMemoryVision() {
+			hasSystem = true;
+		};
+		ComponentMemoryVision(MemoryHolderVision _memoryHolder) :
+			ComponentMemoryVision()
+		{
+			memoryHolder = _memoryHolder;
+		};
+
 		MemoryHolderVision memoryHolder;
 
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionDrawer(visionCaster, memoryHolder));
+			return std::unique_ptr<Duplicatable>(new ComponentMemoryVision(memoryHolder));
 		};
 	};
 	struct ComponentViewFollow final : public Component {
@@ -296,7 +361,6 @@ namespace EntityComponents {
 		};
 	};
 	// populates the ObjectGrid with the specified type every update,
-	// 
 	// NOTE: this component should be ordered AFTER any movement components.
 	struct ComponentObjectGridInhabiterRadius final : public Component {
 

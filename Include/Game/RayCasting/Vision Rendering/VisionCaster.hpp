@@ -21,11 +21,16 @@ struct VisionCaster : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
+	void textureToSeeSet(sf::RenderTexture& texture);
+
 	const sf::RenderTexture& visionTextureGet();
 
 protected:
 	
 	sf::RenderTexture visionTexture;
+
+	// texture that the raysCast function will use when casting
+	sf::RenderTexture* textureToSee;
 
 	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };

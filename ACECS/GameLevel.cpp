@@ -6,12 +6,14 @@
 
 GameLevel::GameLevel() :
 	levelSize(sf::Vector2u(4100, 4100)),
-	imageGrid(WorldImageGrid(1, 1, float(levelSize.x), float(levelSize.y))),
 	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
 	objectGrid(levelSize.x / 4.f, levelSize.y / 4.f, 4.f, 4.f),
 	roomGrid(RoomGrid(8, 8, 32.f, 32.f, 16.f, 16.f)),
 	levelGenerator(LevelGenerator())
 {
+	worldTextureStatic.create(levelSize.x, levelSize.y);
+	worldTextureDynamic.create(levelSize.x, levelSize.y);
+
 	entities = std::vector<EntityId>();
 }
 

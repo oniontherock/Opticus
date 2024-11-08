@@ -3,10 +3,9 @@
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
-#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
-#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics.hpp"
 #include "World/Level.hpp"
 #include "World/LevelGrid.hpp"
 
@@ -23,13 +22,21 @@ struct GameLevel : public BaseLevel {
 
 	sf::Vector2u levelSize;
 
+	EntityId idPlayer;
+	// list of EntityIds that contain dynamic sprite components
+	std::vector<EntityId> dynamicSpriteEntityIds;
+
 	bool firstRun = true;
 
 	WorldDistortionGrid distortionGrid;
-	WorldImageGrid imageGrid;
 	ObjectGrid objectGrid;
 	RoomGrid roomGrid;
 	LevelGenerator levelGenerator;
+
+	// render texture for static objects in the world, I.E. objects that don't move.
+	sf::RenderTexture worldTextureStatic;
+	// render texture for dynamic objects in the world, I.E. objects that do move, or even change sprite.
+	sf::RenderTexture worldTextureDynamic;
 
 	void roomGridGenerate();
 };

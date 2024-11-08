@@ -22,6 +22,10 @@ void VisionCaster::operator= (const VisionCaster& other) {
 	castPosition = other.castPosition;
 }
 
+void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
+	textureToSee = &texture;
+}
+
 const sf::RenderTexture& VisionCaster::visionTextureGet() {
 	return visionTexture;
 }
@@ -64,8 +68,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 	sf::Uint8 xPoint = 1;
 	sf::Uint8 yChunk = 1;
 	sf::Uint8 yPoint = 1;
-
-	auto* worldImage = &gameLevel->imageGrid.cellGetFromWorld(castPosition.position.x, castPosition.position.y);
 
 	auto& distortionGrid = gameLevel->distortionGrid;
 
@@ -131,7 +133,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 		}
 	}
 
-	sf::Vector2u worldImageTextureSize = worldImage->getTexture().getSize();
+	sf::Vector2u worldImageTextureSize = textureToSee->getTexture().getSize();
 
 	sf::Texture visionImageTexture;
 	visionImageTexture.loadFromImage(visionImage);
@@ -139,7 +141,7 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 	sf::Shader shader;
 	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
 	shader.setUniform("rayPositions", visionImageTexture);
-	shader.setUniform("worldTexture", worldImage->getTexture());
+	shader.setUniform("worldTexture", textureToSee->getTexture());
 	shader.setUniform("worldSize", sf::Glsl::Vec2(float(worldImageTextureSize.x), float(worldImageTextureSize.y)));
 
 	sf::Sprite visionSprite(visionImageTexture);

@@ -2,7 +2,6 @@
 
 #include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "GameState.hpp"

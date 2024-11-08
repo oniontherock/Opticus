@@ -151,7 +151,6 @@
     <ClCompile Include="Include\Game\RayCasting\Object Vision\ObjectVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
-    <ClCompile Include="Include\Game\World\Image Grid\WorldTexture.cpp" />
     <ClCompile Include="Include\Game\World\Level Generator\LevelGenerator.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectCell.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectGrid.cpp" />
@@ -162,7 +161,6 @@
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortion.cpp" />
     <ClCompile Include="Include\Game\World\Distortions\WorldDistortionGrid.cpp" />
     <ClCompile Include="Include\Game\RayCasting\RayCaster.cpp" />
-    <ClCompile Include="Include\Game\World\Image Grid\WorldImageGrid.cpp" />
     <ClCompile Include="Source\main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -210,8 +208,6 @@
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortion.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\WorldDistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
-    <ClInclude Include="Include\Game\World\Image Grid\WorldImageGrid.hpp" />
-    <ClInclude Include="Include\Game\World\Image Grid\WorldTexture.hpp" />
     <ClInclude Include="Include\Game\World\Level Generator\LevelGenerator.hpp" />
     <ClInclude Include="Include\Game\World\Objects\Object Grid\ObjectCell.hpp" />
     <ClInclude Include="Include\Game\World\Objects\Object Grid\ObjectGrid.hpp" />

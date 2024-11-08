@@ -32,6 +32,7 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventMoved>>();
 	EventRegistry::typeRegister<EventIDs<EventViewMoved>>();
 	EventRegistry::typeRegister<EventIDs<EventObjectSeen>>();
+	EventRegistry::typeRegister<EventIDs<EventVisionUpdated>>();
 }
 
 #pragma endregion Events
@@ -44,6 +45,7 @@ void EntityComponents::componentIDsInitialize() {
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentSpriteDynamicRegister>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateTicker>>();
 
@@ -59,7 +61,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
-
+	
 	// senses/memory
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVision>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemory>>();
@@ -69,7 +71,10 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorData>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateManager>>();
 
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionDrawer>>();
+	// world vision/memory
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionCasterStatic>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentVisionCasterDynamic>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentMemoryVision>>();
 
 	// debug
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemoryDebug>>();
@@ -90,6 +95,19 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			createComponentPairFromType<ComponentPosition>(),
 			createComponentPairFromType<ComponentRotation>(),
+		}
+		);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
+		"Sprite",
+		{
+			"Transform",
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentSpriteDynamicRegister>(),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
 		}
 		);
 
@@ -164,6 +182,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		{
 			"Input Controlled",
 			"Actor",
+			"Sprite",
 		},
 		/// list of components in template
 		{
@@ -171,7 +190,9 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
-			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
+			createComponentPairFromType<ComponentVisionCasterStatic>(VisionCaster(sf::Vector2f(256.f, 256.f))),
+			createComponentPairFromType<ComponentVisionCasterDynamic>(VisionCaster(sf::Vector2f(256.f, 256.f))),
+			createComponentPairFromType<ComponentMemoryVision>(MemoryHolderVision(sf::Vector2f(640 * 4, 360 * 4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
 			createComponentPairFromType<ComponentSprite>("Art/Character.png"),
@@ -179,19 +200,6 @@ void EntityComponents::componentTemplatesInitialize() {
 			//createComponentPairFromType<ComponentObjectMemoryDebug>(),
 		}
 		);
-	ComponentTemplateManager::componentTemplateAdd(
-
-		/// template name
-		"Static Sprite",
-		{
-			"Transform",
-		},
-		/// list of components in template
-		{
-			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
-		}
-	);
-
 }
 
 #pragma endregion Component Templates
@@ -205,7 +213,6 @@ using namespace EntityEvents;
 #include "../Include/Common/TimeHandler.hpp"
 #include "../Include/Game/World/Objects/ObjectRegistry.hpp"
 #include "../Include/Common/NumberGenerator.hpp"
-#include "../Include/Game/World/Image Grid/WorldImageGrid.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include <iostream>
 #include <Input.hpp>
@@ -311,57 +318,60 @@ void ComponentRotation::system(Entity& entity) {
 void ComponentSprite::system(Entity& entity) {
 	
 	if (!entity.entityComponentHas<ComponentPosition>()) return;
-	
+
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-	sf::Sprite sprite(texture);
-
+	sprite.setTexture(texture);
 	sprite.setOrigin(sf::Vector2f(texture.getSize()) / 2.f);
 	sprite.setPosition(positionComponent->position);
 
-	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->imageGrid.cellGetFromWorld(positionComponent->position.x, positionComponent->position.y);
+	auto& worldTextureDynamic = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic;
 
 	if (entity.entityComponentHas<ComponentRotation>()) {
 		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation * 180.f / Mathf::PI);
-		//std::cout << "rot: " << sprite.getRotation() << std::endl;
 	}
-
-	worldImage.draw(sprite);
 }
-void ComponentVisionDrawer::system(Entity& entity) {
+void ComponentVisionCasterStatic::system(Entity& entity) {
 
 	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
-
-		auto& gameViewPanel = PanelManager::panelGet(PanelName::GameView);
 
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
+		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 512);
 
-		// amount the camera has moved this frame
-		sf::Vector2f cameraMovedAmount;
-		if (entity.entityEventHas<EventViewMoved>()) {
-			cameraMovedAmount = entity.entityEventGet<EventViewMoved>()->naturalMovedAxis;
-		}
+		auto* eventVisionUpdated = entity.entityEventAddAndGet<EventVisionUpdated>();
+		eventVisionUpdated->textureToMemorize = visionCaster.visionTextureGet().getTexture();
+	}
+}
+void ComponentVisionCasterDynamic::system(Entity& entity) {
 
-		memoryHolder.memoryUpdate(-cameraMovedAmount, visionCaster.visionTextureGet().getTexture());
+	if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
-		sf::Sprite memorySprite;
-		memorySprite.setTexture(memoryHolder.memoryGet().getTexture());
-		memorySprite.setOrigin(memoryHolder.memorySize / 2.f);
-		memorySprite.setPosition(gameViewPanel.viewGet().getCenter());
+		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		gameViewPanel.objectDraw(memorySprite);
+		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 512);
+	}
+}
+void ComponentMemoryVision::system(Entity& entity) {
 
+	if (!entity.entityEventHas<EventVisionUpdated>()) return;
 
+	auto eventVisionUpdatedAll = entity.entityEventGetAllOfType<EventVisionUpdated>();
+	
+	// amount the camera has moved this frame
+	sf::Vector2f cameraMovedAmount;
+	if (entity.entityEventHas<EventViewMoved>()) {
+		cameraMovedAmount = entity.entityEventGet<EventViewMoved>()->naturalMovedAxis;
+	}
 
-		sf::Sprite visionSprite;
-		visionSprite.setTexture(visionCaster.visionTextureGet().getTexture());
-		visionSprite.setPosition(gameViewPanel.viewRect.getPosition());
-
-		gameViewPanel.objectDraw(visionSprite);
-
+	for (uint16_t i = 0; i < eventVisionUpdatedAll.size(); i++) {
+		memoryHolder.memoryUpdate(-cameraMovedAmount, eventVisionUpdatedAll[i]->textureToMemorize);
+		
+		cameraMovedAmount = sf::Vector2f(0.f, 0.f);
 	}
 }
 void ComponentObjectVision::system(Entity& entity) {
@@ -465,6 +475,27 @@ void ComponentObjectTypeAssigner::system(Entity& entity) {
 	ObjectRegistry::entityObjectTypeAssign(entity.Id, objectType);
 
 	entity.entityComponentTerminate<ComponentObjectTypeAssigner>();
+}
+void ComponentSpriteDynamicRegister::system(Entity& entity) {
+
+	try {
+		if (!entity.entityComponentHas<ComponentSprite>()) {
+			throw "Does not have ComponentSprite";
+		}
+		if (!entity.entityComponentHas<ComponentPosition>()) {
+			throw "Does not have ComponentPosition";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentSpriteDynamicRegister system failed: Exception:");
+		return;
+	}
+
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+	GameLevelGrid::levelGet(componentPosition->worldPosition.level)->dynamicSpriteEntityIds.push_back(entity.Id);
+
+	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
 }
 void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 	// check that entity has ComponentPosition
@@ -621,8 +652,6 @@ void ComponentActorData::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentActorBlackboard>()) {
 
 		actorDataHolder.emotionsUpdate(entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard);
-
-		std::cout << actorDataHolder.emotionGet(ActorEmotion::Fear) << std::endl;
 	}
 }
 void ComponentActorStateManager::system(Entity& entity) {
@@ -649,7 +678,6 @@ void ComponentActorStateManager::system(Entity& entity) {
 	stateManager.statesUpdate(componentActorData->actorDataHolder, componentActorBlackboard->actorBlackboard);
 	stateManager.stateActiveSet(0);
 }
-
 void ComponentActorStateTicker::system(Entity& entity) {
 
 	try {

@@ -59,11 +59,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 		return;
 	}
 
-	std::vector<float> multipliers(255);
-	for (uint16_t i = 0; i < 255; i++) {
-		multipliers[i] = 1.f / (i + 1);
-	}
-
 	sf::Uint8 xChunk = 1;
 	sf::Uint8 xPoint = 1;
 	sf::Uint8 yChunk = 1;

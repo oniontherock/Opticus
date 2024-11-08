@@ -339,7 +339,7 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 512);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 256);
 
 		auto* eventVisionUpdated = entity.entityEventAddAndGet<EventVisionUpdated>();
 		eventVisionUpdated->textureToMemorize = visionCaster.visionTextureGet().getTexture();
@@ -353,7 +353,7 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 512);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 256);
 	}
 }
 void ComponentMemoryVision::system(Entity& entity) {

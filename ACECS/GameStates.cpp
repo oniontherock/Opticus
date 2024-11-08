@@ -39,6 +39,7 @@ void GameStatePlay::gameStateUpdate() {
 	}
 	auto& worldImage = GameLevelGrid::levelGet(0, 0, 0)->imageGrid.cellGet(0, 0);
 
+	worldImage.clear();
 	worldImage.display();
 	LevelUpdater::levelsUpdate();
 }

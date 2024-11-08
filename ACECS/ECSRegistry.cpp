@@ -174,6 +174,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentVisionDrawer>(VisionCaster(sf::Vector2f(256.f, 256.f)), MemoryHolderVision(sf::Vector2f(640*4, 360*4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			createComponentPairFromType<ComponentSprite>("Art/Character.png"),
 			//createComponentPairFromType<ComponentObjectVisionDebug>(),
 			//createComponentPairFromType<ComponentObjectMemoryDebug>(),
 		}
@@ -187,13 +188,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		},
 		/// list of components in template
 		{
-			createComponentPairFromType<ComponentSprite>("Art/Test Image 2.png"),
-			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Door),
-			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
-			//createComponentPairFromType<ComponentObjectVision>(0.1f),
-			//createComponentPairFromType<ComponentDebug>(),
-
-
+			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
 		}
 	);
 
@@ -321,12 +316,14 @@ void ComponentSprite::system(Entity& entity) {
 
 	sf::Sprite sprite(texture);
 
+	sprite.setOrigin(sf::Vector2f(texture.getSize()) / 2.f);
 	sprite.setPosition(positionComponent->position);
 
 	auto& worldImage = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->imageGrid.cellGetFromWorld(positionComponent->position.x, positionComponent->position.y);
 
 	if (entity.entityComponentHas<ComponentRotation>()) {
-		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation);
+		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation * 180.f / Mathf::PI);
+		//std::cout << "rot: " << sprite.getRotation() << std::endl;
 	}
 
 	worldImage.draw(sprite);

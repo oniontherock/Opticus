@@ -38,7 +38,6 @@ void ActorDataHolder::traitSet(ActorTrait trait, ScaleValue value) {
 	traitSet(uint8_t(trait), value);
 }
 
-
 ScaleValue ActorDataHolder::emotionGet(uint8_t emotion) const {
 	return emotionsVector[emotion];
 }
@@ -65,14 +64,6 @@ void ActorDataHolder::emotionIncrement(ActorEmotion emotion, ScaleValue value) {
 void ActorDataHolder::emotionsUpdate(const ActorBlackboard& actorBlackboard) {
 	std::invoke(emotionUpdateFunction, actorBlackboard, *this);
 }
-
-void ActorDataHolder::dataRemove(ActorDataKey dataKey) {
-	actorDataUMap.erase(dataKey);
-}
-bool ActorDataHolder::dataHas(ActorDataKey dataKey) const {
-	return actorDataUMap.count(dataKey) != 0;
-}
-
 
 void ActorDataHolder::traitsInitialize() {
 	traitsVector.resize(uint8_t(ActorTrait::SIZE));

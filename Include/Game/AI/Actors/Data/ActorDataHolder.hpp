@@ -2,6 +2,7 @@
 #define __ACTOR_DATA_HOLDER_H__
 
 #include "../Blackboard/ActorBlackboard.hpp"
+#include "../../../../Common/DataCache.hpp"
 #include <any>
 #include <cstdint>
 #include <functional>
@@ -39,7 +40,7 @@ enum class ActorEmotion : uint8_t {
 typedef std::vector<ScaleValue> EmotionVector;
 
 // holds data about actors, like their traits and emotions, can be inherited so custom data like HP or speed can be added.
-struct ActorDataHolder {
+struct ActorDataHolder : DataCache {
 	
 	typedef std::function<void(const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData)> ActorEmotionUpdateFunction;
 
@@ -81,20 +82,6 @@ struct ActorDataHolder {
 	// update the emotions based off the contents of the blackboard using the emotionUpdateFunction
 	void emotionsUpdate(const ActorBlackboard& actorBlackboard);
 
-	// removes the element from the actorDataUMap whose key is dataKey
-	void dataRemove(ActorDataKey dataKey);
-	// gets the data for dataKey, T is the type of the data that is being obtained.
-	template <typename T>
-	T dataGet(ActorDataKey dataKey) const {
-		return std::any_cast<T>(actorDataUMap[dataKey]);
-	}
-	// sets the value of dataKey to value.
-	template <typename T>
-	void dataSet(ActorDataKey dataKey, T value) {
-		actorDataUMap[dataKey] = value;
-	}
-	// returns whether the specified dataKey exists in the actorDataUMap.
-	bool dataHas(ActorDataKey dataKey) const;
 private:
 
 	// vector of traits, trait values range from 0-100
@@ -102,11 +89,6 @@ private:
 
 	// vector of emotions, emotion values range from 0-100
 	EmotionVector emotionsVector;
-
-	// map of custom data unique to this actor.
-	// this is used for things like HP or speed of an actor, as not every actor will have these states,
-	// whereas every actor WILL have all the emotions and traits, so those do not need to be unique.
-	ActorDataUMap actorDataUMap;
 
 	// initialize every element in the traitsVector to zero
 	void traitsInitialize();

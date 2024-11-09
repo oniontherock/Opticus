@@ -112,6 +112,8 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Neither</FavorSizeOrSpeed>
       <FavorSizeOrSpeed Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Neither</FavorSizeOrSpeed>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

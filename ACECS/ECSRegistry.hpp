@@ -5,6 +5,7 @@
 #include "../Include/Common/Math.hpp"
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
+#include "../Include/Game/AI/Actors/Movement/ActorMovementTypes.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
 #include "../Include/Game/AI/Utility AI/UtilityStateManager.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
@@ -595,77 +596,21 @@ namespace EntityComponents {
 	};
 	struct ComponentActorMovementHandler final : public Component {
 
-
-		using GoToFunction = std::function<void(Entity& actor, EntityEvents::EventActorGoTo* actorEvent)>;
-		using TurnToFunction = std::function<void(Entity& actor, EntityEvents::EventActorTurnTo* actorEvent)>;
-
 		void system(Entity& entity) final;
 
 		ComponentActorMovementHandler() {
 			hasSystem = true;
-
-			// initialize functions to defaults
-			goToFunction = [](Entity& actor, EntityEvents::EventActorGoTo* actorEvent) {
-
-				auto* componentPosition = actor.entityComponentGet<ComponentPosition>();
-
-				// return if we are already close enough to target
-				if (Vector2fMath::distSqrd(componentPosition->position, actorEvent->positionTo) < actorEvent->desiredDist * actorEvent->desiredDist) return;
-
-				float delta = float(TimeHandler::deltaSimulatedGet());
-
-				constexpr float moveSpeed = 120.f;
-
-				auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
-
-				eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, actorEvent->positionTo) * moveSpeed * delta;
-				};
-			turnToFunction = [](Entity& actor, EntityEvents::EventActorTurnTo* actorEvent) {
-				const float delta = float(TimeHandler::deltaSimulatedGet());
-
-				constexpr float turnSpeed = 180.f * Mathf::PI / 180.f;
-
-				const float turnSpeedDelta = turnSpeed * delta;
-
-				const float angle = Vector2fMath::angle(actor.entityComponentGet<ComponentPosition>()->position, actorEvent->positionTo);
-
-				auto* rotationComponent = actor.entityComponentGet<ComponentRotation>();
-
-				// wrap rotation between -PI and +PI
-				if (rotationComponent->rotation >= +Mathf::PI) rotationComponent->rotation -= Mathf::TAU;
-				if (rotationComponent->rotation <= -Mathf::PI) rotationComponent->rotation += Mathf::TAU;
-
-				float angleDiff = angle - rotationComponent->rotation;
-
-				// wrap angleDiff between -PI and +PI
-				if (angleDiff >= +Mathf::PI) angleDiff -= Mathf::TAU;
-				if (angleDiff <= -Mathf::PI) angleDiff += Mathf::TAU;
-
-				auto* rotateEvent = actor.entityEventAddAndGet<EntityEvents::EventRotate>();
-
-				if (angleDiff > turnSpeedDelta) {
-					rotateEvent->rotateAmount = turnSpeedDelta;
-				}
-				else if (angleDiff < -turnSpeedDelta) {
-					rotateEvent->rotateAmount = -turnSpeedDelta;
-				}
-				else {
-					rotateEvent->rotateAmount = angleDiff;
-				}
-				};
 		};
-		ComponentActorMovementHandler(GoToFunction _goToFunction, TurnToFunction _turnToFunction) {
-			hasSystem = true;
+		ComponentActorMovementHandler(ActorMovement::MovementType _movementType) :
+			ComponentActorMovementHandler()
+		{
+			movementType = _movementType;
+		}
 
-			goToFunction = _goToFunction;
-			turnToFunction = _turnToFunction;
-		};
-
-		GoToFunction goToFunction;
-		TurnToFunction turnToFunction;
+		ActorMovement::MovementType movementType;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentActorMovementHandler(goToFunction, turnToFunction));
+			return std::unique_ptr<Duplicatable>(new ComponentActorMovementHandler(movementType));
 		};
 	};
 }

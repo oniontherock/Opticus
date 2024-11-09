@@ -239,6 +239,7 @@ using namespace EntityEvents;
 #include "../Include/Game/World/Objects/ObjectRegistry.hpp"
 #include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
 #include <iostream>
 #include <Input.hpp>
 #include "Panels.hpp"
@@ -750,7 +751,7 @@ void ComponentActorMovementHandler::system(Entity& entity) {
 		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
 
 		for (uint16_t i = 0; i < events.size(); i++) {
-			std::invoke(goToFunction, entity, events[i]);
+			ActorMovement::goTo(movementType, entity, events[i]->positionTo, events[i]->desiredDist);
 		}
 	}
 	// handle EventActorTurnTo
@@ -758,7 +759,7 @@ void ComponentActorMovementHandler::system(Entity& entity) {
 		auto events = entity.entityEventGetAllOfType<EventActorTurnTo>();
 
 		for (uint16_t i = 0; i < events.size(); i++) {
-			std::invoke(turnToFunction, entity, events[i]);
+			ActorMovement::turnTo(movementType, entity, events[i]->positionTo);
 		}
 	}
 }

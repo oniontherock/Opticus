@@ -49,7 +49,7 @@ void PanelGameView::checkModeChange() {
 }
 
 void PanelGameView::staticDraw(GameLevel* levelActive) {
-	levelActive->worldTextureStatic.clear();
+	levelActive->worldTextureStatic.clear(sf::Color::Transparent);
 
 	// draw white background
 	sf::RectangleShape rectangleBackground;
@@ -57,6 +57,14 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 	rectangleBackground.setFillColor(sf::Color::White);
 
 	levelActive->worldTextureStatic.draw(rectangleBackground);
+
+	for (uint32_t i = 0; i < levelActive->staticSpriteEntityIds.size(); i++) {
+		Entity& entityCur = EntityManager::entityGet(levelActive->staticSpriteEntityIds[i]);
+
+		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
+
+		levelActive->worldTextureStatic.draw(componentSprite->sprite);
+	}
 
 	levelActive->worldTextureStatic.display();
 }

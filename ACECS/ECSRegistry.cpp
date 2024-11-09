@@ -4,7 +4,7 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 21;
+uint16_t MAX_COMPONENT_TYPES = 22;
 uint16_t MAX_EVENT_TYPES = 8;
 
 void ECSRegistry::ECSInitialize() {
@@ -48,6 +48,7 @@ void EntityComponents::componentIDsInitialize() {
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSpriteDynamicRegister>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentSpriteStaticRegister>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateTicker>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorMovementHandler>>();
@@ -103,13 +104,26 @@ void EntityComponents::componentTemplatesInitialize() {
 	ComponentTemplateManager::componentTemplateAdd(
 
 		/// template name
-		"Sprite",
+		"Sprite Dynamic",
 		{
 			"Transform",
 		},
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSpriteDynamicRegister>(),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
+		}
+		);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
+		"Sprite Static",
+		{
+			"Transform",
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentSpriteStaticRegister>(),
 			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
 		}
 		);
@@ -139,43 +153,11 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
 			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
-				}),
-			createComponentPairFromType<ComponentActorData>(ActorDataHolder(TraitVector{ 50.f, 50, 25, 75}, EmotionVector{ 0 },
-				[](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
-
-					const float delta = TimeHandler::deltaSimulatedGet();
-					
-					const float courageousness = actorData.traitGet(ActorTrait::Courageousness);
-
-					auto memory = actorBlackboard.dataGet<ObjectMemoryHolder>("Memory");
-
-					if (memory.memoryHasType(uint8_t(ObjectType::Door))) {
-
-						float doorSoonestSeenValue = 9999.f;
-						uint16_t doorSoonestSeenInd = UINT16_MAX;
-
-						std::vector<ObjectMemory> memoriesDoors = memory.memoriesGetOfType(ObjectType::Door);
-
-						for (uint16_t i = 0; i < memoriesDoors.size(); i++) {
-							if (doorSoonestSeenValue > memoriesDoors[i].second.value) {
-								doorSoonestSeenValue = memoriesDoors[i].second.value;
-								doorSoonestSeenInd = i;
-							}
-						}
-						// seen door in the last 10 seconds
-						if (doorSoonestSeenValue <= 1.f) {
-							actorData.emotionIncrement(ActorEmotion::Fear, delta * (101.f - courageousness));
-						}
-						else {
-							actorData.emotionIncrement(ActorEmotion::Fear, ((doorSoonestSeenValue * doorSoonestSeenValue) * (delta * delta)));
-						}
-					}
-							actorData.emotionIncrement(ActorEmotion::Fear, 10.f * delta);
-				})
-				),
+			}),
+			createComponentPairFromType<ComponentActorData>(ActorDataHolder({50.f, 50, 25, 75}, {0}, [](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
+			})
+			),
 			createComponentPairFromType<ComponentActorStateManager>(std::vector<UtilityStates::StateBase*>{
-				new UtilityStates::StateIdle(), 
-				new UtilityStates::StateWander()
 			}),
 			createComponentPairFromType<ComponentActorStateTicker>(),
 			createComponentPairFromType<ComponentActorMovementHandler>(),
@@ -187,8 +169,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		"Player",
 		{
 			"Input Controlled",
-			"Actor",
-			"Sprite",
+			"Sprite Dynamic",
 		},
 		/// list of components in template
 		{
@@ -202,8 +183,46 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
 			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
-			//createComponentPairFromType<ComponentObjectVisionDebug>(),
-			//createComponentPairFromType<ComponentObjectMemoryDebug>(),
+		}
+		);
+	ComponentTemplateManager::componentTemplateAdd(
+
+		/// template name
+		"Squad Member",
+		{
+			"Actor",
+			"Sprite Dynamic",
+		},
+		/// list of components in template
+		{
+			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::SquadMember),
+			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f + 64.f, 256.f)),
+			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
+			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
+				auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");
+
+				if (objectsSeen[uint16_t(ObjectType::Player)].size() > 0) {
+
+					EntityId playerId = objectsSeen[uint16_t(ObjectType::Player)][0];
+
+					actorBlackboard.dataSet("PlayerId", playerId);
+					actorBlackboard.dataSet("PlayerPosition", EntityManager::entityGet(playerId).entityComponentGet<ComponentPosition>()->position);
+					actorBlackboard.dataSet("DesiredDistanceToTarget", 64.f);
+				}
+				else {
+					actorBlackboard.dataRemove("PlayerId");
+					actorBlackboard.dataRemove("PlayerPosition");
+				}
+			}),
+			createComponentPairFromType<ComponentActorData>(ActorDataHolder({50.f, 50, 25, 75}, {0}, [](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
+
+			})
+			),
+			createComponentPairFromType<ComponentActorStateManager>(std::vector<UtilityStates::StateBase*>{
+			new UtilityStates::StateIdle(),
+			new UtilityStates::StateFollowPlayer(),
+			}),
 		}
 		);
 }
@@ -483,7 +502,6 @@ void ComponentObjectTypeAssigner::system(Entity& entity) {
 	entity.entityComponentTerminate<ComponentObjectTypeAssigner>();
 }
 void ComponentSpriteDynamicRegister::system(Entity& entity) {
-
 	try {
 		if (!entity.entityComponentHas<ComponentSprite>()) {
 			throw "Does not have ComponentSprite";
@@ -502,6 +520,26 @@ void ComponentSpriteDynamicRegister::system(Entity& entity) {
 	GameLevelGrid::levelGet(componentPosition->worldPosition.level)->dynamicSpriteEntityIds.push_back(entity.Id);
 
 	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
+}
+void ComponentSpriteStaticRegister::system(Entity& entity) {
+	try {
+		if (!entity.entityComponentHas<ComponentSprite>()) {
+			throw "Does not have ComponentSprite";
+		}
+		if (!entity.entityComponentHas<ComponentPosition>()) {
+			throw "Does not have ComponentPosition";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentSpriteStaticRegister system failed: Exception:");
+		return;
+	}
+
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+	GameLevelGrid::levelGet(componentPosition->worldPosition.level)->staticSpriteEntityIds.push_back(entity.Id);
+
+	entity.entityComponentTerminate<ComponentSpriteStaticRegister>();
 }
 void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 	// check that entity has ComponentPosition
@@ -712,7 +750,7 @@ void ComponentActorMovementHandler::system(Entity& entity) {
 		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
 
 		for (uint16_t i = 0; i < events.size(); i++) {
-			std::invoke(goToFunction, entity, events[i]->positionTo);
+			std::invoke(goToFunction, entity, events[i]);
 		}
 	}
 	// handle EventActorTurnTo
@@ -720,7 +758,7 @@ void ComponentActorMovementHandler::system(Entity& entity) {
 		auto events = entity.entityEventGetAllOfType<EventActorTurnTo>();
 
 		for (uint16_t i = 0; i < events.size(); i++) {
-			std::invoke(turnToFunction, entity, events[i]->positionTo);
+			std::invoke(turnToFunction, entity, events[i]);
 		}
 	}
 }

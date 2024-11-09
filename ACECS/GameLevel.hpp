@@ -25,6 +25,8 @@ struct GameLevel : public BaseLevel {
 	EntityId idPlayer;
 	// list of EntityIds that contain dynamic sprite components
 	std::vector<EntityId> dynamicSpriteEntityIds;
+	// list of EntityIds that contain static sprite components
+	std::vector<EntityId> staticSpriteEntityIds;
 
 	bool firstRun = true;
 

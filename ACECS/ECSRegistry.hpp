@@ -122,9 +122,12 @@ namespace EntityEvents {
 		EventActorGoTo() {};
 
 		sf::Vector2f positionTo;
+		// the how close to the target to move, defaults to 0
+		float desiredDist;
 
 		void clear() final {
 			positionTo = sf::Vector2f(0.f, 0.f);
+			desiredDist = 0.f;
 		}
 
 		std::unique_ptr<Duplicatable> duplicate() override {
@@ -166,7 +169,7 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentMoveByInput(moveSpeed));
 		};
 	};
-	// registers this entity as having a sprite in the GameLevel then terminates itself
+	// registers this entity as having a dynamic sprite in the GameLevel then terminates itself
 	struct ComponentSpriteDynamicRegister final : public Component {
 
 		void system(Entity& entity) final;
@@ -177,6 +180,19 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentSpriteDynamicRegister());
+		};
+	};
+	// registers this entity as having a static sprite in the GameLevel then terminates itself
+	struct ComponentSpriteStaticRegister final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentSpriteStaticRegister() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentSpriteStaticRegister());
 		};
 	};
 	struct ComponentSprite final : public Component {
@@ -446,7 +462,7 @@ namespace EntityComponents {
 		ComponentObjectMemory() {
 			hasSystem = true;
 		};
-		
+
 		ComponentObjectMemory(ObjectMemoryHolder _objectMemoryHolder) :
 			ComponentObjectMemory()
 		{
@@ -579,8 +595,9 @@ namespace EntityComponents {
 	};
 	struct ComponentActorMovementHandler final : public Component {
 
-		using GoToFunction = std::function<void(Entity& actor, sf::Vector2f positionTo)>;
-		using TurnToFunction = std::function<void(Entity& actor, sf::Vector2f positionTo)>;
+
+		using GoToFunction = std::function<void(Entity& actor, EntityEvents::EventActorGoTo* actorEvent)>;
+		using TurnToFunction = std::function<void(Entity& actor, EntityEvents::EventActorTurnTo* actorEvent)>;
 
 		void system(Entity& entity) final;
 
@@ -588,23 +605,29 @@ namespace EntityComponents {
 			hasSystem = true;
 
 			// initialize functions to defaults
-			goToFunction = [](Entity& actor, sf::Vector2f positionTo) {
+			goToFunction = [](Entity& actor, EntityEvents::EventActorGoTo* actorEvent) {
+
+				auto* componentPosition = actor.entityComponentGet<ComponentPosition>();
+
+				// return if we are already close enough to target
+				if (Vector2fMath::distSqrd(componentPosition->position, actorEvent->positionTo) < actorEvent->desiredDist * actorEvent->desiredDist) return;
+
 				float delta = float(TimeHandler::deltaSimulatedGet());
 
 				constexpr float moveSpeed = 120.f;
 
 				auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
 
-				eventMove->moveAxis = Vector2fMath::dir(actor.entityComponentGet<ComponentPosition>()->position, positionTo) * moveSpeed * delta;
+				eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, actorEvent->positionTo) * moveSpeed * delta;
 				};
-			turnToFunction = [](Entity& actor, sf::Vector2f positionTo) {
+			turnToFunction = [](Entity& actor, EntityEvents::EventActorTurnTo* actorEvent) {
 				const float delta = float(TimeHandler::deltaSimulatedGet());
 
 				constexpr float turnSpeed = 180.f * Mathf::PI / 180.f;
 
 				const float turnSpeedDelta = turnSpeed * delta;
 
-				const float angle = Vector2fMath::angle(actor.entityComponentGet<ComponentPosition>()->position, positionTo);
+				const float angle = Vector2fMath::angle(actor.entityComponentGet<ComponentPosition>()->position, actorEvent->positionTo);
 
 				auto* rotationComponent = actor.entityComponentGet<ComponentRotation>();
 
@@ -612,7 +635,11 @@ namespace EntityComponents {
 				if (rotationComponent->rotation >= +Mathf::PI) rotationComponent->rotation -= Mathf::TAU;
 				if (rotationComponent->rotation <= -Mathf::PI) rotationComponent->rotation += Mathf::TAU;
 
-				const float angleDiff = angle - rotationComponent->rotation;
+				float angleDiff = angle - rotationComponent->rotation;
+
+				// wrap angleDiff between -PI and +PI
+				if (angleDiff >= +Mathf::PI) angleDiff -= Mathf::TAU;
+				if (angleDiff <= -Mathf::PI) angleDiff += Mathf::TAU;
 
 				auto* rotateEvent = actor.entityEventAddAndGet<EntityEvents::EventRotate>();
 

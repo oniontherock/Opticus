@@ -9,7 +9,7 @@ namespace UtilityStates {
 		UtilityStateScore  condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
 		void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) override;
 	};
-	struct StateWander : StateBase {
+	struct StateFollowPlayer : StateBase {
 		UtilityStateScore  condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
 		void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) override;
 	};

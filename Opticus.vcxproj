@@ -174,6 +174,7 @@
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-graphics-d-2.dll" />
     <None Include="..\..\..\SFML\SFML clear naming\bin\Debug\sfml-system-d-2.dll" />
     <None Include="Include\Shaders\Blur.glsl" />
+    <None Include="Include\Shaders\EdgeBlur.glsl" />
     <None Include="Include\Shaders\Grayscale.glsl" />
     <None Include="Include\Shaders\Raycasting\RayPositionsToWorldColors.glsl" />
     <None Include="packages.config" />

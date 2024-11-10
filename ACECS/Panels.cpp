@@ -83,6 +83,7 @@ void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 	levelActive->worldTextureDynamic.display();
 }
 void PanelGameView::playerDraw(GameLevel* levelActive) {
+
 	// draw player memory
 	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
 

@@ -21,8 +21,8 @@ struct WorldDistortionGrid : Grid<WorldDistortion> {
 	// the size of the distortion cells.
 	// with a size of 1x1, the distortion cells will be the size of pixels.
 	// larger values are generally faster, but they decrease the resolution of the worldDistortionGrid
-	static constexpr uint32_t distortionCellSizeX = 1;
-	static constexpr uint32_t distortionCellSizeY = 1;
+	static constexpr uint32_t distortionCellSizeX = 4;
+	static constexpr uint32_t distortionCellSizeY = 4;
 
 	// multiplier for distortionCell coordinates
 	static constexpr float distortionCellMultiplierX = 1.f / distortionCellSizeX;

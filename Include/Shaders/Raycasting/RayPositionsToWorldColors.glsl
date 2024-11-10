@@ -1,6 +1,9 @@
 uniform sampler2D rayPositions;
 uniform sampler2D worldTexture;
 uniform vec2 worldSize;
+uniform vec2 raysOrigin;
+
+const float PI = 3.14159265358979323846;
 
 const vec4 emptyColor = vec4(0.0, 0.0, 0.0, 0.0);
 
@@ -23,8 +26,7 @@ vec4 colorGetFromEncodedPosition(vec4 encodedPosition) {
 	// so we must scale them back up to get a correct ray position
 	encodedPosition *= 255.0;
 	// get the ray's position in the world.
-	// a 
-	vec2 rayPosWorld = vec2((encodedPosition.r * 255) + encodedPosition.g, (encodedPosition.b * 255) + encodedPosition.a);
+	ivec2 rayPosWorld = ivec2((encodedPosition.r * 255) + encodedPosition.g, (encodedPosition.b * 255) + encodedPosition.a);
 
 	vec2 rayPosTex = vec2(rayPosWorld.x / worldSize.x, 1.0 - (rayPosWorld.y / worldSize.y));
 
@@ -32,54 +34,56 @@ vec4 colorGetFromEncodedPosition(vec4 encodedPosition) {
 }
 void main() {
 	
+
 	// get the size of the rayPositions texture
 	vec2 rayTexSize = textureSize(rayPositions, 0);
-	// get the size of a texel in the rayPositions texture
-	vec2 texelSize = vec2(1.0, 1.0) / rayTexSize;
 	// get the current texCoord
-	vec2 texCoord = gl_TexCoord[0].xy;
+	ivec2 fragCoord = gl_TexCoord[0].xy * rayTexSize;
 
 	vec4 endColor;
 
+	float dist = distance(raysOrigin, vec2(fragCoord)) * 0.005;
+
+	int searchSize = int(max(1.0, floor(dist)));
+
 	// amount of colors that are tallied up in the blur
-	uint8_t count = 0;
+	int count = 0;
+
+	bool allNeighboorsColored = true;
+	vec4 centerColor;
+
 	// iterate through the surrounding texels and add up their texel colors.
 	// if the center texel (the texel at 0x0 in the loop) is NOT empty, then we just override the bluring and make the endColor equal the center texel color.
 	// otherwise, we simply make the endColor the average of the surrounding texels.
-	for (float x = -texelSize.x; x <= +texelSize.x; x += texelSize.x) {
-		for (float y = -texelSize.y; y <= +texelSize.y; y += texelSize.y) {
+	for (int x = -searchSize; x <= +searchSize; x++) {
+		for (int y = -searchSize; y <= +searchSize; y++) {
 
-			// the center texCoord, offset by x and y
-			vec2 offsetTexCoord = texCoord + vec2(x, y);
 			// the current neighboring texel's encoded ray position
-			vec4 curNeighborRayPositionEncoded = texture2D(rayPositions, offsetTexCoord);
+			vec4 curNeighborRayPositionEncoded = texelFetchOffset(rayPositions, fragCoord, 0, ivec2(x, y));
 			// if the neighbor is empty, go to the next iteration
 			if (curNeighborRayPositionEncoded == emptyColor) {
+				allNeighboorsColored = false;
 				continue;
 			}
-			// if the neighbor is NOT empty, AND the current texel in the loop is 0x0, then we override the averaging process, and set the endColor to the center color
-			if (x == 0 && y == 0) {
-				// set count to 1 so that no division occurs.
-				count = 1;
-				// set the endColor to the center color.
-				endColor = colorGetFromEncodedPosition(curNeighborRayPositionEncoded);
-				// set x and y to 9999 so that when we break the inner loop, the outer loop does not continue.
-				x = 9999;
-				y = 9999;
-				// exit the loop.
-				break;
-			}
+
+			vec4 color = colorGetFromEncodedPosition(curNeighborRayPositionEncoded);
 
 			// add the current color to the end color. 
-			endColor += colorGetFromEncodedPosition(curNeighborRayPositionEncoded);
+			endColor += color;
 			// increment the counter, as we are a non-empty, non-center pixel. 
 			count++;
+
+			if (x == 0 && y == 0) centerColor = color;
 		}
 	}
 
-	// if the count is higher than 0, average the endColor by the count
-	if (count > 0) {
-		endColor /= count;
+	if (allNeighboorsColored) {
+		endColor = centerColor;
+	} else {
+		// if the count is higher than 0, average the endColor by the count
+		if (count > 0) {
+			endColor /= count;
+		}
 	}
 
 	// set the fragColor to the endColor.

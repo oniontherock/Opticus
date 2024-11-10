@@ -485,14 +485,20 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		float coneSize = 120.f * Mathf::PI / 180.f;
+		float coneSize = 90.f * Mathf::PI / 180.f;
 
-		visionCaster.visionClear();
-		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (coneSize / 2.f), coneSize, 1000, 350);
+		float angle = rotationComponent->rotation;
 
-		// see all around
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, 0, Mathf::TAU, 64, 256);
+		float delta = TimeHandler::deltaRealGet();
+
+		static Cooldown cooldown(1.0 / 60.0);
+		if (cooldown.updateAutoReset(delta)) {
+			visionCaster.visionClear();
+			visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
+			visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 1000, 300);
+		}
+
+		float coneSizeSubtracted = Mathf::TAU - coneSize;
 
 		auto* eventVisionUpdated = entity.entityEventAddAndGet<EventVisionUpdated>();
 		eventVisionUpdated->textureToMemorize = visionCaster.visionTextureGet().getTexture();
@@ -505,14 +511,20 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-		float coneSize = 120.f * Mathf::PI / 180.f;
+		float coneSize = 90.f * Mathf::PI / 180.f;
 
-		visionCaster.visionClear();
-		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (coneSize / 2.f), coneSize, 1000, 350);
+		float angle = rotationComponent->rotation;
 
-		// see all around
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, 0, Mathf::TAU, 64, 256);
+		float delta = TimeHandler::deltaRealGet();
+
+		static Cooldown cooldown(1.0 / 60.0);
+		if (cooldown.updateAutoReset(delta)) {
+			visionCaster.visionClear();
+			visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
+			visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 1000, 300);
+		}
+
+		float coneSizeSubtracted = Mathf::TAU - coneSize;
 	}
 }
 void ComponentMemoryVision::system(Entity& entity) {
@@ -602,7 +614,7 @@ void ComponentViewFollow::system(Entity& entity) {
 		lerp = 0.025f;
 
 		mouseDiff.x *= lerp / (16.f / 9.f);
-		mouseDiff.y *= lerp * (16.f/9.f);
+		mouseDiff.y *= lerp * (16.f / 9.f);
 
 		panel.viewMove(mouseDiff);
 		panel.viewUpdate();

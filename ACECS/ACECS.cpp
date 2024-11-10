@@ -19,9 +19,17 @@ void Engine::inputsRegister() {
 	InputInterface::inputRegister("Move Left", KeySet{ KeyEvent("A", Held), KeyEvent("Left", Held) }, InputKeyLogic::Or);
 	InputInterface::inputRegister("Move Down", KeySet{ KeyEvent("S", Held), KeyEvent("Down", Held) }, InputKeyLogic::Or);
 
-	InputInterface::inputRegister("Toggle ObjectGrid Rendering", KeySet{ KeyEvent("F1", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Toggle ObjectGrid Rendering", KeySet{ KeyEvent("Numpad1", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Toggle Timescale", KeySet{ KeyEvent("Numpad2", Pressed) }, InputKeyLogic::Or);
 
-	InputInterface::inputRegister("Toggle Timescale", KeySet{ KeyEvent("F2", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order Target Select Active", KeySet{ KeyEvent("LControl", Held) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order Target Select", KeySet{ KeyEvent("Mouse Left", Pressed) }, InputKeyLogic::Or);
+
+	InputInterface::inputRegister("Order 1", KeySet{ KeyEvent("Num1", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order 2", KeySet{ KeyEvent("Num2", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order 3", KeySet{ KeyEvent("Num3", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order 4", KeySet{ KeyEvent("Num4", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Order 5", KeySet{ KeyEvent("Num5", Pressed)}, InputKeyLogic::Or);
 }
 
 // game states are registered here
@@ -29,7 +37,7 @@ void Engine::panelsRegister() {
 	using namespace PanelManager;
 	panelAdd(PanelTypes::GameView, PanelPtr(new PanelGameView(
 		PanelRect(0, 0, 1280, 720), // screen coordinates
-		PanelRect(0, 0, 640, 360), // world coordinates
+		PanelRect(0, 0, 1280, 720), // world coordinates
 		sf::Color::Black
 	)));
 }

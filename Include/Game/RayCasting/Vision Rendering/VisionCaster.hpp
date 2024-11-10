@@ -19,6 +19,8 @@ struct VisionCaster : public RayCaster {
 	void operator= (const VisionCaster& other);
 
 
+	void visionClear();
+
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
 	void textureToSeeSet(sf::RenderTexture& texture);

@@ -27,6 +27,8 @@ struct DataCache {
 	}
 	// returns whether the specified dataKey exists in the dataUMap.
 	bool dataHas(DataKey dataKey) const;
+	// clears all data from the dataUMap
+	void dataClear();
 private:
 
 	// map of all data contained in the cache

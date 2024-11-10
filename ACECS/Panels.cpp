@@ -18,6 +18,7 @@ void PanelGameView::panelUpdate() {
 		staticDraw(levelActive);
 		dynamicDraw(levelActive);
 		playerDraw(levelActive);
+		hudDraw(levelActive);
 	}
 	if (mode == ObjectGridRender) {
 		ObjectGrid& objectGrid = levelActive->objectGrid;
@@ -111,4 +112,20 @@ void PanelGameView::playerDraw(GameLevel* levelActive) {
 	visionSpriteDynamic.setPosition(viewRect.getPosition());
 
 	objectDraw(visionSpriteDynamic);
+}
+void PanelGameView::hudDraw(GameLevel* levelActive) {
+
+	for (uint16_t i = 0; i < levelActive->entities.size(); i++) {
+		
+		Entity& entity = EntityManager::entityGet(levelActive->entities[i]);
+
+		if (entity.entityComponentHas<EntityComponents::ComponentOrderTargetingDrawer>()) {
+
+			auto* entityComponentOrderTargetingDrawer = entity.entityComponentGet<EntityComponents::ComponentOrderTargetingDrawer>();
+
+			for (uint16_t j = 0; j < entityComponentOrderTargetingDrawer->highlights.size(); j++) {
+				objectDraw(entityComponentOrderTargetingDrawer->highlights[j]);
+			}
+		}
+	}
 }

@@ -42,7 +42,7 @@ void ActorMovement::goToHumanoid(Entity& actor, sf::Vector2f positionTo, float d
 void ActorMovement::turnToHumanoid(Entity& actor, sf::Vector2f positionTo) {
 	const float delta = float(TimeHandler::deltaSimulatedGet());
 
-	constexpr float turnSpeed = 180.f * Mathf::PI / 180.f;
+	constexpr float turnSpeed = (180.f * Mathf::PI / 180.f);
 
 	const float turnSpeedDelta = turnSpeed * delta;
 

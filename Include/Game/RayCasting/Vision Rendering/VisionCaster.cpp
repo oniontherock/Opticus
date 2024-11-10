@@ -26,6 +26,10 @@ void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
 	textureToSee = &texture;
 }
 
+void VisionCaster::visionClear() {
+	visionTexture.clear(sf::Color::Transparent);
+}
+
 const sf::RenderTexture& VisionCaster::visionTextureGet() {
 	return visionTexture;
 }
@@ -141,7 +145,6 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 
 	sf::Sprite visionSprite(visionImageTexture);
 
-	visionTexture.clear(sf::Color::Transparent);
 	visionTexture.draw(visionSprite, &shader);
 	visionTexture.display();
 }

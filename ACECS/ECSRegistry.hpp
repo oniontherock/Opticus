@@ -2,8 +2,10 @@
 #define __ECS_REGISTRY_H__
 
 #include "../ACECS/Panels.hpp"
+#include "../Include/Common/DataCache.hpp"
 #include "../Include/Common/Math.hpp"
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
+#include "../Include/Game/AI/Actors/Orders/OrderTypes.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementTypes.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
@@ -149,6 +151,37 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventActorTurnTo());
 		};
 	};
+	// event for orders given to actors by other entities
+	struct EventActorOrder final : public Event {
+
+		EventActorOrder() {};
+
+		// the data for the order, including type of order, id of entity that gave the order, and other custom data.
+		OrderData orderData;
+
+		void clear() final {
+			orderData.dataClear();
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventActorOrder());
+		};
+	};
+	// event containing data about an order this entity is transmiting
+	struct EventOrderTransmit final : public Event {
+
+		EventOrderTransmit() {};
+
+		OrderData orderData;
+
+		void clear() final {
+			orderData.dataClear();
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventOrderTransmit());
+		};
+	};
 }
 namespace EntityComponents {
 	struct ComponentMoveByInput final : public Component {
@@ -231,18 +264,17 @@ namespace EntityComponents {
 		ComponentRotateToMouse() {
 			hasSystem = true;
 		};
-		ComponentRotateToMouse(float _lerpSpeed) :
+		ComponentRotateToMouse(float _turnSpeed) :
 			ComponentRotateToMouse()
 		{
-			lerpSpeed = _lerpSpeed;
+			turnSpeed = _turnSpeed;
 		};
 
-		// speed of linear interpolation towards mouse.
-		// note that this is in seconds, so a speed of 0.5 means it will reach halfway in one second
-		float lerpSpeed = 0.5f;
+		// turn speed in radians, note that this is speed per-second
+		float turnSpeed = Mathf::PI;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentRotateToMouse(lerpSpeed));
+			return std::unique_ptr<Duplicatable>(new ComponentRotateToMouse(turnSpeed));
 		};
 	};
 	struct ComponentPosition final : public Component {
@@ -581,6 +613,18 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentActorStateManager(stateManager));
 		};
 	};
+	struct ComponentActorWanderSelector final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentActorWanderSelector() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorWanderSelector());
+		};
+	};
 	// calls the behavior function on the ComponentActorStateManager's active state
 	struct ComponentActorStateTicker final : public Component {
 
@@ -611,6 +655,73 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorMovementHandler(movementType));
+		};
+	};
+	struct ComponentOrderTransmitByInput final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentOrderTransmitByInput() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentOrderTransmitByInput());
+		};
+	};
+	struct ComponentOrderTargeter final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentOrderTargeter() {
+			hasSystem = true;
+		};
+
+		std::set<EntityId> actorsTargeted;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentOrderTargeter());
+		};
+	};
+	struct ComponentOrderTransmitter final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentOrderTransmitter() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentOrderTransmitter());
+		};
+	};
+	// draws highlights around targeted actors.
+	struct ComponentOrderTargetingDrawer final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentOrderTargetingDrawer() {
+			hasSystem = true;
+		};
+
+		// the highlights to be drawn
+		std::vector<sf::CircleShape> highlights;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentOrderTargetingDrawer());
+		};
+	};
+	// listens for orders and adds them to the actor's blackboard if it hears them
+	struct ComponentActorOrderReceiver final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentActorOrderReceiver() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentActorOrderReceiver());
 		};
 	};
 }

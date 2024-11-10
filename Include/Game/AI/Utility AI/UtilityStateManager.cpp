@@ -14,6 +14,44 @@ UtilityStateManager::UtilityStateManager(std::vector<UtilityStates::StateBase*> 
 	stateActiveInd = 0;
 }
 
+UtilityStateManager::UtilityStateManager(UtilityStateManager& other) {
+	for (uint16_t i = 0; i < other.statesVector.size(); i++) {
+		statesVector.push_back(StateSharedPtr(static_cast<UtilityStates::StateBase*>(Duplicatable::duplicateAndGetRaw(other.statesVector[i].get()))));
+	}
+
+	stateScores.resize(statesVector.size());
+
+	stateActiveInd = other.stateActiveInd;
+}
+UtilityStateManager::UtilityStateManager(const UtilityStateManager& other) {
+	for (uint16_t i = 0; i < other.statesVector.size(); i++) {
+		statesVector.push_back(StateSharedPtr(static_cast<UtilityStates::StateBase*>(Duplicatable::duplicateAndGetRaw(other.statesVector[i].get()))));
+	}
+
+	stateScores.resize(statesVector.size());
+
+	stateActiveInd = other.stateActiveInd;
+}
+void UtilityStateManager::operator= (UtilityStateManager& other) {
+	for (uint16_t i = 0; i < other.statesVector.size(); i++) {
+		statesVector.push_back(StateSharedPtr(static_cast<UtilityStates::StateBase*>(Duplicatable::duplicateAndGetRaw(other.statesVector[i].get()))));
+	}
+
+	stateScores.resize(statesVector.size());
+
+	stateActiveInd = other.stateActiveInd;
+}
+void UtilityStateManager::operator= (const UtilityStateManager& other) {
+	for (uint16_t i = 0; i < other.statesVector.size(); i++) {
+		statesVector.push_back(StateSharedPtr(static_cast<UtilityStates::StateBase*>(Duplicatable::duplicateAndGetRaw(other.statesVector[i].get()))));
+	}
+
+	stateScores.resize(statesVector.size());
+
+	stateActiveInd = other.stateActiveInd;
+}
+
+
 void UtilityStateManager::statesEvaluate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) {
 	for (uint16_t i = 0; i < statesVector.size(); i++) {
 		stateScores[i] = statesVector[i]->condition(actorData, actorBlackboard);

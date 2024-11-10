@@ -29,6 +29,8 @@ private:
 	void dynamicDraw(GameLevel* levelActive);
 	// draws player related stuff like vision and memory
 	void playerDraw(GameLevel* levelActive);
+	// draws all hud related elements
+	void hudDraw(GameLevel* levelActive);
 };
 
 

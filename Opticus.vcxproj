@@ -76,6 +76,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -92,6 +93,7 @@
     <ClCompile>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\SFMLInclude;C:\Users\dayna\Documents\Visual Studio Project\ACECS Engine\Engine Modules</AdditionalIncludeDirectories>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\SFMLLib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -142,10 +144,10 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
+    <ClCompile Include="Include\Common\DataCache.cpp" />
     <ClCompile Include="Include\Common\Cooldown.cpp" />
     <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
-    <ClCompile Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Data\ActorDataHolder.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Movement\ActorMovementFunctions.cpp" />
     <ClCompile Include="Include\Game\AI\Memory\ObjectMemoryHolder.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="ACECS\GameStates.hpp" />
     <ClInclude Include="ACECS\Panels.hpp" />
     <ClInclude Include="Include\Common\Cooldown.hpp" />
+    <ClInclude Include="Include\Common\DataCache.hpp" />
     <ClInclude Include="Include\Common\Grid.hpp" />
     <ClInclude Include="Include\Common\Math.hpp" />
     <ClInclude Include="Include\Common\NumberGenerator.hpp" />
@@ -202,6 +205,7 @@
     <ClInclude Include="Include\Game\AI\Actors\Data\ActorDataHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Movement\ActorMovementFunctions.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Movement\ActorMovementTypes.hpp" />
+    <ClInclude Include="Include\Game\AI\Actors\Orders\OrderTypes.hpp" />
     <ClInclude Include="Include\Game\AI\Memory\ObjectMemoryHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\States\AIStates.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\UtilityState.hpp" />

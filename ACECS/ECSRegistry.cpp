@@ -4,8 +4,8 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 22;
-uint16_t MAX_EVENT_TYPES = 8;
+uint16_t MAX_COMPONENT_TYPES = 29;
+uint16_t MAX_EVENT_TYPES = 10;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -35,6 +35,12 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventVisionUpdated>>();
 	EventRegistry::typeRegister<EventIDs<EventActorTurnTo>>();
 	EventRegistry::typeRegister<EventIDs<EventActorGoTo>>();
+	EventRegistry::typeRegister<EventIDs<EventActorOrder>>();
+	EventRegistry::typeRegister<EventIDs<EventOrderTransmit>>();
+
+	//EventRegistry::typeRegister<EventIDs<EVENT_GOES_HERE>>();
+	//EventRegistry::typeRegister<EventIDs<EVENT_GOES_HERE>>();
+	//EventRegistry::typeRegister<EventIDs<EVENT_GOES_HERE>>();
 }
 
 #pragma endregion Events
@@ -43,7 +49,6 @@ void EntityEvents::eventIDsInitialize() {
 // registers all components,
 // registering a component gives it an ID which dictates it's update order, lower ID, sooner update.
 void EntityComponents::componentIDsInitialize() {
-
 	using ComponentRegistry = TypeIDAllocator<Component>;
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectTypeAssigner>>();
@@ -54,6 +59,9 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorMovementHandler>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTransmitByInput>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTargeter>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTransmitter>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotateToMouse>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentPosition>>();
@@ -63,12 +71,19 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
-
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTargetingDrawer>>();
+	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
+	
+	//ComponentRegistry::typeRegister<ComponentIDs<COMPONENT_GOES_HERE>>();
+	//ComponentRegistry::typeRegister<ComponentIDs<COMPONENT_GOES_HERE>>();
+	//ComponentRegistry::typeRegister<ComponentIDs<COMPONENT_GOES_HERE>>();
 	
 	// senses/memory
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectVision>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectMemory>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorOrderReceiver>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorWanderSelector>>();
 
 	// Actor/AI
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorBlackboard>>();
@@ -176,13 +191,17 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::Player),
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
-			createComponentPairFromType<ComponentRotateToMouse>(0.99f),
+			createComponentPairFromType<ComponentRotateToMouse>(Mathf::TAU*1.25f),
 			createComponentPairFromType<ComponentVisionCasterStatic>(VisionCaster(sf::Vector2f(256.f, 256.f))),
 			createComponentPairFromType<ComponentVisionCasterDynamic>(VisionCaster(sf::Vector2f(256.f, 256.f))),
 			createComponentPairFromType<ComponentMemoryVision>(MemoryHolderVision(sf::Vector2f(640 * 4, 360 * 4))),
 			createComponentPairFromType<ComponentViewFollow>(PanelName::GameView),
-			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
 			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
+			createComponentPairFromType<ComponentOrderTransmitByInput>(),
+			createComponentPairFromType<ComponentOrderTargeter>(),
+			createComponentPairFromType<ComponentOrderTransmitter>(),
+			createComponentPairFromType<ComponentOrderTargetingDrawer>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -195,36 +214,111 @@ void EntityComponents::componentTemplatesInitialize() {
 		},
 		/// list of components in template
 		{
+			createComponentPairFromType<ComponentActorMovementHandler>(ActorMovement::MovementType::Humanoid),
+			createComponentPairFromType<ComponentActorOrderReceiver>(),
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::SquadMember),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f + 64.f, 256.f)),
-			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(16),
+			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
 			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
 			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
-				auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");
 
-				if (objectsSeen[uint16_t(ObjectType::Player)].size() > 0) {
+			const float delta = TimeHandler::deltaSimulatedGet();
 
-					EntityId playerId = objectsSeen[uint16_t(ObjectType::Player)][0];
 
-					actorBlackboard.dataSet("PlayerId", playerId);
-					actorBlackboard.dataSet("PlayerPosition", EntityManager::entityGet(playerId).entityComponentGet<ComponentPosition>()->position);
-					actorBlackboard.dataSet("DesiredDistanceToTarget", 64.f);
+			auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");
+
+			if (objectsSeen[uint16_t(ObjectType::Player)].size() > 0) {
+
+				EntityId playerId = objectsSeen[uint16_t(ObjectType::Player)][0];
+
+				// set this actor's LeaderId to the playerId.
+				actorBlackboard.dataSet("LeaderId", playerId);
+			}
+			//if (objectsSeen[uint16_t(ObjectType::SquadMember)].size() > 0) {
+
+
+
+			//	EntityId playerId = objectsSeen[uint16_t(ObjectType::SquadMember)][0];
+
+			//	// set this actor's LeaderId to the playerId.
+			//	actorBlackboard.dataSet("LeaderId", playerId);
+			//}
+
+			if (actorBlackboard.dataHas("Orders")) {
+
+				OrderVector orders = actorBlackboard.dataGet<OrderVector>("Orders");
+
+				OrderSubVector& ordersDismiss = orders[uint16_t(OrderType::OrdersDismiss)];
+
+				if (ordersDismiss.size() > 0) {
+
+					// iterate over OrdersDismiss orders
+					for (uint16_t i = 0; i < ordersDismiss.size(); i++) {
+
+						// get current OrdersDismiss order
+						EntityId ordersToDismissId = ordersDismiss[i].dataGet<EntityId>("OrderFromId");
+
+						// iterate over all other orders
+						for (uint16_t j = 0; j < uint16_t(OrderType::SIZE); j++) {
+							// skip order if it is an order dismiss order
+							if (j == uint16_t(OrderType::OrdersDismiss)) continue;
+
+							OrderSubVector& ordersSubVector = orders[j];
+
+							// iterate over all orders in current sub vector
+							for (int16_t k = ordersSubVector.size() - 1; k >= 0; k--) {
+
+								OrderToSet orderToIds = ordersSubVector[k].dataGet<OrderToSet>("OrderToIds");
+
+								// if an order is from the entity that told us to dismiss our orders from them, dismiss the order
+								if (ordersSubVector[k].dataGet<EntityId>("OrderFromId") == ordersToDismissId && (orderToIds.contains(actor.Id) || orderToIds.size() <= 0)) {
+									ordersSubVector.erase(ordersSubVector.begin() + k);
+								}
+							}
+						}
+
+						// erase the current OrdersDismiss order
+						ordersDismiss.erase(ordersDismiss.begin() + i);
+					}
 				}
-				else {
-					actorBlackboard.dataRemove("PlayerId");
-					actorBlackboard.dataRemove("PlayerPosition");
-				}
-			}),
-			createComponentPairFromType<ComponentActorData>(ActorDataHolder({50.f, 50, 25, 75}, {0}, [](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
 
-			})
-			),
-			createComponentPairFromType<ComponentActorStateManager>(std::vector<UtilityStates::StateBase*>{
-			new UtilityStates::StateIdle(),
-			new UtilityStates::StateFollowPlayer(),
-			}),
-		}
-		);
+				// list of orders told to us
+				OrderVector ordersToSelfVector;
+
+				// populate ordersToUsVector
+				for (uint16_t i = 0; i < uint16_t(OrderType::SIZE); i++) {
+					ordersToSelfVector.push_back(OrderSubVector());
+				}
+
+				for (uint16_t i = 0; i < uint16_t(OrderType::SIZE); i++) {
+
+					OrderSubVector& ordersSubVector = orders[i];
+
+					// iterate over all orders in current sub vector
+					for (uint16_t j = 0; j < ordersSubVector.size(); j++) {
+
+						OrderToSet orderToIds = ordersSubVector[j].dataGet<OrderToSet>("OrderToIds");
+
+						if (orderToIds.contains(actor.Id) || orderToIds.size() <= 0) {
+							ordersToSelfVector[i].push_back(ordersSubVector[j]);
+						}
+					}
+				}
+
+				actorBlackboard.dataSet("OrdersToSelf", ordersToSelfVector);
+				actorBlackboard.dataSet("Orders", orders);
+			}
+		}),
+		createComponentPairFromType<ComponentActorData>(ActorDataHolder({50.f, 50, 25, 75}, {0}, [](const ActorBlackboard& actorBlackboard, ActorDataHolder& actorData) {
+
+		})),
+		createComponentPairFromType<ComponentActorStateManager>(UtilityStateManager(std::vector<UtilityStates::StateBase*>{
+		new UtilityStates::StateIdle(),
+		new UtilityStates::StateActorFollow(),
+		new UtilityStates::StatePointGoTo(),
+		})),
+		createComponentPairFromType<ComponentActorWanderSelector>(),
+		});
 }
 
 #pragma endregion Component Templates
@@ -265,10 +359,9 @@ void ComponentMoveByInput::system(Entity& entity) {
 }
 void ComponentRotateToMouse::system(Entity& entity) {
 	if (entity.entityComponentHas<ComponentPosition>() && entity.entityComponentHas<ComponentRotation>()) {
+		const float delta = float(TimeHandler::deltaSimulatedGet());
 
-		float delta = float(TimeHandler::deltaSimulatedGet());
-
-		float deltaLerp = 1.f - powf(1.f - lerpSpeed, delta);
+		const float turnSpeedDelta = turnSpeed * delta;
 
 		auto& gameViewPanel = PanelManager::panelGet(PanelName::GameView);
 
@@ -279,24 +372,24 @@ void ComponentRotateToMouse::system(Entity& entity) {
 		// wrap rotation between -PI and +PI
 		if (rotationComponent->rotation >= +Mathf::PI) rotationComponent->rotation -= Mathf::TAU;
 		if (rotationComponent->rotation <= -Mathf::PI) rotationComponent->rotation += Mathf::TAU;
-		
+
 		float angleDiff = angle - rotationComponent->rotation;
 
-		float rotateAngle = angleDiff;
-		// wrap rotateAngle between -PI and +PI
-		if (rotateAngle >= +Mathf::PI) rotateAngle -= Mathf::TAU;
-		if (rotateAngle <= -Mathf::PI) rotateAngle += Mathf::TAU;
+		// wrap angleDiff between -PI and +PI
+		if (angleDiff >= +Mathf::PI) angleDiff -= Mathf::TAU;
+		if (angleDiff <= -Mathf::PI) angleDiff += Mathf::TAU;
 
+		auto* rotateEvent = entity.entityEventAddAndGet<EntityEvents::EventRotate>();
 
-		// limit the speed of the rotation;
-		float rotLimit = Mathf::TAU;
-		rotateAngle *= deltaLerp;
-		if (rotateAngle > +rotLimit) rotateAngle = +rotLimit;
-		if (rotateAngle < -rotLimit) rotateAngle = -rotLimit;
-
-		auto* rotateEvent = entity.entityEventAddAndGet<EventRotate>();
-
-		rotateEvent->rotateAmount = rotateAngle;
+		if (angleDiff > turnSpeedDelta) {
+			rotateEvent->rotateAmount = turnSpeedDelta;
+		}
+		else if (angleDiff < -turnSpeedDelta) {
+			rotateEvent->rotateAmount = -turnSpeedDelta;
+		}
+		else {
+			rotateEvent->rotateAmount = angleDiff;
+		}
 	}
 }
 void ComponentPosition::system(Entity& entity) {
@@ -351,10 +444,38 @@ void ComponentSprite::system(Entity& entity) {
 	sprite.setOrigin(sf::Vector2f(texture.getSize()) / 2.f);
 	sprite.setPosition(positionComponent->position);
 
-	auto& worldTextureDynamic = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic;
-
 	if (entity.entityComponentHas<ComponentRotation>()) {
 		sprite.setRotation(entity.entityComponentGet<ComponentRotation>()->rotation * 180.f / Mathf::PI);
+	}
+}
+void ComponentOrderTargetingDrawer::system(Entity& entity) {
+
+	highlights.clear();
+
+	if (!entity.entityComponentHas<ComponentOrderTargeter>()) return;
+
+	OrderToSet actorsTargeted = entity.entityComponentGet<ComponentOrderTargeter>()->actorsTargeted;
+
+	GameLevel* gameLevel = GameLevelGrid::levelGet(entity.entityComponentGet<ComponentPosition>()->worldPosition.level);
+
+	for (OrderToSet::iterator itr = actorsTargeted.begin(); itr != actorsTargeted.end(); itr++) {
+
+		Entity& actor = EntityManager::entityGet(*itr);
+
+		auto* actorComponentPosition = actor.entityComponentGet<ComponentPosition>();
+		auto* actorComponentObjectGridInhabiterRadius = actor.entityComponentGet<ComponentObjectGridInhabiterRadius>();
+
+		float radius = actorComponentObjectGridInhabiterRadius->radius;
+
+		sf::CircleShape circleShape(radius);
+
+		circleShape.setOrigin(sf::Vector2f(radius, radius));
+		circleShape.setPosition(actorComponentPosition->position);
+		circleShape.setFillColor(sf::Color::Transparent);
+		circleShape.setOutlineColor(sf::Color(0, 200, 0, 127));
+		circleShape.setOutlineThickness(1.f);
+
+		highlights.push_back(circleShape);
 	}
 }
 void ComponentVisionCasterStatic::system(Entity& entity) {
@@ -364,8 +485,14 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
+		float coneSize = 120.f * Mathf::PI / 180.f;
+
+		visionCaster.visionClear();
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 256);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (coneSize / 2.f), coneSize, 1000, 350);
+
+		// see all around
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, 0, Mathf::TAU, 64, 256);
 
 		auto* eventVisionUpdated = entity.entityEventAddAndGet<EventVisionUpdated>();
 		eventVisionUpdated->textureToMemorize = visionCaster.visionTextureGet().getTexture();
@@ -378,8 +505,14 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
+		float coneSize = 120.f * Mathf::PI / 180.f;
+
+		visionCaster.visionClear();
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 520.f, 256);
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (coneSize / 2.f), coneSize, 1000, 350);
+
+		// see all around
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, 0, Mathf::TAU, 64, 256);
 	}
 }
 void ComponentMemoryVision::system(Entity& entity) {
@@ -466,10 +599,10 @@ void ComponentViewFollow::system(Entity& entity) {
 
 		sf::Vector2f mouseDiff = mousePos - panel.viewGet().getCenter();
 
-		lerp = 0.05f;
+		lerp = 0.025f;
 
-		mouseDiff.x *= lerp;
-		mouseDiff.y *= lerp * panel.viewAspectRatioGet();
+		mouseDiff.x *= lerp / (16.f / 9.f);
+		mouseDiff.y *= lerp * (16.f/9.f);
 
 		panel.viewMove(mouseDiff);
 		panel.viewUpdate();
@@ -762,6 +895,228 @@ void ComponentActorMovementHandler::system(Entity& entity) {
 			ActorMovement::turnTo(movementType, entity, events[i]->positionTo);
 		}
 	}
+}
+void ComponentOrderTransmitByInput::system(Entity& entity) {
+
+	if (!(
+		InputInterface::inputGetActive("Order 1") ||
+		InputInterface::inputGetActive("Order 2") ||
+		InputInterface::inputGetActive("Order 3") ||
+		InputInterface::inputGetActive("Order 4") ||
+		InputInterface::inputGetActive("Order 5")
+		)) return;
+	
+	auto eventActorsTargetedVector = entity.entityEventGetAllOfType<EventOrderTransmit>();
+
+	OrderData orderData;
+	orderData.dataSet("OrderFromId", entity.Id);
+	orderData.dataSet("OrderToIds", OrderToSet());
+
+	if (InputInterface::inputGetActive("Order 1")) {
+		Panel& panelGameView = PanelManager::panelGet(PanelName::GameView);
+
+		orderData.dataSet("OrderType", OrderType::PointGoTo);
+		orderData.dataSet("PointToGoTo", panelGameView.viewMousePositionGet());
+	}
+	else if (InputInterface::inputGetActive("Order 2")) {
+		orderData.dataSet("OrderType", OrderType::ActorFollow);
+		orderData.dataSet("ActorToFollowId", entity.Id);
+	}
+	else if (InputInterface::inputGetActive("Order 3")) {
+		orderData.dataSet("OrderType", OrderType::ActorFollowTactical);
+		orderData.dataSet("ActorToFollowId", entity.Id);
+	}
+	else if (InputInterface::inputGetActive("Order 4")) {
+		orderData.dataSet("OrderType", OrderType::OrdersEnforce);
+	}
+	else if (InputInterface::inputGetActive("Order 5")) {
+		orderData.dataSet("OrderType", OrderType::OrdersDismiss);
+	}
+
+	auto* eventOrderTransmit = entity.entityEventAddAndGet<EventOrderTransmit>();
+	eventOrderTransmit->orderData = orderData;
+}
+void ComponentOrderTargeter::system(Entity& entity) {
+	try {
+		if (!entity.entityComponentHas<ComponentPosition>()) {
+			throw "Does not have ComponentPosition";
+		}
+		else if (!entity.entityComponentHas<ComponentRotation>()) {
+			throw "Does not have ComponentRotation";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentOrderTargeter system failed: Exception: " + std::string(e));
+	}
+
+	if (!InputInterface::inputGetActive("Order Target Select Active")) {
+		actorsTargeted.clear();
+		return;
+	}
+
+	if (InputInterface::inputGetActive("Order Target Select")) {
+
+		auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+		Panel& panelGameView = PanelManager::panelGet(PanelName::GameView);
+
+		// casts a ray from the position component to the mouse
+		ObjectVision toMouseVision;
+
+		float entityToMouseDist = Vector2fMath::dist(componentPosition->position, panelGameView.viewMousePositionGet());
+		float entityToMouseAngle = Vector2fMath::angle(componentPosition->position, panelGameView.viewMousePositionGet());
+
+		toMouseVision.update(componentPosition->position.x, componentPosition->position.y, entityToMouseAngle, 0, entityToMouseDist, 1);
+
+		// list of objects between the position component and the mouse
+		ObjectIdVector& toMouseObjects = toMouseVision.objectsSeenGet();
+
+		// iterate over every type of object
+		for (uint16_t i = 0; i < uint16_t(ObjectType::SIZE); i++) {
+			if (toMouseObjects[i].size() <= 0) continue;
+
+			EntityId targetNew = *(toMouseObjects[i].end() - 1);
+			// skip own Id
+			if (targetNew == entity.Id) continue;
+
+			actorsTargeted.insert(targetNew);
+		}
+	}
+
+	if (actorsTargeted.size() > 0 && entity.entityEventHas<EventOrderTransmit>()) {
+		auto eventOrderTransmitVector = entity.entityEventGetAllOfType<EventOrderTransmit>();
+
+		for (uint16_t i = 0; i < eventOrderTransmitVector.size(); i++) {
+			OrderToSet orderToIds = eventOrderTransmitVector[i]->orderData.dataGet<OrderToSet>("OrderToIds");
+
+			orderToIds.insert(actorsTargeted.begin(), actorsTargeted.end());
+
+			eventOrderTransmitVector[i]->orderData.dataSet("OrderToIds", orderToIds);
+
+		}
+	}
+}
+void ComponentActorWanderSelector::system(Entity& entity) {
+
+	try {
+		if (!entity.entityComponentHas<ComponentActorBlackboard>()) {
+			throw "Does not have ComponentActorBlackboard";
+		}
+		else if (!entity.entityComponentHas<ComponentPosition>()) {
+			throw "Does not have ComponentPosition";
+
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentActorWanderSelector system failed: Exception: " + std::string(e));
+		return;
+	}
+
+	ActorBlackboard& actorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard;
+	sf::Vector2f position = entity.entityComponentGet<ComponentPosition>()->position;
+
+	if (!actorBlackboard.dataHas("CooldownWander")) {
+		actorBlackboard.dataSet("CooldownWander", Cooldown(0.f));
+	}
+	if (!actorBlackboard.dataHas("PointWander")) {
+		actorBlackboard.dataSet("PointWander", sf::Vector2f(0.f, 0.f));
+	}
+	
+	const float delta = TimeHandler::deltaSimulatedGet();
+
+	Cooldown cooldownWander = actorBlackboard.dataGet<Cooldown>("CooldownWander");
+
+	if (cooldownWander.updateAutoReset(delta)) {
+		actorBlackboard.dataSet("PointWander", position + sf::Vector2f(RNGf::getRange(256.f), RNGf::getRange(256.f)));
+		cooldownWander.target = RNGf::getRange(2.f, 8.f);
+	}
+	actorBlackboard.dataSet("CooldownWander", cooldownWander);
+}
+void ComponentOrderTransmitter::system(Entity& entity) {
+
+	if (!entity.entityComponentHas<ComponentPosition>()) {
+		ConsoleHandler::consolePrintErr("ComponentOrderTransmitter system failed: Exception: Does not have ComponentPosition");
+		return;
+	}
+
+	if (entity.entityEventHas<EventOrderTransmit>()) {
+
+		auto eventOrderTransmitVector = entity.entityEventGetAllOfType<EventOrderTransmit>();
+
+		for (uint16_t eventCurInd = 0; eventCurInd < eventOrderTransmitVector.size(); eventCurInd++) {
+			auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+			// used for getting surrounding objects to give orders to.
+			ObjectVision objectLocator;
+			objectLocator.update(componentPosition->position.x, componentPosition->position.y, 0, Mathf::TAU, 520, 256);
+			ObjectIdVector objects = objectLocator.objectsSeenGet();
+
+			for (uint16_t i = 0; i < objects.size(); i++) {
+				for (uint16_t j = 0; j < objects[i].size(); j++) {
+
+					if (objects[i][j] == entity.Id) continue;
+
+					Entity& entityCur = EntityManager::entityGet(objects[i][j]);
+
+					auto* entityCurEventActorOrder = entityCur.entityEventAddAndGet<EntityEvents::EventActorOrder>();
+
+					entityCurEventActorOrder->orderData = eventOrderTransmitVector[eventCurInd]->orderData;
+				}
+			}
+		}
+	}
+}
+void ComponentActorOrderReceiver::system(Entity& entity) {
+	
+	try {
+		if (!entity.entityComponentHas<ComponentActorBlackboard>()) {
+			throw "Does not have ComponentActorBlackboard";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentActorOrderListener system failed: Exception: " + std::string(e));
+	}
+	
+	if (!entity.entityEventHas<EventActorOrder>()) return;
+
+	ActorBlackboard& actorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard;
+
+	auto eventActorOrderVector = entity.entityEventGetAllOfType<EventActorOrder>();
+
+	for (uint16_t i = 0; i < eventActorOrderVector.size(); i++) {
+
+		OrderVector orderVector;
+
+		if (actorBlackboard.dataHas("Orders")) {
+			orderVector = actorBlackboard.dataGet<OrderVector>("Orders");
+		}
+		else {
+			// populate orderVector if it's never been initialized
+			for (uint16_t i = 0; i < uint16_t(OrderType::SIZE); i++) {
+				orderVector.push_back(OrderSubVector());
+			}
+		}
+
+		OrderSubVector& orderSubVector = orderVector[uint16_t(eventActorOrderVector[i]->orderData.dataGet<OrderType>("OrderType"))];
+
+		// ensure an order of the same type from the same person does not already exist,
+		// if it does, override it will the new one.
+		for (uint16_t i = 0; i < orderSubVector.size(); i++) {
+			if (orderSubVector[i].dataGet<EntityId>("OrderFromId") == eventActorOrderVector[i]->orderData.dataGet<EntityId>("OrderFromId")) {
+				orderSubVector[i] = eventActorOrderVector[i]->orderData;
+				// if we replaced the existing order with our new order, we goto orderReplaced, so the new order isn't added twice.
+				goto orderReplacedLabel;
+			}
+		}
+
+		// added the new order to the orderSubVector
+		orderSubVector.push_back(eventActorOrderVector[i]->orderData);
+		// used for skipping adding of the new order to the orderSubVector
+		orderReplacedLabel:
+
+		actorBlackboard.dataSet("Orders", orderVector);
+	}
+
 }
 
 #pragma endregion Systems

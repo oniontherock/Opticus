@@ -4,6 +4,8 @@
 #include "../Actors/Blackboard/ActorBlackboard.hpp"
 #include "../Actors/Data/ActorDataHolder.hpp"
 #include <cstdint>
+#include <memory>
+#include <ECS/Duplicatable/Duplicatable.hpp>
 #include <ECS/Entities/Entity.hpp>
 #include <ECS/TypeDefinitions.hpp>
 
@@ -11,10 +13,7 @@ typedef uint8_t UtilityStateScore;
 
 namespace UtilityStates {
 	// base class for AI states,
-	struct StateBase {
-		//// score of this state, determined by the condition function,
-		//// scores are used for determining which state should be used, higher scores are better
-		//UtilityStateScore score;
+	struct StateBase : Duplicatable {
 
 		// determines the score based off of the actors data and blackboard
 		virtual UtilityStateScore condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) = 0;

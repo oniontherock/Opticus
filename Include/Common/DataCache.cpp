@@ -11,3 +11,7 @@ bool DataCache::dataHas(DataKey dataKey) const {
 	return dataUMap.count(dataKey) != 0;
 }
 
+void DataCache::dataClear() {
+	dataUMap.clear();
+}
+

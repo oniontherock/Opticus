@@ -35,6 +35,10 @@ public:
 
 	UtilityStateManager();
 	UtilityStateManager(std::vector<UtilityStates::StateBase*> _statesVector);
+	UtilityStateManager(UtilityStateManager& other);
+	UtilityStateManager(const UtilityStateManager& other);
+	void operator= (UtilityStateManager& other);
+	void operator= (const UtilityStateManager& other);
 
 	// evaluate and sort the scores of every state.
 	void statesUpdate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard);

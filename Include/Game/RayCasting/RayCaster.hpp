@@ -17,6 +17,7 @@ protected:
 	// used in raysCast for where to cast rays from,
 	// can also be used by derived classes for other things.
 	WorldPosition castPosition;
+	float castAngle;
 
 	/**
 		casts out a series of rays from a specified position towards an angle in a cone
@@ -27,7 +28,7 @@ protected:
 		@param coneSize: the angular size of the cone to cast rays in.
 		@param rayCount: the amount of rays to cast.
 	*/
-	virtual void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) = 0;
+	virtual void raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) = 0;
 };
 
 

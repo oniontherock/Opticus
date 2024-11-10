@@ -34,7 +34,7 @@ protected:
 	// texture that the raysCast function will use when casting
 	sf::RenderTexture* textureToSee;
 
-	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
+	void raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };
 
 #endif

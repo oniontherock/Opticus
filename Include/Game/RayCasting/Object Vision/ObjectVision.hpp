@@ -32,7 +32,7 @@ protected:
 	void objectsSeenCreate();
 	void objectsSeenClear();
 
-	void raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
+	void raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };
 
 #endif

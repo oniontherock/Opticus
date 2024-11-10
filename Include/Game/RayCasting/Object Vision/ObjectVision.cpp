@@ -26,16 +26,17 @@ void ObjectVision::objectsSeenClear() {
 void ObjectVision::update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	castPosition.position = sf::Vector2f(fromX, fromY);
+	castAngle = angleTo - (coneSize / 2.f);
 
 	// cast the rays, updating the objectsSeenVector
-	raysCast(angleTo, coneSize, rayMaxDist, rayCount);
+	raysCast(coneSize, rayMaxDist, rayCount);
 }
 
 ObjectIdVector& ObjectVision::objectsSeenGet() {
 	return objectsSeenVector;
 }
 
-void ObjectVision::raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
+void ObjectVision::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	objectsSeenClear();
 
@@ -57,7 +58,7 @@ void ObjectVision::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 
 		// the rotation (in radians) of the current ray.
-		const float rayRotation = angleTo + (float(curRayInd) * rayAngleDifference);
+		const float rayRotation = castAngle + (float(curRayInd) * rayAngleDifference);
 
 		sf::Vector2f rayPosition = castPosition.position;
 		sf::Vector2f rayHeading = sf::Vector2f(cos(rayRotation), sin(rayRotation));

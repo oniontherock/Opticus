@@ -36,9 +36,10 @@ const sf::RenderTexture& VisionCaster::visionTextureGet() {
 void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	castPosition.position = sf::Vector2f(fromX, fromY);
+	castAngle = angleTo - (coneSize / 2.f);
 
 	// cast the rays, updating the visionImage
-	raysCast(angleTo - (coneSize / 2.f), coneSize, rayMaxDist, rayCount);
+	raysCast(coneSize, rayMaxDist, rayCount);
 }
 
 void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAngleDifference, sf::Vector2f castPosition, float rayMaxDist, WorldDistortionGrid& distortionGrid, sf::Image& visionImage, sf::Vector2u gameLevelSize, sf::Vector2f cameraCenter, sf::Vector2u visionTextureSize) {
@@ -112,7 +113,7 @@ void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAng
 		}
 	}
 }
-void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) {
+void VisionCaster::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
@@ -136,8 +137,8 @@ void VisionCaster::raysCast(float angleTo, float coneSize, float rayMaxDist, uin
 
 	auto& distortionGrid = gameLevel->distortionGrid;
 
-	raysCastAndUpdateVisionImage(rayCount, angleTo, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
-	raysCastAndUpdateVisionImage(128, angleTo, Mathf::TAU / 128.f, castPosition.position, 64.f, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
+	raysCastAndUpdateVisionImage(rayCount, castAngle, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
+	raysCastAndUpdateVisionImage(128, (castAngle - (coneSize)) + Mathf::PI, (Mathf::TAU - coneSize) / 128.f, castPosition.position, 64.f, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
 
 	sf::Vector2u worldImageTextureSize = textureToSee->getTexture().getSize();
 

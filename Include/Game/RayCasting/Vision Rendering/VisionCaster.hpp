@@ -25,12 +25,6 @@ struct VisionCaster : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
-	bool renderVision;
-	bool renderAround;
-
-	uint32_t rayCountAround = 128;
-	float rayMaxDistAround = 64;
-
 	void textureToSeeSet(sf::RenderTexture& texture);
 
 	const sf::RenderTexture& visionTextureGet();
@@ -46,8 +40,6 @@ protected:
 	sf::Vector2f cameraCenterGlobal;
 	// center of the GameView panel's view localized around the global cast position,
 	sf::Vector2f cameraCenterLocal;
-
-
 
 	// texture that the raysCast function will use when casting
 	sf::RenderTexture* textureToSee;

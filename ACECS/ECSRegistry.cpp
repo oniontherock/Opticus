@@ -218,21 +218,19 @@ void EntityComponents::componentTemplatesInitialize() {
 
 			if (memory.memoryHasType(ObjectType::SquadMember)) {
 
-				std::set<std::pair<EntityId, float>> squadMemberIdsAndTimesSet;
+				std::vector<std::pair<sf::Vector2f, float>> squadMemberPositionMemoriesVector;
 
 				std::vector<ObjectMemory>& squadMemberMemoriesVector = memory.memoriesGetOfType(ObjectType::SquadMember);
 
-				//std::cout << squadMemberMemoriesVector.size() << std::endl;
-
 				for (uint16_t i = 0; i < squadMemberMemoriesVector.size(); i++) {
 
-					EntityId squadMemberId = squadMemberMemoriesVector[i].first;
+					sf::Vector2f squadMemberPosition = EntityManager::entityGet(squadMemberMemoriesVector[i].first).entityComponentGet<ComponentPosition>()->position;
 					float memoryTimeInverted = squadMemberMemoriesVector[i].second.target - squadMemberMemoriesVector[i].second.value;
 
-					squadMemberIdsAndTimesSet.insert(std::pair<EntityId, float>(squadMemberId, memoryTimeInverted));
+					squadMemberPositionMemoriesVector.push_back(std::pair<sf::Vector2f, float>(squadMemberPosition, memoryTimeInverted));
 				}
 
-				actorBlackboard.dataSet<std::set<std::pair<EntityId, float>>>("SquadMemberIdsAndTimesSet", squadMemberIdsAndTimesSet);
+				actorBlackboard.dataSet<std::vector<std::pair<sf::Vector2f, float>>>("SquadMemberPositionMemoriesVector", squadMemberPositionMemoriesVector);
 			}
 				}),
 			createComponentPairFromType<ComponentObjectsGetAtMouse>(),
@@ -257,10 +255,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
 			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
 
-			//const float delta = float(TimeHandler::deltaSimulatedGet());
-
 			auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");
-			//auto objectMemory = actorBlackboard.dataGet<ObjectMemoryHolder>("Memory");
 
 			if (objectsSeen[uint16_t(ObjectType::Player)].size() > 0) {
 
@@ -269,20 +264,6 @@ void EntityComponents::componentTemplatesInitialize() {
 				// set this actor's LeaderId to the playerId.
 				actorBlackboard.dataSet("LeaderId", playerId);
 			}
-
-			//if (objectsSeen[uint16_t(ObjectType::SquadMember)].size() > 0) {
-
-			//	std::set<EntityId> squadMemberIds;
-
-			//	for (uint16_t i = 0; i < objectsSeen[uint16_t(ObjectType::SquadMember)].size(); i++) {
-			//		squadMemberIds.insert(objectsSeen[uint16_t(ObjectType::SquadMember)][0]);
-			//	}
-			//	if (actorBlackboard.dataHas("LeaderId")) {
-			//		squadMemberIds.insert(actorBlackboard.dataGet<EntityId>("LeaderId"));
-			//	}
-
-			//	actorBlackboard.dataSet("SquadMemberIdsSet", squadMemberIds);
-			//}
 
 			if (actorBlackboard.dataHas("Orders")) {
 
@@ -507,8 +488,28 @@ void ComponentVisionCasterHolder::system(Entity& entity) {
 
 	if (doUpdate) {
 		visionCaster.visionClear();
+		// get squad member surroundings
+		if (entity.entityComponentHas<ComponentActorBlackboard>()) {
+			ActorBlackboard& actorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard;
 
-		visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 1000, 300);
+			if (actorBlackboard.dataHas("SquadMemberPositionMemoriesVector")) {
+
+				auto squadMemberPositionMemoriesVector = actorBlackboard.dataGet<std::vector<std::pair<sf::Vector2f, float>>>("SquadMemberPositionMemoriesVector");
+
+				for (auto itr = squadMemberPositionMemoriesVector.begin(); itr != squadMemberPositionMemoriesVector.end(); itr++) {
+				
+					sf::Vector2f squadMemberPosition = itr->first;
+					float squadMemberTime = itr->second;
+				
+					visionCaster.update(squadMemberPosition.x, squadMemberPosition.y, 0, Mathf::TAU, squadMemberTime, 256);
+				}
+			}
+		}
+		// get vision
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 1000, 512);
+		// get surroundings
+		visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle + Mathf::PI, Mathf::TAU - coneSize, 64, 128);
+
 	}
 }
 void ComponentVisionCasterStatic::system(Entity& entity) {

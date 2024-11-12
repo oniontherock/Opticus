@@ -5,9 +5,6 @@ VisionCaster::VisionCaster() {
 	visionTexture.create(panelSize.x, panelSize.y);
 
 	textureToSee = nullptr;
-
-	renderVision = true;
-	renderAround = true;
 }
 VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 	VisionCaster()
@@ -17,8 +14,6 @@ VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 VisionCaster::VisionCaster(bool _renderVision, bool _renderAround) :
 	VisionCaster()
 {
-	renderVision = _renderVision;
-	renderAround = _renderAround;
 }
 
 
@@ -28,17 +23,11 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 	castPosition = other.castPosition;
 
 	textureToSee = other.textureToSee;
-
-	renderVision = other.renderVision;
-	renderAround = other.renderAround;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
 	castPosition = other.castPosition;
-
-	renderVision = other.renderVision;
-	renderAround = other.renderAround;
 }
 
 void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
@@ -48,9 +37,6 @@ void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
 void VisionCaster::visionClear() {
 	visionImage.create(visionTexture.getSize().x, visionTexture.getSize().y, sf::Color::Transparent);
 	visionImageCenter = sf::Vector2f(visionTexture.getSize()) / 2.f;
-
-	cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
-	cameraCenterLocal = cameraCenterGlobal - castPosition.position;
 
 	visionTexture.clear(sf::Color::Transparent);
 }
@@ -82,6 +68,9 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 
 	castPosition.position = sf::Vector2f(fromX, fromY);
 	castAngle = angleTo - (coneSize / 2.f);
+
+	cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
+	cameraCenterLocal = cameraCenterGlobal - castPosition.position;
 
 	// cast the rays, updating the visionImage
 	raysCast(coneSize, rayMaxDist, rayCount);
@@ -171,11 +160,6 @@ void VisionCaster::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 
 	auto& distortionGrid = gameLevel->distortionGrid;
 
-	if (renderVision) {
-		raysCastAndUpdateVisionImage(rayCount, castAngle, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
-	}
-	if (renderAround) {
-		raysCastAndUpdateVisionImage(rayCountAround, (castAngle - (coneSize)) + Mathf::PI, (Mathf::TAU - coneSize) / rayCountAround, castPosition.position, rayMaxDistAround, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
-	}
+	raysCastAndUpdateVisionImage(rayCount, castAngle, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
 }
 

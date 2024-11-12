@@ -501,7 +501,7 @@ void ComponentVisionCasterHolder::system(Entity& entity) {
 					sf::Vector2f squadMemberPosition = itr->first;
 					float squadMemberTime = itr->second;
 				
-					visionCaster.update(squadMemberPosition.x, squadMemberPosition.y, 0, Mathf::TAU, squadMemberTime, 256);
+					visionCaster.update(squadMemberPosition.x, squadMemberPosition.y, 0, Mathf::TAU, squadMemberTime / 2.f, 128);
 				}
 			}
 		}
@@ -593,21 +593,37 @@ void ComponentMemoryVision::system(Entity& entity) {
 	}
 }
 void ComponentObjectVision::system(Entity& entity) {
-	if (cooldownVisionUpdate.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
-		if (entity.entityComponentHas<ComponentRotation>() && entity.entityComponentHas<ComponentPosition>()) {
 
-			auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
-			auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-			objectVision.update(positionComponent->position.x, positionComponent->position.y, rotationComponent->rotation - (Mathf::TAU / 12.f), Mathf::TAU / 6.f, 640, 64);
-
-			ObjectIdVector& objectsSeenSet = objectVision.objectsSeenGet();
-
-			if (objectsSeenSet.size() <= 0) return;
-
-			auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
-			eventObjectSeen->objectsSeen = &objectsSeenSet;
+	try {
+		if (!entity.entityComponentHas<ComponentRotation>()) {
+			throw "Does not have ComponentRotation";
 		}
+		if (!entity.entityComponentHas<ComponentPosition>()) {
+			throw "Does not have ComponentPosition";
+		}
+	}
+	catch (const char* e) {
+		ConsoleHandler::consolePrintErr("ComponentObjectVision system failed: Exception: " + std::string(e));
+		return;
+	}
+
+	if (cooldownVisionUpdate.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
+		auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
+		auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+		float coneSize = 90.f * Mathf::PI / 180.f;
+
+		float angle = rotationComponent->rotation;
+
+		objectVision.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 640, 64);
+
+		ObjectIdVector& objectsSeenSet = objectVision.objectsSeenGet();
+
+		if (objectsSeenSet.size() <= 0) return;
+
+		auto* eventObjectSeen = entity.entityEventAddAndGet<EventObjectSeen>();
+		eventObjectSeen->objectsSeen = &objectsSeenSet;
 	}
 }
 void ComponentViewFollow::system(Entity& entity) {

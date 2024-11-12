@@ -7,9 +7,10 @@
 GameLevel::GameLevel() :
 	levelSize(sf::Vector2u(4100, 4100)),
 	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
-	objectGrid(levelSize.x / 4.f, levelSize.y / 4.f, 4.f, 4.f),
-	roomGrid(RoomGrid(8, 8, 32.f, 32.f, 16.f, 16.f)),
-	levelGenerator(LevelGenerator())
+	objectGrid(levelSize.x / 4, levelSize.y / 4, 4.f, 4.f),
+	roomGrid(RoomGrid(8, 8, 32, 32, 16.f, 16.f)),
+	levelGenerator(LevelGenerator()),
+	idPlayer(0)
 {
 	worldTextureStatic.create(levelSize.x, levelSize.y);
 	worldTextureDynamic.create(levelSize.x, levelSize.y);

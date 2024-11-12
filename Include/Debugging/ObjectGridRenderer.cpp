@@ -13,11 +13,11 @@ void ObjectGridRenderer::objectGridRender(ObjectGrid& objectGrid) {
 		objectGridImage.createMaskFromColor(sf::Color::Black);
 	}
 
-	int xStart = (objectGrid.gridGetSizeX() / renderCycleMax) * (renderCycle.x - 1);
-	int xEnd = (objectGrid.gridGetSizeX() / renderCycleMax) * renderCycle.x;
+	uint16_t xStart = uint16_t((objectGrid.gridGetSizeX() / renderCycleMax) * (renderCycle.x - 1));
+	uint16_t xEnd = uint16_t((objectGrid.gridGetSizeX() / renderCycleMax) * renderCycle.x);
 
-	int yStart = (objectGrid.gridGetSizeY() / renderCycleMax) * (renderCycle.y - 1);
-	int yEnd = (objectGrid.gridGetSizeY() / renderCycleMax) * renderCycle.y;
+	uint16_t yStart = uint16_t((objectGrid.gridGetSizeY() / renderCycleMax) * (renderCycle.y - 1));
+	uint16_t yEnd = uint16_t((objectGrid.gridGetSizeY() / renderCycleMax) * renderCycle.y);
 
 	for (uint16_t x = xStart; x < xEnd; x++) {
 		for (uint16_t y = yStart; y < yEnd; y++) {
@@ -40,9 +40,9 @@ void ObjectGridRenderer::objectGridRender(ObjectGrid& objectGrid) {
 				b += objectTypeColor.b;
 			}
 
-			uint16_t totalColors = idsVector.size();
+			uint16_t totalColors = uint16_t(idsVector.size());
 
-			sf::Color pixelColor = sf::Color(r / totalColors, g / totalColors, b / totalColors, 255);
+			sf::Color pixelColor = sf::Color(sf::Uint8(r / totalColors), sf::Uint8(g / totalColors), sf::Uint8(b / totalColors), 255);
 
 			objectGridImage.setPixel(x, y, pixelColor);
 

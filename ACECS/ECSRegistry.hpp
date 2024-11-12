@@ -5,9 +5,10 @@
 #include "../Include/Common/DataCache.hpp"
 #include "../Include/Common/Math.hpp"
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
-#include "../Include/Game/AI/Actors/Orders/OrderTypes.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementTypes.hpp"
+#include "../Include/Game/AI/Actors/Orders/OrderHandler.hpp"
+#include "../Include/Game/AI/Actors/Orders/OrderTypes.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
 #include "../Include/Game/AI/Utility AI/UtilityStateManager.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
@@ -93,7 +94,9 @@ namespace EntityEvents {
 	// contains a list of EntityIds and ObjectTypes that were seen this update.
 	struct EventObjectSeen final : public Event {
 
-		EventObjectSeen() {};
+		EventObjectSeen() {
+			clear();
+		};
 
 		ObjectIdVector* objectsSeen;
 
@@ -122,7 +125,9 @@ namespace EntityEvents {
 	};
 	struct EventActorGoTo final : public Event {
 
-		EventActorGoTo() {};
+		EventActorGoTo() {
+			clear();
+		};
 
 		sf::Vector2f positionTo;
 		// the how close to the target to move, defaults to 0
@@ -167,7 +172,7 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventActorOrder());
 		};
 	};
-	// event containing data about an order this entity is transmiting
+	// event containing data about an order this entity is transmitting
 	struct EventOrderTransmit final : public Event {
 
 		EventOrderTransmit() {};
@@ -180,6 +185,41 @@ namespace EntityEvents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new EventOrderTransmit());
+		};
+	};
+	// event for telling an entity they are being followed by another entity
+	struct EventFollowed final : public Event {
+
+		EventFollowed() { clear(); };
+
+		// id of who is following
+		EntityId followerId;
+		// squared distance from the follower
+		float distSqrd;
+
+		void clear() final {
+			followerId = 0;
+			distSqrd = 0;
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventFollowed());
+		};
+	};
+	// event containing the objects at the mouse
+	struct EventObjectsAtMouse final : public Event {
+
+		EventObjectsAtMouse() { clear(); };
+
+		// ids of objects at mouse
+		std::set<EntityId> atMouseObjects;
+
+		void clear() final {
+			atMouseObjects.clear();
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventObjectsAtMouse());
 		};
 	};
 }
@@ -317,6 +357,31 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentRotation(rotation));
 		};
 	};
+	// holds an instance of the VisionCaster class for use by ComponentVisionCasterStatic and ComponentVisionCasterDynamic
+	struct ComponentVisionCasterHolder final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentVisionCasterHolder() {
+			hasSystem = true;
+			updateCooldown = Cooldown(1.f / 60);
+			doUpdate = true;
+		};
+		ComponentVisionCasterHolder(VisionCaster _visionCaster) :
+			ComponentVisionCasterHolder()
+		{
+			visionCaster = _visionCaster;
+		};
+
+		VisionCaster visionCaster;
+
+		Cooldown updateCooldown;
+		bool doUpdate;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterHolder(visionCaster));
+		};
+	};
 	struct ComponentVisionCasterStatic final : public Component {
 
 		void system(Entity& entity) final;
@@ -324,16 +389,9 @@ namespace EntityComponents {
 		ComponentVisionCasterStatic() {
 			hasSystem = true;
 		};
-		ComponentVisionCasterStatic(VisionCaster _visionCaster) :
-			ComponentVisionCasterStatic()
-		{
-			visionCaster = _visionCaster;
-		};
-
-		VisionCaster visionCaster;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterStatic(visionCaster));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterStatic());
 		};
 	};
 	struct ComponentVisionCasterDynamic final : public Component {
@@ -343,16 +401,9 @@ namespace EntityComponents {
 		ComponentVisionCasterDynamic() {
 			hasSystem = true;
 		};
-		ComponentVisionCasterDynamic(VisionCaster _visionCaster) :
-			ComponentVisionCasterDynamic()
-		{
-			visionCaster = _visionCaster;
-		};
-
-		VisionCaster visionCaster;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterDynamic(visionCaster));
+			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterDynamic());
 		};
 	};
 	struct ComponentMemoryVision final : public Component {
@@ -369,6 +420,8 @@ namespace EntityComponents {
 		};
 
 		MemoryHolderVision memoryHolder;
+
+		sf::Vector2f cameraMovedAmountTotal;
 
 
 		std::unique_ptr<Duplicatable> duplicate() override {
@@ -423,6 +476,7 @@ namespace EntityComponents {
 
 		ComponentObjectTypeAssigner() {
 			hasSystem = true;
+			objectType = ObjectType::Null;
 		};
 		ComponentObjectTypeAssigner(ObjectType _objectType) :
 			ComponentObjectTypeAssigner()
@@ -444,6 +498,8 @@ namespace EntityComponents {
 
 		ComponentObjectGridInhabiterRadius() {
 			hasSystem = true;
+			radius = 0;
+			WorldPosition{};
 		};
 		ComponentObjectGridInhabiterRadius(float _radius) :
 			ComponentObjectGridInhabiterRadius()
@@ -564,7 +620,7 @@ namespace EntityComponents {
 
 		ComponentActorBlackboard() {
 			hasSystem = true;
-			updateFunc = [](Entity& actor, ActorBlackboard& actorBlackboard) {};
+			updateFunc = [](Entity&, ActorBlackboard&) {};
 
 		};
 		ComponentActorBlackboard(ActorBlackboard _actorBlackboard) :
@@ -644,6 +700,7 @@ namespace EntityComponents {
 
 		ComponentActorMovementHandler() {
 			hasSystem = true;
+			movementType = ActorMovement::MovementType::Humanoid;
 		};
 		ComponentActorMovementHandler(ActorMovement::MovementType _movementType) :
 			ComponentActorMovementHandler()
@@ -669,6 +726,7 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentOrderTransmitByInput());
 		};
 	};
+	// targets orders to certain entities
 	struct ComponentOrderTargeter final : public Component {
 
 		void system(Entity& entity) final;
@@ -681,6 +739,21 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentOrderTargeter());
+		};
+	};
+	// targets the follow instruction of follow orders to certain entities
+	struct ComponentOrderFollowTargeter final : public Component{
+
+		void system(Entity& entity) final;
+
+		ComponentOrderFollowTargeter() {
+			hasSystem = true;
+		};
+
+		std::set<EntityId> actorsTargeted;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentOrderFollowTargeter());
 		};
 	};
 	struct ComponentOrderTransmitter final : public Component {
@@ -720,8 +793,36 @@ namespace EntityComponents {
 			hasSystem = true;
 		};
 
+		OrderVector orderVector;
+
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorOrderReceiver());
+		};
+	};
+	// keeps track of who is following the entity
+	struct ComponentFollowerTracker final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentFollowerTracker() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentFollowerTracker());
+		};
+	};
+	// get's the objects at the mouse and sends an EventObjectsAtMouse for them
+	struct ComponentObjectsGetAtMouse final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentObjectsGetAtMouse() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentObjectsGetAtMouse());
 		};
 	};
 }

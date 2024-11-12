@@ -114,8 +114,8 @@ public:
 	template <typename F>
 	static Vector2 rotate(T x, T y, F theta) {
 		return Vector2(
-			(x * std::cos(theta)) - (y * std::sin(theta)),
-			(x * std::sin(theta)) + (y * std::cos(theta))
+			(x * T(std::cos(theta))) - (y * T(std::sin(theta))),
+			(x * T(std::sin(theta))) + T(y * T(std::cos(theta)))
 		);
 	}
 	template <typename F>

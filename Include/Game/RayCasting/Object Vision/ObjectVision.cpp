@@ -53,7 +53,7 @@ void ObjectVision::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 
 	auto& distortionGrid = gameLevel->distortionGrid;
 
-	constexpr double posMultiplier = 1.0 / 255.0;
+	//constexpr double posMultiplier = 1.0 / 255.0;
 
 	for (uint32_t curRayInd = 0; curRayInd < rayCount; curRayInd++) {
 

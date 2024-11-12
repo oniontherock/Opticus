@@ -26,7 +26,7 @@ class UtilityStateManager {
 	uint16_t stateActiveInd;
 
 	// calls the condition function on every state in the statesVector.
-	void statesEvaluate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard);
+	void statesEvaluate(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard);
 	// sort the statesVector based off of the score of the states.
 	void statesSort();
 
@@ -41,10 +41,10 @@ public:
 	void operator= (const UtilityStateManager& other);
 
 	// evaluate and sort the scores of every state.
-	void statesUpdate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard);
+	void statesUpdate(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard);
 	
 	// calls the behavior function on the active state
-	void stateActiveUpdate(Entity& actor, const ActorBlackboard& actorBlackboard);
+	void stateActiveUpdate(Entity& actor, ActorBlackboard& actorBlackboard);
 	// sets the active state to be the
 	void stateActiveSet(uint16_t ind);
 

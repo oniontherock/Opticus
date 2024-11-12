@@ -4,25 +4,25 @@
 
 MemoryHolderVision::MemoryHolderVision() {
 	memorySize = sf::Vector2f(1, 1);
-	textureMemory.create(memorySize.x, memorySize.y);
+	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
 
 	//initializeNoise();
 }
 MemoryHolderVision::MemoryHolderVision(sf::Vector2f _memorySize) {
 	memorySize = _memorySize;
-	textureMemory.create(memorySize.x, memorySize.y);
+	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
 
 	//initializeNoise();
 }
 MemoryHolderVision::MemoryHolderVision(const MemoryHolderVision& other) {
 	memorySize = other.memorySize;
-	textureMemory.create(memorySize.x, memorySize.y);
+	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
 
 	//initializeNoise();
 }
 void MemoryHolderVision::operator= (const MemoryHolderVision& other) {
 	memorySize = other.memorySize;
-	textureMemory.create(memorySize.x, memorySize.y);
+	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
 
 	//initializeNoise();
 }
@@ -97,7 +97,7 @@ sf::RenderTexture& MemoryHolderVision::memoryGet() {
 }
 void MemoryHolderVision::memoryBlur() {
 	// get simulated delta
-	float delta = float(TimeHandler::deltaSimulatedGet());
+	float delta = float(TimeHandler::timeSimulatedGet() - timeOfLastBlur) / 1000.f;
 
 	// update the blurCooldown, if it is ready, blur the memoryTexture a bit
 	if (blurCooldown.updateAutoReset(delta)) {
@@ -117,4 +117,5 @@ void MemoryHolderVision::memoryBlur() {
 		// display the memoryTexture
 		textureMemory.display();
 	}
+	timeOfLastBlur = TimeHandler::timeSimulatedGet();
 }

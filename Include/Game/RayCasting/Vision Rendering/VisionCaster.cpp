@@ -3,11 +3,22 @@
 VisionCaster::VisionCaster() {
 	sf::Vector2u panelSize = sf::Vector2u(PanelManager::panelGet(PanelName::GameView).viewGet().getSize());
 	visionTexture.create(panelSize.x, panelSize.y);
+
+	textureToSee = nullptr;
+
+	renderVision = true;
+	renderAround = true;
 }
 VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 	VisionCaster()
 {
 	castPosition = _castPosition;
+}
+VisionCaster::VisionCaster(bool _renderVision, bool _renderAround) :
+	VisionCaster()
+{
+	renderVision = _renderVision;
+	renderAround = _renderAround;
 }
 
 
@@ -15,11 +26,19 @@ VisionCaster::VisionCaster(const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
 	castPosition = other.castPosition;
+
+	textureToSee = other.textureToSee;
+
+	renderVision = other.renderVision;
+	renderAround = other.renderAround;
 }
 void VisionCaster::operator= (const VisionCaster& other) {
 	visionTexture.create(other.visionTexture.getSize().x, other.visionTexture.getSize().y);
 
 	castPosition = other.castPosition;
+
+	renderVision = other.renderVision;
+	renderAround = other.renderAround;
 }
 
 void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
@@ -27,7 +46,33 @@ void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
 }
 
 void VisionCaster::visionClear() {
+	visionImage.create(visionTexture.getSize().x, visionTexture.getSize().y, sf::Color::Transparent);
+	visionImageCenter = sf::Vector2f(visionTexture.getSize()) / 2.f;
+
+	cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
+	cameraCenterLocal = cameraCenterGlobal - castPosition.position;
+
 	visionTexture.clear(sf::Color::Transparent);
+}
+
+void VisionCaster::visionDisplay() {
+	sf::Vector2u worldImageTextureSize = textureToSee->getTexture().getSize();
+
+	sf::Texture visionImageTexture;
+	visionImageTexture.loadFromImage(visionImage);
+
+	sf::Shader shader;
+	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
+	shader.setUniform("rayPositions", visionImageTexture);
+	shader.setUniform("worldTexture", textureToSee->getTexture());
+	shader.setUniform("worldSize", sf::Glsl::Vec2(float(worldImageTextureSize.x), float(worldImageTextureSize.y)));
+	shader.setUniform("raysOrigin", sf::Glsl::Vec2(sf::Vector2f(visionImageCenter - cameraCenterLocal)));
+
+	sf::Sprite visionSprite(visionImageTexture);
+
+	visionTexture.draw(visionSprite, &shader);
+
+	visionTexture.display();
 }
 
 const sf::RenderTexture& VisionCaster::visionTextureGet() {
@@ -42,7 +87,7 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 	raysCast(coneSize, rayMaxDist, rayCount);
 }
 
-void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAngleDifference, sf::Vector2f castPosition, float rayMaxDist, WorldDistortionGrid& distortionGrid, sf::Image& visionImage, sf::Vector2u gameLevelSize, sf::Vector2f cameraCenter, sf::Vector2u visionTextureSize) {
+static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAngleDifference, sf::Vector2f castPosition, float rayMaxDist, WorldDistortionGrid& distortionGrid, sf::Image& visionImage, sf::Vector2u gameLevelSize, sf::Vector2f cameraCenter, sf::Vector2u visionTextureSize) {
 
 	constexpr double posMultiplier = 1.0 / 255.0;
 
@@ -117,17 +162,6 @@ void VisionCaster::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(castPosition.level);
 
-	sf::Image visionImage;
-	visionImage.create(visionTexture.getSize().x, visionTexture.getSize().y, sf::Color::Transparent);
-
-	// the center of the visionImage
-	const sf::Vector2f visionImageCenter = sf::Vector2f(visionTexture.getSize()) / 2.f;
-	// center of the GameView panel's view in global room coordinates
-	const sf::Vector2f cameraCenterGlobal = PanelManager::panelGet(PanelName::GameView).viewGet().getCenter();
-	// center of the GameView panel's view localized around the global cast position,
-	const sf::Vector2f cameraCenterLocal = cameraCenterGlobal - castPosition.position;
-
-
 	// the angular difference (in radians) between two rays.
 	const float rayAngleDifference = coneSize / rayCount;
 
@@ -137,24 +171,11 @@ void VisionCaster::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 
 	auto& distortionGrid = gameLevel->distortionGrid;
 
-	raysCastAndUpdateVisionImage(rayCount, castAngle, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
-	raysCastAndUpdateVisionImage(128, (castAngle - (coneSize)) + Mathf::PI, (Mathf::TAU - coneSize) / 128.f, castPosition.position, 64.f, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
-
-	sf::Vector2u worldImageTextureSize = textureToSee->getTexture().getSize();
-
-	sf::Texture visionImageTexture;
-	visionImageTexture.loadFromImage(visionImage);
-
-	sf::Shader shader;
-	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
-	shader.setUniform("rayPositions", visionImageTexture);
-	shader.setUniform("worldTexture", textureToSee->getTexture());
-	shader.setUniform("worldSize", sf::Glsl::Vec2(float(worldImageTextureSize.x), float(worldImageTextureSize.y)));
-	shader.setUniform("raysOrigin", sf::Glsl::Vec2(sf::Vector2f(visionImageCenter - cameraCenterLocal)));
-
-	sf::Sprite visionSprite(visionImageTexture);
-
-	visionTexture.draw(visionSprite, &shader);
-	visionTexture.display();
+	if (renderVision) {
+		raysCastAndUpdateVisionImage(rayCount, castAngle, rayAngleDifference, castPosition.position, rayMaxDist, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
+	}
+	if (renderAround) {
+		raysCastAndUpdateVisionImage(rayCountAround, (castAngle - (coneSize)) + Mathf::PI, (Mathf::TAU - coneSize) / rayCountAround, castPosition.position, rayMaxDistAround, distortionGrid, visionImage, gameLevel->levelSize, visionImageCenter - cameraCenterLocal, visionTexture.getSize());
+	}
 }
 

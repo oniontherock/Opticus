@@ -7,23 +7,31 @@
 
 namespace UtilityStates {
 	struct StateIdle : StateBase {
-		UtilityStateScore  condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
-		void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) override;
+		UtilityStateScore  condition(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
+		void behavior(Entity& actor, ActorBlackboard& actorBlackboard) override;
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new StateIdle());
 		};
 	};
 	struct StateActorFollow : StateBase {
-		UtilityStateScore  condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
-		void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) override;
+		UtilityStateScore  condition(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
+		void behavior(Entity& actor, ActorBlackboard& actorBlackboard) override;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new StateActorFollow());
 		};
 	};
-	struct StatePointGoTo: StateBase {
-		UtilityStateScore  condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
-		void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) override;
+	struct StateActorFollowTactical : StateBase {
+		UtilityStateScore  condition(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
+		void behavior(Entity& actor, ActorBlackboard& actorBlackboard) override;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new StateActorFollowTactical());
+		};
+	};
+	struct StatePointGoTo : StateBase {
+		UtilityStateScore  condition(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) override;
+		void behavior(Entity& actor, ActorBlackboard& actorBlackboard) override;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new StatePointGoTo());

@@ -17,7 +17,7 @@ protected:
 	// used in raysCast for where to cast rays from,
 	// can also be used by derived classes for other things.
 	WorldPosition castPosition;
-	float castAngle;
+	float castAngle = 0.f;
 
 	/**
 		casts out a series of rays from a specified position towards an angle in a cone

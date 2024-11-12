@@ -16,11 +16,13 @@ namespace UtilityStates {
 	struct StateBase : Duplicatable {
 
 		// determines the score based off of the actors data and blackboard
-		virtual UtilityStateScore condition(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) = 0;
+		virtual UtilityStateScore condition(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) = 0;
 		// performs certain behaviors depending on the state,
 		// uses the actor for things like sending move events
 		// uses the blackboard for things like finding the location of enemies in view
-		virtual void behavior(Entity& actor, const ActorBlackboard& actorBlackboard) = 0;
+		virtual void behavior(Entity& actor, ActorBlackboard& actorBlackboard) = 0;
+
+		//virtual void
 	};
 }
 

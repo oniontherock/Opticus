@@ -6,11 +6,11 @@ void LevelGenerator::roomHallwayCarve(Room& room, sf::Vector2i side, uint16_t si
 
 	const sf::Vector2u roomSizeHalf = room.gridGetSize() / 2u;
 
-	uint16_t xStart = side.x > 0 ? roomSizeHalf.x - size : 1;
-	uint16_t xEnd = side.x < 0 ? roomSizeHalf.x + size : room.gridGetSizeX()-1;
+	uint16_t xStart = uint16_t(side.x > 0 ? roomSizeHalf.x - size : 1);
+	uint16_t xEnd = uint16_t(side.x < 0 ? roomSizeHalf.x + size : room.gridGetSizeX() - 1);
 
-	uint16_t yStart = side.y > 0 ? roomSizeHalf.y - size : 1;
-	uint16_t yEnd = side.y < 0 ? roomSizeHalf.y + size : room.gridGetSizeY()-1;
+	uint16_t yStart = uint16_t(side.y > 0 ? roomSizeHalf.y - size : 1);
+	uint16_t yEnd = uint16_t(side.y < 0 ? roomSizeHalf.y + size : room.gridGetSizeY() - 1);
 
 	for (uint16_t x = xStart; x < xEnd; x++) {
 		for (uint16_t y = yStart; y < yEnd; y++) {
@@ -25,11 +25,11 @@ void LevelGenerator::roomDoorCarve(Room& room, sf::Vector2i side, uint16_t size)
 	
 	const sf::Vector2u roomSizeHalf = room.gridGetSize() / 2u;
 	
-	uint16_t xStart = side.x > 0 ? room.gridGetSizeX() - 1 : 0;
-	uint16_t xEnd = side.x < 0 ? 1 : room.gridGetSizeX();
+	uint16_t xStart = uint16_t(side.x > 0 ? room.gridGetSizeX() - 1 : 0);
+	uint16_t xEnd = uint16_t(side.x < 0 ? 1 : room.gridGetSizeX());
 
-	uint16_t yStart = side.y > 0 ? room.gridGetSizeY() - 1 : 0;
-	uint16_t yEnd = side.y < 0 ? 1 : room.gridGetSizeY();
+	uint16_t yStart = uint16_t(side.y > 0 ? room.gridGetSizeY() - 1 : 0);
+	uint16_t yEnd = uint16_t(side.y < 0 ? 1 : room.gridGetSizeY());
 
 	for (uint16_t x = xStart; x < xEnd; x++) {
 		for (uint16_t y = yStart; y < yEnd; y++) {
@@ -49,11 +49,11 @@ void LevelGenerator::roomSolidify(Room& room) {
 }
 void LevelGenerator::roomSideSolidify(Room& room, sf::Vector2i side) {
 
-	uint16_t xStart = side.x > 0 ? room.gridGetSizeX()-1 : 0;
-	uint16_t xEnd = side.x < 0 ? 1 : room.gridGetSizeX();
+	uint16_t xStart = uint16_t(side.x > 0 ? room.gridGetSizeX() - 1 : 0);
+	uint16_t xEnd = uint16_t(side.x < 0 ? 1 : room.gridGetSizeX());
 
-	uint16_t yStart = side.y > 0 ? room.gridGetSizeY()-1 : 0;
-	uint16_t yEnd = side.y < 0 ? 1 : room.gridGetSizeY();
+	uint16_t yStart = uint16_t(side.y > 0 ? room.gridGetSizeY() - 1 : 0);
+	uint16_t yEnd = uint16_t(side.y < 0 ? 1 : room.gridGetSizeY());
 
 	for (uint16_t x = xStart; x < xEnd; x++) {
 		for (uint16_t y = yStart; y < yEnd; y++) {
@@ -62,19 +62,19 @@ void LevelGenerator::roomSideSolidify(Room& room, sf::Vector2i side) {
 	}
 }
 
-void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t size, WorldDistortionGrid& distortionGrid) {
+void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t, WorldDistortionGrid& distortionGrid) {
 	
-	const uint16_t xFromStart = sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0;
-	const uint16_t xFromEnd = sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX();
+	const uint16_t xFromStart = uint16_t(sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0);
+	const uint16_t xFromEnd = uint16_t(sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX());
 	
-	const uint16_t yFromStart = sideFrom.y > 0 ? roomFrom.gridGetSizeY() - 1 : 0;
-	const uint16_t yFromEnd = sideFrom.y < 0 ? 1 : roomFrom.gridGetSizeY();
+	const uint16_t yFromStart = uint16_t(sideFrom.y > 0 ? roomFrom.gridGetSizeY() - 1 : 0);
+	const uint16_t yFromEnd = uint16_t(sideFrom.y < 0 ? 1 : roomFrom.gridGetSizeY());
 	
-	const uint16_t xToStart = sideTo.x > 0 ? roomTo.gridGetSizeX() - 1 : 0;
-	const uint16_t xToEnd = sideTo.x < 0 ? 1 : roomTo.gridGetSizeX();
+	const uint16_t xToStart = uint16_t(sideTo.x > 0 ? roomTo.gridGetSizeX() - 1 : 0);
+	const uint16_t xToEnd = uint16_t(sideTo.x < 0 ? 1 : roomTo.gridGetSizeX());
 	
-	const uint16_t yToStart = sideTo.y > 0 ? roomTo.gridGetSizeY() - 1 : 0;
-	const uint16_t yToEnd = sideTo.y < 0 ? 1 : roomTo.gridGetSizeY();
+	const uint16_t yToStart = uint16_t(sideTo.y > 0 ? roomTo.gridGetSizeY() - 1 : 0);
+	const uint16_t yToEnd = uint16_t(sideTo.y < 0 ? 1 : roomTo.gridGetSizeY());
 
 	// we get the cell size only from roomFrom because the cell size must be the same for rooms in the same roomGrid
 	sf::Vector2f cellSize = roomFrom.cellsGetSize();
@@ -106,7 +106,7 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 			// offset for the teleporter to teleport to.
 			// this is necessary because we are iterating over cells,
 			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
-			const int32_t cellToAxisSize = (toAxis ? cellSize.x : cellSize.y);
+			const int32_t cellToAxisSize = int32_t((toAxis ? cellSize.x : cellSize.y));
 			for (int32_t subCellOffset = 0; subCellOffset < cellToAxisSize; subCellOffset++) {
 
 				const sf::Vector2i portalOffset = portalDirection * (subCellOffset - (cellToAxisSize / 2));
@@ -128,7 +128,7 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 			// offset for the distortionCell to be placed at.
 			// this is necessary because we are iterating over cells,
 			// and since a cell is almost always larger than 1x1, placing a distortion only on the cell wont work
-			const int32_t cellFromAxisSize = (fromAxis ? cellSize.x : cellSize.y);
+			const int32_t cellFromAxisSize = int32_t(fromAxis ? cellSize.x : cellSize.y);
 			for (int32_t subCellOffset = 0; subCellOffset < cellFromAxisSize; subCellOffset++) {
 
 				const sf::Vector2i distortionOffset = distortionDirection * (subCellOffset - (cellFromAxisSize / 2));
@@ -183,7 +183,7 @@ void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortio
 		roomToRoomPortalCreate(room, sf::Vector2i(0, 1), roomGrid.cellGet(room.connectionBottom.x, room.connectionBottom.y), sf::Vector2i(0, -1), 4, distortionGrid);
 	}
 
-	sf::Color roomColor = sf::Color(rand(), rand(), rand(), 255);
+	sf::Color roomColor = sf::Color(sf::Uint8(rand()), sf::Uint8(rand()), sf::Uint8(rand()), 255);
 
 	for (uint16_t x = 0; x < room.gridGetSizeX(); x++) {
 		for (uint16_t y = 0; y < room.gridGetSizeY(); y++) {
@@ -191,17 +191,17 @@ void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortio
 		}
 	}
 }
-void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
-	if (room.positionGrid.x < roomGrid.gridGetSizeX() - 1) {
+void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid&) {
+	if (uint16_t(room.positionGrid.x) < roomGrid.gridGetSizeX() - 1) {
 		room.connectionRight = room.positionGrid + RoomGridPosition(1, 0);
 	}
-	if (room.positionGrid.x > 0) {
+	if (uint16_t(room.positionGrid.x) > 0) {
 		room.connectionLeft = room.positionGrid + RoomGridPosition(-1, 0);
 	}
-	if (room.positionGrid.y > 0) {
+	if (uint16_t(room.positionGrid.y) > 0) {
 		room.connectionTop = room.positionGrid + RoomGridPosition(0, -1);
 	}
-	if (room.positionGrid.y < roomGrid.gridGetSizeY() - 1) {
+	if (uint16_t(room.positionGrid.y) < roomGrid.gridGetSizeY() - 1) {
 		room.connectionBottom = room.positionGrid + RoomGridPosition(0, 1);
 	}
 }

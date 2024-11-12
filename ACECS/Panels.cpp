@@ -96,23 +96,14 @@ void PanelGameView::playerDraw(GameLevel* levelActive) {
 
 	objectDraw(memorySprite);
 
-	// draw player static vision
-	auto* playerVisionCasterStatic = player.entityComponentGet<EntityComponents::ComponentVisionCasterStatic>();
+	// draw player vision
+	auto* playerVisionCasterHolder = player.entityComponentGet<EntityComponents::ComponentVisionCasterHolder>();
 
-	sf::Sprite visionSpriteStatic;
-	visionSpriteStatic.setTexture(playerVisionCasterStatic->visionCaster.visionTextureGet().getTexture());
-	visionSpriteStatic.setPosition(viewRect.getPosition());
+	sf::Sprite visionSprite;
+	visionSprite.setTexture(playerVisionCasterHolder->visionCaster.visionTextureGet().getTexture());
+	visionSprite.setPosition(viewRect.getPosition());
 
-	objectDraw(visionSpriteStatic);
-
-	// draw player dynamic vision
-	auto* playerVisionCasterDynamic = player.entityComponentGet<EntityComponents::ComponentVisionCasterDynamic>();
-
-	sf::Sprite visionSpriteDynamic;
-	visionSpriteDynamic.setTexture(playerVisionCasterDynamic->visionCaster.visionTextureGet().getTexture());
-	visionSpriteDynamic.setPosition(viewRect.getPosition());
-
-	objectDraw(visionSpriteDynamic);
+	objectDraw(visionSprite);
 }
 void PanelGameView::hudDraw(GameLevel* levelActive) {
 

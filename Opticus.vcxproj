@@ -150,6 +150,7 @@
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Data\ActorDataHolder.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Movement\ActorMovementFunctions.cpp" />
+    <ClCompile Include="Include\Game\AI\Actors\Orders\OrderHandler.cpp" />
     <ClCompile Include="Include\Game\AI\Memory\ObjectMemoryHolder.cpp" />
     <ClCompile Include="Include\Game\AI\Utility AI\States\AIStates.cpp" />
     <ClCompile Include="Include\Game\AI\Utility AI\UtilityStateManager.cpp" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Include\Game\AI\Actors\Data\ActorDataHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Movement\ActorMovementFunctions.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Movement\ActorMovementTypes.hpp" />
+    <ClInclude Include="Include\Game\AI\Actors\Orders\OrderHandler.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Orders\OrderTypes.hpp" />
     <ClInclude Include="Include\Game\AI\Memory\ObjectMemoryHolder.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\States\AIStates.hpp" />

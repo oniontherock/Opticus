@@ -52,9 +52,9 @@ void UtilityStateManager::operator= (const UtilityStateManager& other) {
 }
 
 
-void UtilityStateManager::statesEvaluate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) {
+void UtilityStateManager::statesEvaluate(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) {
 	for (uint16_t i = 0; i < statesVector.size(); i++) {
-		stateScores[i] = statesVector[i]->condition(actorData, actorBlackboard);
+		stateScores[i] = statesVector[i]->condition(actor, actorData, actorBlackboard);
 	}
 }
 void UtilityStateManager::statesSort() {
@@ -70,12 +70,12 @@ void UtilityStateManager::statesSort() {
 	}
 }
 
-void UtilityStateManager::statesUpdate(const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) {
-	statesEvaluate(actorData, actorBlackboard);
+void UtilityStateManager::statesUpdate(const Entity& actor, const ActorDataHolder& actorData, const ActorBlackboard& actorBlackboard) {
+	statesEvaluate(actor, actorData, actorBlackboard);
 	statesSort();
 }
 
-void UtilityStateManager::stateActiveUpdate(Entity& actor, const ActorBlackboard& actorBlackboard) {
+void UtilityStateManager::stateActiveUpdate(Entity& actor, ActorBlackboard& actorBlackboard) {
 	statesVector[stateActiveInd]->behavior(actor, actorBlackboard);
 }
 void UtilityStateManager::stateActiveSet(uint16_t ind) {
@@ -86,7 +86,7 @@ StateVector UtilityStateManager::statesGet() {
 	return statesVector;
 }
 uint16_t UtilityStateManager::statesCountGet() {
-	return statesVector.size();
+	return uint16_t(statesVector.size());
 }
 std::vector<UtilityStates::StateBase*> UtilityStateManager::statesGetBeyondThreshold(UtilityStateScore threshold) {
 

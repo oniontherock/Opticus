@@ -37,6 +37,9 @@ void GameStatePlay::gameStateUpdate() {
 		firstUpdate = true;
 	}
 
+	//GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+
+
 	LevelUpdater::levelsUpdate();
 }
 
@@ -45,7 +48,8 @@ void GameStatePlay::gameStateStart() {
 	levelGenerate();
 
 	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
-	
+	levelActive->aStarGrid.cellsAllUpdateNeighbors(levelActive->distortionGrid);
+
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
 
 

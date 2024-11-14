@@ -172,10 +172,10 @@ public:
 	sf::Vector2f cellsGetSize() {
 		return cellSize;
 	}
-	uint32_t cellsGetSizeX() {
+	float cellsGetSizeX() {
 		return cellSize.x;
 	}
-	uint32_t cellsGetSizeY() {
+	float cellsGetSizeY() {
 		return cellSize.y;
 	}
 };

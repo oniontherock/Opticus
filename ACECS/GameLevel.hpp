@@ -3,6 +3,7 @@
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
+#include "../Include/Game/Pathfinding/AStar/AStarGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
 #include "SFML/Graphics.hpp"
@@ -34,6 +35,7 @@ struct GameLevel : public BaseLevel {
 	ObjectGrid objectGrid;
 	RoomGrid roomGrid;
 	LevelGenerator levelGenerator;
+	AStarGrid aStarGrid;
 
 	// render texture for static objects in the world, I.E. objects that don't move.
 	sf::RenderTexture worldTextureStatic;

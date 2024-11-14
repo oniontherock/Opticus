@@ -11,10 +11,6 @@ VisionCaster::VisionCaster(sf::Vector2f _castPosition) :
 {
 	castPosition = _castPosition;
 }
-VisionCaster::VisionCaster(bool _renderVision, bool _renderAround) :
-	VisionCaster()
-{
-}
 
 
 VisionCaster::VisionCaster(const VisionCaster& other) {

@@ -198,7 +198,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentMoveByInput>(120.f),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f, 256.f)),
 			createComponentPairFromType<ComponentRotateToMouse>(Mathf::TAU * 1.25f),
-			createComponentPairFromType<ComponentVisionCasterHolder>(VisionCaster(true, true)),
+			createComponentPairFromType<ComponentVisionCasterHolder>(VisionCaster()),
 			createComponentPairFromType<ComponentVisionCasterStatic>(),
 			createComponentPairFromType<ComponentVisionCasterDynamic>(),
 			createComponentPairFromType<ComponentMemoryVision>(MemoryHolderVision(sf::Vector2f(640 * 4, 360 * 4))),
@@ -543,9 +543,6 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 void ComponentVisionCasterDynamic::system(Entity& entity) {
 
 	try {
-		if (!entity.entityComponentHas<ComponentRotation>()) {
-			throw "Does not have ComponentRotation";
-		}
 		if (!entity.entityComponentHas<ComponentPosition>()) {
 			throw "Does not have ComponentPosition";
 		}
@@ -561,17 +558,11 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 	auto* componentVisionCasterHolder = entity.entityComponentGet<ComponentVisionCasterHolder>();
 	VisionCaster& visionCaster = componentVisionCasterHolder->visionCaster;
 
-	auto* rotationComponent = entity.entityComponentGet<ComponentRotation>();
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-	float coneSize = 90.f * Mathf::PI / 180.f;
-
-	float angle = rotationComponent->rotation;
 
 	if (componentVisionCasterHolder->doUpdate) {
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
 		visionCaster.visionDisplay();
-
 	}
 }
 void ComponentMemoryVision::system(Entity& entity) {

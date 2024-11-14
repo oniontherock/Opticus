@@ -1,5 +1,7 @@
 #include "ActorMovementFunctions.hpp"
 #include "../../../ACECS/ECSRegistry.hpp"
+#include "../../../Pathfinding/AStar/AStarGrid.hpp"
+#include "../../../ACECS/GameLevel.hpp"
 
 using namespace ActorMovement;
 using namespace EntityEvents;
@@ -31,13 +33,19 @@ void ActorMovement::goToHumanoid(Entity& actor, sf::Vector2f positionTo, float d
 	// return if we are already close enough to target
 	if (Vector2fMath::distSqrd(componentPosition->position, positionTo) < desiredDist * desiredDist) return;
 
+	GameLevel* gameLevel = GameLevelGrid::levelGet(componentPosition->worldPosition.level);
+
+	AStarPath path = gameLevel->aStarGrid.pointsGetPath(componentPosition->position, positionTo);
+
+	if (path.size() <= 0) return;
+
 	float delta = float(TimeHandler::deltaSimulatedGet());
 
 	constexpr float moveSpeed = 120.f;
 
 	auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
 
-	eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, positionTo) * moveSpeed * delta;
+	eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, *(path.end() - 1)) * moveSpeed * delta;
 }
 void ActorMovement::turnToHumanoid(Entity& actor, sf::Vector2f positionTo) {
 	const float delta = float(TimeHandler::deltaSimulatedGet());

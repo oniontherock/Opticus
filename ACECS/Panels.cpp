@@ -4,6 +4,7 @@
 #include "../Include/Common/VectorMath.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
+#include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
@@ -19,6 +20,13 @@ void PanelGameView::panelUpdate() {
 		dynamicDraw(levelActive);
 		playerDraw(levelActive);
 		hudDraw(levelActive);
+
+		sf::Texture pathsTexture = AStarPathDrawer::pathsTexture.getTexture();
+
+		sf::Sprite pathsSprite(pathsTexture);
+
+		objectDraw(pathsSprite);
+		AStarPathDrawer::pathsTextureReset();
 	}
 	if (mode == ObjectGridRender) {
 		ObjectGrid& objectGrid = levelActive->objectGrid;

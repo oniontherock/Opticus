@@ -56,12 +56,12 @@ void GameStatePlay::gameStateStart() {
 	// create player and assign the level's playerId to the id of the newly created player
 	levelActive->idPlayer = EntityManager::entityCreate(0, 0, 0, "Player");
 	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
-	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2256, 2000);
+	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(500, 500);
 
 	float offset = 128;
 	for (uint16_t i = 0; i < 3; i++) {
 		Entity& squadMember = EntityManager::entityGet(EntityManager::entityCreate(0, 0, 0, "Squad Member"));
-		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - (i * offset), 2000);
+		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(500 - (i * offset), 500);
 	}
 
 	EntityId spriteAId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");

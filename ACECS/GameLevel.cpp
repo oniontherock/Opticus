@@ -5,12 +5,12 @@
 #include "ECSRegistry.hpp"
 
 GameLevel::GameLevel() :
-	levelSize(sf::Vector2u(4100, 4100)),
+	levelSize(sf::Vector2u(1000, 1000)),
 	distortionGrid(WorldDistortionGrid(levelSize.x, levelSize.y)),
 	objectGrid(levelSize.x / 4, levelSize.y / 4, 4.f, 4.f),
 	roomGrid(RoomGrid(8, 8, 32, 32, 16.f, 16.f)),
 	levelGenerator(LevelGenerator()),
-	aStarGrid(AStarGrid(levelSize.x / 16, levelSize.y / 16, 16.f, 16.f)),
+	aStarGrid(AStarGrid(levelSize.x / 64, levelSize.y / 64, 64.f, 64.f)),
 	idPlayer(0)
 {
 	worldTextureStatic.create(levelSize.x, levelSize.y);

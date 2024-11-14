@@ -21,99 +21,100 @@ AStarGrid::AStarGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, fl
 
 AStarPath AStarGrid::pointsGetPath(sf::Vector2f pointA, sf::Vector2f pointB) {
 	
-	AStarCell& cellStart = cellGetFromWorld(pointA);
-	AStarCell& cellEnd = cellGetFromWorld(pointB);
+	AStarCellPosition cellStart = coordinatesWorldToCell(pointA);
+	AStarCellPosition cellEnd = coordinatesWorldToCell(pointB);
 
-	std::vector<AStarCell*> cellsOpenVector; // cells to be evaluated
-	std::vector<AStarCell*> cellsClosedVector; // cells that have already been evaluated
+	std::vector<AStarCellPosition> cellsOpenVector; // cells to be evaluated
+	std::vector<AStarCellPosition> cellsClosedVector; // cells that have already been evaluated
 
-	cellsOpenVector.push_back(&cellStart);
+	cellsOpenVector.push_back(cellStart);
 
-	AStarCell* cellCurrent = &cellStart;
+	AStarCellPosition cellCurrent = cellStart;
 
+	while ((cellCurrent != cellEnd) && (cellsOpenVector.size() > 0)) {
 
-	while ((cellCurrent->cellPositionGrid != cellEnd.cellPositionGrid) && (cellsOpenVector.size() > 0)) {
-		
-		auto cellsOpenVectorMinItr = std::min_element(cellsOpenVector.begin(), cellsOpenVector.end());
-
-		cellCurrent = *cellsOpenVectorMinItr;
-		cellsOpenVector.erase(cellsOpenVectorMinItr);
+		auto itr = std::find(cellsOpenVector.begin(), cellsOpenVector.end(), cellCurrent);
+		if (itr != cellsOpenVector.end()) {
+			cellsOpenVector.erase(itr);
+		}
 		cellsClosedVector.push_back(cellCurrent);
+
+		AStarCostValue costLowest = 99999;
+
+		for (uint16_t i = 0; i < cellsOpenVector.size(); i++) {
+			
+			AStarCostValue costCur = cellGet(cellsOpenVector[i]).costF;
+			
+			if (costCur < costLowest) {
+
+				cellCurrent = cellsOpenVector[i];
+				costLowest = costCur;
+
+			}
+		}
 
 		for (int16_t x = -1; x <= 1; x++) {
 			for (int16_t y = -1; y <= 1; y++) {
 
 				if (x == 0 && y == 0) continue;
 
-				if (!cellPosIsInGrid(cellCurrent->cellPositionGrid.x + x, cellCurrent->cellPositionGrid.y + y)) continue;
+				if (!cellPosIsInGrid(cellCurrent.x + x, cellCurrent.y + y)) continue;
 
 				sf::Vector2i axisToNeighbor = sf::Vector2i(x, y);
 
-				AStarCell& cellNeighbor = cellGet(cellCurrent->cellPositionGrid.x + x, cellCurrent->cellPositionGrid.y + y);
+				AStarCellPosition cellNeighborPos = AStarCellPosition(cellCurrent.x + x, cellCurrent.y + y);
+				AStarCell& cellNeighbor = cellGet(cellNeighborPos);
 
-				auto referenceWrapperEquals = [cellNeighbor](const AStarCell* a) {
-					return *a == cellNeighbor;
-					};
+				//auto referenceWrapperEquals = [cellNeighbor](const AStarCell* a) {
+				//	return *a == cellNeighbor;
+				//	};
 
 				// skip current neighbor if they aren't valid or have already been explored
-				if ((!cellNeighbor.valid) || (std::find_if(cellsClosedVector.begin(), cellsClosedVector.end(), referenceWrapperEquals) != cellsClosedVector.end())) continue;
+				if ((!cellNeighbor.valid) || (std::find(cellsClosedVector.begin(), cellsClosedVector.end(), cellNeighborPos) != cellsClosedVector.end())) continue;
 
+				cellNeighbor.costHCalculate(cellEnd);
 				// euclidean distance from the cellCurrent to the cellNeighbor,
 				// note that we don't square x or y because they are always either 1 or 0,
-				AStarCostValue distanceEuclidean = AStarCostValue(sqrt(axisToNeighbor.x + axisToNeighbor.y) * 10.f);
+				AStarCostValue distanceEuclidean = (axisToNeighbor.x != 0 && axisToNeighbor.y != 0) ? 14 : 10;
 
 				// potential new costG for neighbor if path is shorter than existing neighborCur costG
-				AStarCostValue neighborNewCostG = cellCurrent->costG + distanceEuclidean;
+				AStarCostValue neighborNewCostG = cellGet(cellCurrent).costG + distanceEuclidean;
+
+				AStarCostValue neighborNewCostF = neighborNewCostG + cellNeighbor.costH;
 
 				// whether the neighborCur is in the cellsOpenVector
-				bool neighborIsInOpen = std::find_if(cellsOpenVector.begin(), cellsOpenVector.end(), referenceWrapperEquals) != cellsOpenVector.end();
+				bool neighborIsInOpen = std::find(cellsOpenVector.begin(), cellsOpenVector.end(), cellNeighborPos) != cellsOpenVector.end();
 
-				if (neighborNewCostG < cellNeighbor.costG || !neighborIsInOpen) {
+				if (neighborNewCostF < cellNeighbor.costF || !neighborIsInOpen) {
 					if (!neighborIsInOpen) {
-						cellNeighbor.costHCalculate();
-
-						cellsOpenVector.push_back(&cellNeighbor);
+						cellsOpenVector.push_back(cellNeighbor.cellPositionGrid);
 					}
-					cellNeighbor.costF = neighborNewCostG + cellNeighbor.costH;
+					cellNeighbor.costF = neighborNewCostF;
 
-					// set the cellNeighbor's parent axis to be the axis from the current cell to the neighbor in world coordinates
-					sf::Vector2f axisToNeighborNormalized = Vector2fMath::normalize(float(axisToNeighbor.x), float(axisToNeighbor.y));;
-					//cellNeighbor.cellParentFromAxis = sf::Vector2f(axisToNeighborNormalized.x * cellsGetSizeX(), axisToNeighborNormalized.y * cellsGetSizeY());
-					// set the cellNeighbor's parent neighbor index to be the opposite of the neighbor index from the current cell to the neighbor
-					//cellNeighbor.cellParentNeighborIndex = (8u - i);
-
+					cellNeighbor.cellParentPositionGrid = cellCurrent;
 				}
 			}
 		}
 	}
 
-	std::cout << cellEnd.cellParentNeighborIndex << std::endl;
 	AStarPath path;
 
 	// current cell in back tracer, used for finding path
-	AStarCell* cellBackTraceCur = &cellEnd;
-	// current position in back trace.
-	// 
-	// we use this and not just the cell's position because a cell's position, and the connection could be different,
-	// because if you travel through a portal, that teleports you down by 50 cells, then using the cell position would cause you to go down,
-	// but you actually travel to the right to go through the portal
-	sf::Vector2f positionBackTraceCur = cellBackTraceCur->cellPositionWorld;
+	AStarCellPosition cellBackTraceCur = cellEnd;
 
-	while (cellBackTraceCur->cellParentFromAxis.x != 0 || cellBackTraceCur->cellParentFromAxis.y != 0) {
-		path.push_back(positionBackTraceCur);
+	while (cellBackTraceCur != cellStart) {
+		path.push_back(coordinatesCellToWorld(cellBackTraceCur) + (cellsGetSize() / 2.f));
 
-		positionBackTraceCur -= cellBackTraceCur->cellParentFromAxis;
-		cellBackTraceCur = &cellGet(cellBackTraceCur->neighborCellsVector[cellBackTraceCur->cellParentNeighborIndex]);
-
+		cellBackTraceCur = cellGet(cellBackTraceCur).cellParentPositionGrid;
 	}
 
 	// reset costs of all cells in the open vector
 	for (uint16_t i = 0; i < cellsOpenVector.size(); i++) {
-		cellsOpenVector[i]->resetCosts();
+		cellGet(cellsOpenVector[i]).resetCosts();
 	}
 	// reset costs of all cells in the closed vector
 	for (uint16_t i = 0; i < cellsClosedVector.size(); i++) {
-		cellsClosedVector[i]->resetCosts();
+		cellGet(cellsClosedVector[i]).resetCosts();
 	}
 
 	return path;
@@ -121,7 +122,7 @@ AStarPath AStarGrid::pointsGetPath(sf::Vector2f pointA, sf::Vector2f pointB) {
 
 
 void AStarGrid::cellUpdateNeighbors(CellCoordinate cellX, CellCoordinate cellY, WorldDistortionGrid & distortionGrid) {
-	return cells[cellX][cellY].neighborCellsVectorUpdate(*this, cellSize, distortionGrid);
+	//return cells[cellX][cellY].neighborCellsVectorUpdate(*this, cellSize, distortionGrid);
 }
 void AStarGrid::cellUpdateNeighbors(CellVector cellPos, WorldDistortionGrid& distortionGrid) {
 	return cellUpdateNeighbors(cellPos.x, cellPos.y, distortionGrid);

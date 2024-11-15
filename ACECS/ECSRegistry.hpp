@@ -826,6 +826,24 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectsGetAtMouse());
 		};
 	};
+	struct ComponentAStarPathHolder final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentAStarPathHolder() {
+			hasSystem = true;
+			updateCooldown = Cooldown(0.1f);
+		};
+
+		AStarPath path;
+		Cooldown updateCooldown;
+
+		sf::Vector2f target;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentAStarPathHolder());
+		};
+	};
 }
 
 #endif

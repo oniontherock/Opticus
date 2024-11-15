@@ -20,10 +20,13 @@ void Engine::inputsRegister() {
 	InputInterface::inputRegister("Move Down", KeySet{ KeyEvent("S", Held), KeyEvent("Down", Held) }, InputKeyLogic::Or);
 
 	InputInterface::inputRegister("Toggle ObjectGrid Rendering", KeySet{ KeyEvent("Numpad1", Pressed) }, InputKeyLogic::Or);
-	InputInterface::inputRegister("Toggle Timescale", KeySet{ KeyEvent("Numpad2", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Toggle Paths Rendering", KeySet{ KeyEvent("Numpad2", Pressed) }, InputKeyLogic::Or);
+	InputInterface::inputRegister("Toggle Timescale", KeySet{ KeyEvent("Numpad3", Pressed) }, InputKeyLogic::Or);
 
 	InputInterface::inputRegister("Order Target Select Active", KeySet{ KeyEvent("LControl", Held) }, InputKeyLogic::Or);
 	InputInterface::inputRegister("Order Target Select", KeySet{ KeyEvent("Mouse Left", Pressed) }, InputKeyLogic::Or);
+	
+	InputInterface::inputRegister("Cell Invalidate", KeySet{ KeyEvent("Mouse Right", Held) }, InputKeyLogic::Or);
 
 	InputInterface::inputRegister("Order 1", KeySet{ KeyEvent("Num1", Pressed) }, InputKeyLogic::Or);
 	InputInterface::inputRegister("Order 2", KeySet{ KeyEvent("Num2", Pressed) }, InputKeyLogic::Or);

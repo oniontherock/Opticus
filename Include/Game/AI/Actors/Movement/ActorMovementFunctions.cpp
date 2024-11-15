@@ -34,30 +34,13 @@ void ActorMovement::goToHumanoid(Entity& actor, sf::Vector2f positionTo, float d
 	// return if we are already close enough to target
 	if (Vector2fMath::distSqrd(componentPosition->position, positionTo) < desiredDist * desiredDist) return;
 
-	GameLevel* gameLevel = GameLevelGrid::levelGet(componentPosition->worldPosition.level);
-
-	AStarPath path = gameLevel->aStarGrid.pointsGetPath(componentPosition->position, positionTo);
-
-	AStarPathDrawer::pathDraw(path);
-
-	if (path.size() <= 0) return;
-
-	sf::Vector2f target;
-
-	if (path.size() <= 2) {
-		target = positionTo;
-	}
-	else {
-		target = *(path.end() - 1);
-	}
-
 	float delta = float(TimeHandler::deltaSimulatedGet());
 
 	constexpr float moveSpeed = 120.f;
 
 	auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
 
-	eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, target) * moveSpeed * delta;
+	eventMove->moveAxis = Vector2fMath::dir(componentPosition->position, positionTo) * moveSpeed * delta;
 }
 void ActorMovement::turnToHumanoid(Entity& actor, sf::Vector2f positionTo) {
 	const float delta = float(TimeHandler::deltaSimulatedGet());

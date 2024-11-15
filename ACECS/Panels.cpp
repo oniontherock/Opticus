@@ -15,18 +15,11 @@ void PanelGameView::panelUpdate() {
 
 	auto* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
-	if (mode == Normal || mode == ObjectGridRender) {
+	if (mode == Normal || mode == ObjectGridRender || mode == PathsRender) {
 		staticDraw(levelActive);
 		dynamicDraw(levelActive);
 		playerDraw(levelActive);
 		hudDraw(levelActive);
-
-		sf::Texture pathsTexture = AStarPathDrawer::pathsTexture.getTexture();
-
-		sf::Sprite pathsSprite(pathsTexture);
-
-		objectDraw(pathsSprite);
-		AStarPathDrawer::pathsTextureReset();
 	}
 	if (mode == ObjectGridRender) {
 		ObjectGrid& objectGrid = levelActive->objectGrid;
@@ -43,6 +36,16 @@ void PanelGameView::panelUpdate() {
 
 		objectDraw(objectGridSprite);
 	}
+	if (mode == PathsRender) {
+		AStarPathDrawer::pathsTexture.display();
+
+		sf::Texture pathsTexture = AStarPathDrawer::pathsTexture.getTexture();
+
+		sf::Sprite pathsSprite(pathsTexture);
+
+		objectDraw(pathsSprite);
+		AStarPathDrawer::pathsTextureReset();
+	}
 }
 
 void PanelGameView::checkModeChange() {
@@ -50,6 +53,14 @@ void PanelGameView::checkModeChange() {
 	if (InputInterface::inputGetActive("Toggle ObjectGrid Rendering")) {
 		if (mode != ObjectGridRender) {
 			mode = ObjectGridRender;
+		}
+		else {
+			mode = Normal;
+		}
+	}
+	if (InputInterface::inputGetActive("Toggle Paths Rendering")) {
+		if (mode != PathsRender) {
+			mode = PathsRender;
 		}
 		else {
 			mode = Normal;

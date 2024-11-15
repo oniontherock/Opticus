@@ -37,8 +37,13 @@ void GameStatePlay::gameStateUpdate() {
 		firstUpdate = true;
 	}
 
-	//GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+	if (InputInterface::inputGetActive("Cell Invalidate")) {
+		GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
+		sf::Vector2f mousePos = PanelManager::panelGet(PanelName::GameView).viewMousePositionGet();
+
+		levelActive->aStarGrid.cellGetFromWorld(mousePos).valid = false;
+	}
 
 	LevelUpdater::levelsUpdate();
 }
@@ -48,6 +53,7 @@ void GameStatePlay::gameStateStart() {
 	levelGenerate();
 
 	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+
 	levelActive->aStarGrid.cellsAllUpdateNeighbors(levelActive->distortionGrid);
 
 	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
@@ -56,12 +62,12 @@ void GameStatePlay::gameStateStart() {
 	// create player and assign the level's playerId to the id of the newly created player
 	levelActive->idPlayer = EntityManager::entityCreate(0, 0, 0, "Player");
 	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
-	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(500, 500);
+	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000, 2000);
 
-	float offset = 128;
+	float offset = 64;
 	for (uint16_t i = 0; i < 3; i++) {
 		Entity& squadMember = EntityManager::entityGet(EntityManager::entityCreate(0, 0, 0, "Squad Member"));
-		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(500 - (i * offset), 500);
+		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - (i * offset), 2000);
 	}
 
 	EntityId spriteAId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");

@@ -75,7 +75,7 @@ AStarPath AStarGrid::pointsGetPath(sf::Vector2f pointA, sf::Vector2f pointB) {
 				cellNeighbor.costHCalculate(cellEnd);
 				// euclidean distance from the cellCurrent to the cellNeighbor,
 				// note that we don't square x or y because they are always either 1 or 0,
-				AStarCostValue distanceEuclidean = (axisToNeighbor.x != 0 && axisToNeighbor.y != 0) ? 14 : 10;
+				AStarCostValue distanceEuclidean = sqrt((axisToNeighbor.x * axisToNeighbor.x) + (axisToNeighbor.y * axisToNeighbor.y)) * 10;
 
 				// potential new costG for neighbor if path is shorter than existing neighborCur costG
 				AStarCostValue neighborNewCostG = cellGet(cellCurrent).costG + distanceEuclidean;

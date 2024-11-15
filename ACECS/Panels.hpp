@@ -14,6 +14,7 @@ struct PanelGameView : public Panel {
 	enum Modes {
 		Normal,
 		ObjectGridRender,
+		PathsRender,
 	};
 
 	Modes mode = Normal;

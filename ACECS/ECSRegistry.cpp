@@ -4,7 +4,7 @@
 #include <Graphics.hpp>
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 32;
+uint16_t MAX_COMPONENT_TYPES = 33;
 uint16_t MAX_EVENT_TYPES = 13;
 
 void ECSRegistry::ECSInitialize() {
@@ -58,6 +58,7 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSpriteStaticRegister>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorStateTicker>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentAStarPathHolder>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentActorMovementHandler>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentMoveByInput>>();
@@ -182,6 +183,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			}),
 			createComponentPairFromType<ComponentActorStateTicker>(),
 			createComponentPairFromType<ComponentActorMovementHandler>(),
+			createComponentPairFromType<ComponentAStarPathHolder>(),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -237,15 +239,15 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentOrderFollowTargeter>(),
 		}
 		);
-	ComponentTemplateManager::componentTemplateAdd(
+		ComponentTemplateManager::componentTemplateAdd(
 
-		/// template name
-		"Squad Member",
-		{
-			"Actor",
-			"Sprite Dynamic",
-		},
-		/// list of components in template
+			/// template name
+			"Squad Member",
+			{
+				"Actor",
+				"Sprite Dynamic",
+			},
+			/// list of components in template
 		{
 			createComponentPairFromType<ComponentActorMovementHandler>(ActorMovement::MovementType::Humanoid),
 			createComponentPairFromType<ComponentActorOrderReceiver>(),
@@ -270,7 +272,7 @@ void EntityComponents::componentTemplatesInitialize() {
 				OrderVector* orders = actorBlackboard.dataGet<OrderVector*>("Orders");
 
 				OrderSubVector& ordersDismiss = orders->at(uint16_t(OrderType::OrdersDismiss));
-				
+
 				// vector of entityIds for the orders to dismiss
 				std::set<EntityId> ordersFromDismissVector;
 
@@ -319,6 +321,7 @@ using namespace EntityEvents;
 #include "../Include/Common/NumberGenerator.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
+#include "../Include/Debugging/AStarPathDrawer.hpp"
 #include <iostream>
 #include <Input.hpp>
 #include "Panels.hpp"
@@ -944,24 +947,6 @@ void ComponentActorStateTicker::system(Entity& entity) {
 
 	componentActorStateManager->stateManager.stateActiveUpdate(entity, componentActorBlackboard->actorBlackboard);
 }
-void ComponentActorMovementHandler::system(Entity& entity) {
-	// handle EventActorGoTo
-	if (entity.entityEventHas<EventActorGoTo>()) {
-		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
-
-		for (uint16_t i = 0; i < events.size(); i++) {
-			ActorMovement::goTo(movementType, entity, events[i]->positionTo, events[i]->desiredDist);
-		}
-	}
-	// handle EventActorTurnTo
-	if (entity.entityEventHas<EventActorTurnTo>()) {
-		auto events = entity.entityEventGetAllOfType<EventActorTurnTo>();
-
-		for (uint16_t i = 0; i < events.size(); i++) {
-			ActorMovement::turnTo(movementType, entity, events[i]->positionTo);
-		}
-	}
-}
 void ComponentOrderTransmitByInput::system(Entity& entity) {
 
 
@@ -1352,6 +1337,64 @@ void ComponentOrderFollowTargeter::system(Entity& entity) {
 		}
 
 	}
+}
+void ComponentActorMovementHandler::system(Entity& entity) {
+	// handle EventActorGoTo
+	if (entity.entityEventHas<EventActorGoTo>()) {
+		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
+
+		for (uint16_t i = 0; i < events.size(); i++) {
+			ActorMovement::goTo(movementType, entity, events[i]->positionTo, events[i]->desiredDist);
+		}
+	}
+	// handle EventActorTurnTo
+	if (entity.entityEventHas<EventActorTurnTo>()) {
+		auto events = entity.entityEventGetAllOfType<EventActorTurnTo>();
+
+		for (uint16_t i = 0; i < events.size(); i++) {
+			ActorMovement::turnTo(movementType, entity, events[i]->positionTo);
+		}
+	}
+}
+void ComponentAStarPathHolder::system(Entity& entity) {
+	
+	if (!entity.entityComponentHas<ComponentPosition>()) {
+		ConsoleHandler::consolePrintErr("ComponentAStarPathHolder system failed: Exception: " + std::string("Does not have ComponentPosition"));
+		return;
+	}
+	
+
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+	AStarGrid& aStarGrid = GameLevelGrid::levelGet(componentPosition->worldPosition.level)->aStarGrid;
+	float aStarGridCellSize = aStarGrid.cellsGetSize().x;
+
+	if (entity.entityEventHas<EventActorGoTo>()) {
+
+		auto events = entity.entityEventGetAllOfType<EventActorGoTo>();
+
+		for (uint16_t i = 0; i < events.size(); i++) {
+			// check if new event's target is farther than a cell away from the current target
+			if (Vector2fMath::distSqrd(events[i]->positionTo, target) > aStarGridCellSize * aStarGridCellSize) {
+
+				target = events[i]->positionTo;
+
+				path = aStarGrid.pointsGetPath(componentPosition->position, target);
+				updateCooldown.reset();
+			}
+			// check if the path's total distance is higher than the move event's desired dist,
+			// and if it is, set the desired dist to 0, so the actor follows the path better
+			if (Vector2fMath::distSqrd(componentPosition->position, target) > events[i]->desiredDist * events[i]->desiredDist) {
+				events[i]->desiredDist = 0.f;
+				if (path.size() > 0) events[i]->positionTo = path.back();
+			}
+		}
+	}
+	if (updateCooldown.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
+		path = aStarGrid.pointsGetPath(componentPosition->position, target);
+	}
+
+
+	AStarPathDrawer::pathDraw(path);
 }
 
 #pragma endregion Systems

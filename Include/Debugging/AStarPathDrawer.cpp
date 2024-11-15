@@ -3,7 +3,7 @@
 sf::RenderTexture AStarPathDrawer::pathsTexture;
 
 void AStarPathDrawer::pathsTextureReset() {
-	pathsTexture.create(1000, 1000);
+	pathsTexture.create(4096, 4096);
 	pathsTexture.clear(sf::Color::Transparent);
 }
 
@@ -16,7 +16,5 @@ void AStarPathDrawer::pathDraw(AStarPath path) {
 		circleShape.setPosition(path[i]);
 		pathsTexture.draw(circleShape);
 	}
-
-	pathsTexture.display();
 }
 

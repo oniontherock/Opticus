@@ -28,11 +28,6 @@ class AStarCell {
 	AStarCell();
 	AStarCell(AStarCellPosition _cellPositionGrid, sf::Vector2f aStarGridCellSize);
 
-	// position of the cell in the world
-	sf::Vector2f cellPositionWorld;
-	// position of the cell in the AStarGrid
-	AStarCellPosition cellPositionGrid;
-
 	AStarCellPosition cellParentPositionGrid;
 
 
@@ -55,6 +50,7 @@ class AStarCell {
 	void resetPathingData();
 
 public:
+	friend class AStarGrid;
 
 	bool operator< (const AStarCell& other) const;
 	bool operator== (const AStarCell& other) const;
@@ -62,7 +58,11 @@ public:
 	// whether this cell is valid for pathfinding, if not, the cell is treated like a wall
 	bool valid = true;
 
-	friend class AStarGrid;
+	// position of the cell in the world
+	sf::Vector2f cellPositionWorld;
+	// position of the cell in the AStarGrid
+	AStarCellPosition cellPositionGrid;
+
 };
 
 

@@ -1363,10 +1363,13 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 		return;
 	}
 	
+	updateCooldown.update(float(TimeHandler::deltaSimulatedGet()));
 
 	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
 	AStarGrid& aStarGrid = GameLevelGrid::levelGet(componentPosition->worldPosition.level)->aStarGrid;
 	float aStarGridCellSize = aStarGrid.cellsGetSize().x;
+
+	bool pathTargetReached = Vector2fMath::distSqrd(componentPosition->position, pathTarget) < 1.f * 1.f;
 
 	if (entity.entityEventHas<EventActorGoTo>()) {
 
@@ -1374,23 +1377,38 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 
 		for (uint16_t i = 0; i < events.size(); i++) {
 			// check if new event's target is farther than a cell away from the current target
-			if (Vector2fMath::distSqrd(events[i]->positionTo, target) > aStarGridCellSize * aStarGridCellSize) {
+			if (Vector2fMath::distSqrd(events[i]->positionTo, endTarget) > aStarGridCellSize * aStarGridCellSize) {
 
-				target = events[i]->positionTo;
+				endTarget = events[i]->positionTo;
 
-				path = AStarPathfinder::pathGet(componentPosition->position, target, aStarGrid);
-				updateCooldown.reset();
+				path = AStarPathfinder::pathGet(componentPosition->position, endTarget, aStarGrid);
+				if (path.size() > 0) {
+					pathTarget = path.back();
+				}
+				else {
+					pathTarget = endTarget;
+				}
+				updateCooldown.reset(); 
 			}
 			// check if the path's total distance is higher than the move event's desired dist,
 			// and if it is, set the desired dist to 0, so the actor follows the path better
-			if (Vector2fMath::distSqrd(componentPosition->position, target) > events[i]->desiredDist * events[i]->desiredDist) {
+			if (Vector2fMath::distSqrd(componentPosition->position, endTarget) > events[i]->desiredDist * events[i]->desiredDist) {
 				events[i]->desiredDist = 0.f;
-				if (path.size() > 0) events[i]->positionTo = path.back();
 			}
+			if (path.size() > 0) events[i]->positionTo = pathTarget;
 		}
 	}
-	if (updateCooldown.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
-		path = AStarPathfinder::pathGet(componentPosition->position, target, aStarGrid);
+	if (pathTargetReached) {
+		if (updateCooldown.ready()) {
+			path = AStarPathfinder::pathGet(pathTarget, endTarget, aStarGrid);
+			if (path.size() > 0) {
+				pathTarget = path.back();
+			}
+			else {
+				pathTarget = endTarget;
+			}
+			updateCooldown.reset();
+		}
 	}
 
 

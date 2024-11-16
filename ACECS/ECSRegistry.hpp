@@ -223,6 +223,22 @@ namespace EntityEvents {
 			return std::unique_ptr<Duplicatable>(new EventObjectsAtMouse());
 		};
 	};
+	struct EventPath final : public Event {
+
+		EventPath() { clear(); };
+
+		AStarPath path;
+		bool success;
+
+		void clear() final {
+			path.clear();
+			success = false;
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventPath());
+		};
+	};
 }
 namespace EntityComponents {
 	struct ComponentMoveByInput final : public Component {
@@ -836,9 +852,12 @@ namespace EntityComponents {
 		};
 
 		AStarPath path;
+		// current position in the path we are moving to,
+		// this is used to make sure the entity moves to the center of the cell before re-pathing
+		sf::Vector2f pathTarget;
 		Cooldown updateCooldown;
-
-		sf::Vector2f target;
+		// target we hope to path find to
+		sf::Vector2f endTarget;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentAStarPathHolder());

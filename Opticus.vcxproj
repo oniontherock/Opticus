@@ -159,6 +159,7 @@
     <ClCompile Include="Include\Game\Pathfinding\AStar\Grid\AStarGrid.cpp" />
     <ClCompile Include="Include\Game\Pathfinding\AStar\Grid\AStarGridCourse.cpp" />
     <ClCompile Include="Include\Game\Pathfinding\AStar\Path Creation\AStarPathfinder.cpp" />
+    <ClCompile Include="Include\Game\Pathfinding\AStar\Path Creation\PathRequestManager.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Object Vision\ObjectVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
@@ -223,6 +224,7 @@
     <ClInclude Include="Include\Game\Pathfinding\AStar\Grid\AStarGrid.hpp" />
     <ClInclude Include="Include\Game\Pathfinding\AStar\Grid\AStarGridCourse.hpp" />
     <ClInclude Include="Include\Game\Pathfinding\AStar\Path Creation\AStarPathfinder.hpp" />
+    <ClInclude Include="Include\Game\Pathfinding\AStar\Path Creation\PathRequestManager.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Object Vision\ObjectVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />

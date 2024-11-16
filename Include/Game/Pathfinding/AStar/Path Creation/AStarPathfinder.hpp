@@ -8,6 +8,7 @@
 class AStarPathfinder {
 
 	static AStarPath pathRetrace(AStarCell& cellStart, AStarCell& cellEnd);
+	static AStarPath pathSimplify(AStarPath path);
 	static void cellsResetData(std::vector<AStarCell*> cells);
 	static AStarCostValue cellDistanceGet(AStarCellPosition cellPosFrom, AStarCellPosition cellPosTo);
 

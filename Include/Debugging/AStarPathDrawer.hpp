@@ -10,7 +10,12 @@ public:
 	static void pathsTextureReset();
 	static void pathDraw(AStarPath path);
 
+	static void cellsInvalidDraw(AStarGrid& aStarGrid);
+
+
 	static sf::RenderTexture pathsTexture;
+
+
 };
 
 

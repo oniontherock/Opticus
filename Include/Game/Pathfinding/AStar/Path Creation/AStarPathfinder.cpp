@@ -28,6 +28,35 @@ AStarPath AStarPathfinder::pathRetrace(AStarCell& cellStart, AStarCell& cellEnd)
 	return path;
 }
 
+AStarPath AStarPathfinder::pathSimplify(AStarPath path) {
+	// path has only two points, return path, since it can't be simplified
+	if (path.size() <= 2) return path;
+	
+	std::reverse(path.begin(), path.end());
+
+	AStarPath pathSimplified;
+
+	std::vector<uint16_t> toRemoveIndices;
+	
+	sf::Vector2f dirStart;
+
+	for (uint16_t i = 0; i < path.size()-1; i++) {
+
+		sf::Vector2f dir = Vector2fMath::dir(path[i], path[i + 1]);
+
+		if (dir != dirStart) {
+			pathSimplified.push_back(path[i]);
+			dirStart = dir;
+		}
+	}
+	// push_back last element of path because it is skipped in the previous iteration
+	pathSimplified.push_back(path.back());
+
+	std::reverse(pathSimplified.begin(), pathSimplified.end());
+	return pathSimplified;
+}
+
+
 void AStarPathfinder::cellsResetData(std::vector<AStarCell*> cells) {
 	// reset costs of all cells
 	for (uint16_t i = 0; i < cells.size(); i++) {
@@ -41,15 +70,11 @@ AStarCostValue AStarPathfinder::cellDistanceGet(AStarCellPosition cellPosFrom, A
 
 	if (distX > distY) {
 		return (14 * distY) + 10 * (distX - distY);
-		}
+	}
 	else {
 		return (14 * distX) + 10 * (distY - distX);
 	}
-
 }
-
-
-
 
 struct AStarCellComparator {
 	bool operator() (AStarCell* a, AStarCell* b) {
@@ -80,6 +105,10 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 	AStarCellPosition cellStart = aStarGrid.coordinatesWorldToCell(pointStart);
 	AStarCellPosition cellEnd = aStarGrid.coordinatesWorldToCell(pointEnd);
 
+	if (!aStarGrid.cellGet(cellStart).valid || !aStarGrid.cellGet(cellEnd).valid) {
+		return AStarPath{ pointStart };
+	}
+
 	std::vector<AStarCell*> cellsOpenVector; // cells to be evaluated
 	std::vector<AStarCellPosition> cellsClosedVector; // cells that have already been evaluated
 
@@ -109,9 +138,34 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 
 				if (x == 0 && y == 0) continue;
 
-				if (!aStarGrid.cellPosIsInGrid(cellCurrent->cellPositionGrid.x + x, cellCurrent->cellPositionGrid.y + y)) continue;
+				int16_t cellPosOffsetX = cellCurrent->cellPositionGrid.x + x;
+				int16_t cellPosOffsetY = cellCurrent->cellPositionGrid.y + y;
 
-				AStarCell& cellNeighbor = aStarGrid.cellGet(cellCurrent->cellPositionGrid.x + x, cellCurrent->cellPositionGrid.y + y);
+				if (!aStarGrid.cellPosIsInGrid(cellPosOffsetX, cellPosOffsetY)) continue;
+
+				// if cell is a diagonal, make sure the pathfinder doesn't cut a corner
+				if (x != 0 && y != 0) {
+
+
+					bool isValidX = aStarGrid.cellGet(cellPosOffsetX, cellCurrent->cellPositionGrid.y).valid;
+					bool isValidY = aStarGrid.cellGet(cellCurrent->cellPositionGrid.x, cellPosOffsetY).valid;
+
+					// skip neighbor if you must pass through a walled corner to reach it, I.E. it is inaccessible
+					if (!isValidX && isValidY) {
+						continue;
+					}
+					// if x axis is valid, allow pathfinder to select neighbor on the y axis
+					else if (!isValidX) {
+						cellPosOffsetX -= x;
+					}
+					// if y axis is valid, allow pathfinder to select neighbor on the y axis
+					else if (!isValidY) {
+						cellPosOffsetY -= y;
+
+					}
+				}
+
+				AStarCell& cellNeighbor = aStarGrid.cellGet(cellPosOffsetX, cellPosOffsetY);
 
 				auto cellPosFind = [cellNeighbor](AStarCellPosition cellPos) { return cellPos == cellNeighbor.cellPositionGrid; };
 				auto cellFind = [cellNeighbor](AStarCell* cell) { return *cell == cellNeighbor; };
@@ -142,7 +196,8 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 	}
 
 	// get finished path
-	AStarPath path = pathRetrace(aStarGrid.cellGet(cellStart), aStarGrid.cellGet(cellEnd));
+	AStarPath path = pathSimplify(pathRetrace(aStarGrid.cellGet(cellStart), aStarGrid.cellGet(cellEnd)));
+
 
 	// get all cells
 	std::vector<AStarCell*> cellsAll;
@@ -174,3 +229,5 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointEnd, Entity& entity) {
 AStarPath AStarPathfinder::pathGet(sf::Vector2f pointEnd, EntityId entityId) {
 	pathGet(pointEnd, EntityManager::entityGet(entityId));
 }
+
+

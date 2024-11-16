@@ -37,6 +37,7 @@ void PanelGameView::panelUpdate() {
 		objectDraw(objectGridSprite);
 	}
 	if (mode == PathsRender) {
+		AStarPathDrawer::cellsInvalidDraw(levelActive->aStarGrid);
 		AStarPathDrawer::pathsTexture.display();
 
 		sf::Texture pathsTexture = AStarPathDrawer::pathsTexture.getTexture();

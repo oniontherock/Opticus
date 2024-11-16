@@ -10,7 +10,7 @@ GameLevel::GameLevel() :
 	objectGrid(levelSize.x / 4, levelSize.y / 4, 4.f, 4.f),
 	roomGrid(RoomGrid(8, 8, 32, 32, 16.f, 16.f)),
 	levelGenerator(LevelGenerator()),
-	aStarGrid(AStarGrid(levelSize.x / 64, levelSize.y / 64, 64.f, 64.f)),
+	aStarGrid(AStarGrid(levelSize.x / 16, levelSize.y / 16, 16.f, 16.f)),
 	idPlayer(0)
 {
 	worldTextureStatic.create(levelSize.x, levelSize.y);

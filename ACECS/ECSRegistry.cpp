@@ -1378,7 +1378,7 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 
 				target = events[i]->positionTo;
 
-				path = aStarGrid.pointsGetPath(componentPosition->position, target);
+				path = AStarPathfinder::pathGet(componentPosition->position, target, aStarGrid);
 				updateCooldown.reset();
 			}
 			// check if the path's total distance is higher than the move event's desired dist,
@@ -1390,7 +1390,7 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 		}
 	}
 	if (updateCooldown.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
-		path = aStarGrid.pointsGetPath(componentPosition->position, target);
+		path = AStarPathfinder::pathGet(componentPosition->position, target, aStarGrid);
 	}
 
 

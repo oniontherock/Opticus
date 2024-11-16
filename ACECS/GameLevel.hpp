@@ -3,7 +3,7 @@
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
-#include "../Include/Game/Pathfinding/AStar/AStarGrid.hpp"
+#include "../Include/Game/Pathfinding/AStar/Grid/AStarGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
 #include "SFML/Graphics.hpp"

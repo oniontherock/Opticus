@@ -9,11 +9,12 @@ void AStarPathDrawer::pathsTextureReset() {
 
 void AStarPathDrawer::pathDraw(AStarPath path) {
 
-	sf::CircleShape circleShape(16);
+	sf::CircleShape circleShape(32);
 	circleShape.setFillColor(sf::Color::Blue);
+	circleShape.setOrigin(circleShape.getRadius(), circleShape.getRadius());
 
 	for (uint16_t i = 0; i < path.size(); i++) {
-		circleShape.setPosition(path[i]);
+		circleShape.setPosition(path[i]); 
 		pathsTexture.draw(circleShape);
 	}
 }

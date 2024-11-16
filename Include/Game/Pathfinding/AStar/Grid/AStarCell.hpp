@@ -3,7 +3,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <vector>
-#include "../../World/Distortions/WorldDistortionGrid.hpp"
+#include "../../../World/Distortions/WorldDistortionGrid.hpp"
 
 // position of a cell in the AStarGrid
 typedef sf::Vector2u AStarCellPosition;
@@ -21,23 +21,20 @@ typedef std::vector<AStarCellPosition> NeighborCellsVector;
 // type used for costs
 typedef uint16_t AStarCostValue;
 
-class AStarGrid;
 
-class AStarCell {
+struct AStarCell {
 
 	AStarCell();
 	AStarCell(AStarCellPosition _cellPositionGrid, sf::Vector2f aStarGridCellSize);
 
-	AStarCellPosition cellParentPositionGrid;
-
-
+	AStarCell* cellParent;
 	// g cost of the AStarCell
 	AStarCostValue costG;
 	// h cost of the AStarCell
 	AStarCostValue costH;
 	// f cost of the AStarCell
 	AStarCostValue costF;
-	void costHCalculate(AStarCellPosition targetPosition);
+
 
 	// reset G, H, and F costs,
 	void resetCosts();
@@ -49,11 +46,9 @@ class AStarCell {
 	// costF,
 	void resetPathingData();
 
-public:
-	friend class AStarGrid;
-
 	bool operator< (const AStarCell& other) const;
 	bool operator== (const AStarCell& other) const;
+	bool operator!= (const AStarCell& other) const;
 
 	// whether this cell is valid for pathfinding, if not, the cell is treated like a wall
 	bool valid = true;

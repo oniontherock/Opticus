@@ -11,7 +11,7 @@
 #include "../Include/Game/AI/Actors/Orders/OrderTypes.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
 #include "../Include/Game/AI/Utility AI/UtilityStateManager.hpp"
-#include "../Include/Game/Pathfinding/AStar/AStarGrid.hpp"
+#include "../Include/Game/Pathfinding/AStar/Path Creation/AStarPathfinder.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/VisionCaster.hpp"

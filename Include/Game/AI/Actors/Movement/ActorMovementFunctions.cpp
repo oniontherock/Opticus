@@ -1,6 +1,6 @@
 #include "ActorMovementFunctions.hpp"
 #include "../../../ACECS/ECSRegistry.hpp"
-#include "../../../Pathfinding/AStar/AStarGrid.hpp"
+#include "../../../Pathfinding/AStar/Grid/AStarGrid.hpp"
 #include "../../../ACECS/GameLevel.hpp"
 #include "../../../../Debugging/AStarPathDrawer.hpp"
 

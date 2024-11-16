@@ -12,9 +12,10 @@ AStarCell::AStarCell() :
 }
 
 AStarCell::AStarCell(AStarCellPosition _cellPositionGrid, sf::Vector2f aStarGridCellSize) :
-	cellPositionGrid(_cellPositionGrid),
-	cellPositionWorld(sf::Vector2f(cellPositionGrid.x * aStarGridCellSize.x, cellPositionGrid.y * aStarGridCellSize.y))
+	cellPositionGrid(_cellPositionGrid)
 {
+	cellPositionWorld = sf::Vector2f(cellPositionGrid.x * aStarGridCellSize.x, cellPositionGrid.y * aStarGridCellSize.y) + (aStarGridCellSize / 2.f);
+
 	resetPathingData();
 }
 
@@ -24,12 +25,10 @@ bool AStarCell::operator< (const AStarCell& other) const {
 bool AStarCell::operator== (const AStarCell& other) const {
 	return cellPositionGrid == other.cellPositionGrid;
 }
-
-
-
-void AStarCell::costHCalculate(AStarCellPosition targetPosition) {
-	costH = AStarCostValue(Vector2iMath::dist(cellPositionGrid.x, cellPositionGrid.y, targetPosition.x, targetPosition.y)) * 10;
+bool AStarCell::operator!= (const AStarCell& other) const {
+	return cellPositionGrid != other.cellPositionGrid;
 }
+
 void AStarCell::resetCosts() {
 	costG = 0;
 	costH = 0;
@@ -38,5 +37,5 @@ void AStarCell::resetCosts() {
 void AStarCell::resetPathingData() {
 	resetCosts();
 
-	cellParentPositionGrid = AStarCellPosition(0, 0);
+	cellParent = nullptr;
 }

@@ -16,7 +16,13 @@ AStarPath AStarPathfinder::pathRetrace(AStarCell& cellStart, AStarCell& cellEnd)
 	while (*cellBackTraceCur != cellStart) {
 		path.push_back(cellBackTraceCur->cellPositionWorld);
 
-		cellBackTraceCur = cellBackTraceCur->cellParent;
+		if (cellBackTraceCur->cellParent == nullptr) {
+			ConsoleHandler::consolePrintErr("Pathfinder pathRetrace failed: Exception: \"cellParent\" was nullptr");
+			break;
+		}
+		else {
+			cellBackTraceCur = cellBackTraceCur->cellParent;
+		}
 	}
 
 	return path;

@@ -399,7 +399,7 @@ void ComponentPosition::system(Entity& entity) {
 		// amount the ray would have moved naturally
 		movedEvent->naturalMovedAxis = heading;
 
-		GameLevelGrid::levelGet(worldPosition.level)->distortionGrid.cellGetFromWorld(position).headingApplyDistortion(heading, position);
+		GameLevelGrid::levelGet(entity.levelId)->distortionGrid.cellGetFromWorld(position).headingApplyDistortion(heading, position);
 		
 		position += heading;
 
@@ -536,7 +536,7 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 	VisionCaster& visionCaster = componentVisionCasterHolder->visionCaster;
 
 	if (componentVisionCasterHolder->doUpdate) {
-		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureStatic);
+		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(entity.levelId)->worldTextureStatic);
 		visionCaster.visionDisplay();
 
 		auto* eventVisionUpdated = entity.entityEventAddAndGet<EventVisionUpdated>();
@@ -564,7 +564,7 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 	if (componentVisionCasterHolder->doUpdate) {
-		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(positionComponent->worldPosition.level)->worldTextureDynamic);
+		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(entity.levelId)->worldTextureDynamic);
 		visionCaster.visionDisplay();
 	}
 }
@@ -688,7 +688,7 @@ void ComponentDistortionRadius::system(Entity& entity) {
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-	auto& distortionGrid = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->distortionGrid;
+	auto& distortionGrid = GameLevelGrid::levelGet(entity.levelId)->distortionGrid;
 
 	for (float offsetX = -distortionRadius / 2.f; offsetX <= +distortionRadius / 2.f; offsetX += 1.f) {
 		for (float offsetY = -distortionRadius / 2.f; offsetY <= +distortionRadius / 2.f; offsetY += 1.f) {
@@ -720,7 +720,7 @@ void ComponentSpriteDynamicRegister::system(Entity& entity) {
 
 	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
 
-	GameLevelGrid::levelGet(componentPosition->worldPosition.level)->dynamicSpriteEntityIds.push_back(entity.Id);
+	GameLevelGrid::levelGet(entity.levelId)->dynamicSpriteEntityIds.push_back(entity.Id);
 
 	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
 }
@@ -740,7 +740,7 @@ void ComponentSpriteStaticRegister::system(Entity& entity) {
 
 	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
 
-	GameLevelGrid::levelGet(componentPosition->worldPosition.level)->staticSpriteEntityIds.push_back(entity.Id);
+	GameLevelGrid::levelGet(entity.levelId)->staticSpriteEntityIds.push_back(entity.Id);
 
 	entity.entityComponentTerminate<ComponentSpriteStaticRegister>();
 }
@@ -763,8 +763,9 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
-	if (positionPrev == WorldPosition(0, 0, 0, 0, 0)) {
-		positionPrev = positionComponent->worldPosition;
+	// check if positionPrev has been set yet
+	if (positionPrev == sf::Vector2f(0, 0)) {
+		positionPrev = positionComponent->position;
 	}
 
 	// note that two separate objectGrid references are used because an entity could travel to a different level.
@@ -780,7 +781,7 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 		}
 	};
 
-	auto& objectGridPopulation = GameLevelGrid::levelGet(positionComponent->worldPosition.level)->objectGrid;
+	auto& objectGridPopulation = GameLevelGrid::levelGet(entity.levelId)->objectGrid;
 
 	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
 		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
@@ -791,7 +792,7 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 		}
 	};
 
-	positionPrev = positionComponent->worldPosition;
+	positionPrev = positionComponent->position;
 }
 void ComponentObjectMemoryDebug::system(Entity& entity) {
 
@@ -1366,7 +1367,7 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 	updateCooldown.update(float(TimeHandler::deltaSimulatedGet()));
 
 	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
-	AStarGrid& aStarGrid = GameLevelGrid::levelGet(componentPosition->worldPosition.level)->aStarGrid;
+	AStarGrid& aStarGrid = GameLevelGrid::levelGet(entity.levelId)->aStarGrid;
 	float aStarGridCellSize = aStarGrid.cellsGetSize().x;
 
 	bool pathTargetReached = Vector2fMath::distSqrd(componentPosition->position, pathTarget) < 1.f * 1.f;

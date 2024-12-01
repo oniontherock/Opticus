@@ -78,7 +78,7 @@ AStarCostValue AStarPathfinder::cellDistanceGet(AStarCellPosition cellPosFrom, A
 
 struct AStarCellComparator {
 	bool operator() (AStarCell* a, AStarCell* b) {
-		return *b < *a;
+		return *b <= *a;
 	}
 };
 struct CellHeap : std::priority_queue<AStarCell*, std::vector<AStarCell*>, AStarCellComparator> {
@@ -109,28 +109,17 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 		return AStarPath{ pointStart };
 	}
 
-	std::vector<AStarCell*> cellsOpenVector; // cells to be evaluated
+	CellHeap cellsOpenHeap; // cells to be evaluated
 	std::vector<AStarCellPosition> cellsClosedVector; // cells that have already been evaluated
 
-	cellsOpenVector.push_back(&aStarGrid.cellGet(cellStart));
+	cellsOpenHeap.push(&aStarGrid.cellGet(cellStart));
 
-	AStarCell* cellCurrent = *cellsOpenVector.begin();
+	AStarCell* cellCurrent = cellsOpenHeap.top();
 
-	while ((cellCurrent->cellPositionGrid != cellEnd) && (cellsOpenVector.size() > 0)) {
+	while ((cellCurrent->cellPositionGrid != cellEnd) && (cellsOpenHeap.size() > 0)) {
 
-		cellCurrent = *cellsOpenVector.begin();
-		for (auto itr = cellsOpenVector.begin(); itr != cellsOpenVector.end(); itr++) {
-
-			if (**itr < *cellCurrent) {
-				cellCurrent = *itr;
-			}
-		}
-
-		auto itr = std::find(cellsOpenVector.begin(), cellsOpenVector.end(), cellCurrent);
-
-		if (itr != cellsOpenVector.end()) {
-			cellsOpenVector.erase(itr);
-		}
+		cellCurrent = cellsOpenHeap.top();
+		cellsOpenHeap.pop();
 		cellsClosedVector.push_back(cellCurrent->cellPositionGrid);
 
 		for (int16_t x = -1; x <= 1; x++) {
@@ -145,8 +134,6 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 
 				// if cell is a diagonal, make sure the pathfinder doesn't cut a corner
 				if (x != 0 && y != 0) {
-
-
 					bool isValidX = aStarGrid.cellGet(cellPosOffsetX, cellCurrent->cellPositionGrid.y).valid;
 					bool isValidY = aStarGrid.cellGet(cellCurrent->cellPositionGrid.x, cellPosOffsetY).valid;
 
@@ -161,7 +148,6 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 					// if y axis is valid, allow pathfinder to select neighbor on the y axis
 					else if (!isValidY) {
 						cellPosOffsetY -= y;
-
 					}
 				}
 
@@ -173,12 +159,11 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 				// skip current neighbor if they aren't valid or have already been explored
 				if (!cellNeighbor.valid || std::find_if(cellsClosedVector.begin(), cellsClosedVector.end(), cellPosFind) != cellsClosedVector.end()) continue;
 
-
 				// potential new costG for neighbor if path is shorter than existing neighborCur costG
 				AStarCostValue neighborNewCostG = cellCurrent->costG + cellDistanceGet(cellCurrent->cellPositionGrid, cellNeighbor.cellPositionGrid);
 
 				// whether the neighborCur is in the cellsOpenVector
-				bool neighborIsInOpen = std::find_if(cellsOpenVector.begin(), cellsOpenVector.end(), cellFind) != cellsOpenVector.end();
+				bool neighborIsInOpen = cellsOpenHeap.has(cellNeighbor);
 
 				if (neighborNewCostG < cellNeighbor.costG || !neighborIsInOpen) {
 
@@ -188,7 +173,7 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 					cellNeighbor.cellParent = cellCurrent;
 
 					if (!neighborIsInOpen) {
-						cellsOpenVector.push_back(&aStarGrid.cellGet(cellNeighbor.cellPositionGrid));
+						cellsOpenHeap.push(&aStarGrid.cellGet(cellNeighbor.cellPositionGrid));
 					}
 				}
 			}
@@ -197,17 +182,6 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 
 	// get finished path
 	AStarPath path = pathSimplify(pathRetrace(aStarGrid.cellGet(cellStart), aStarGrid.cellGet(cellEnd)));
-
-
-	// get all cells
-	std::vector<AStarCell*> cellsAll;
-	cellsAll.reserve(cellsOpenVector.size() + cellsClosedVector.size());
-	cellsAll.insert(cellsAll.end(), cellsOpenVector.begin(), cellsOpenVector.end());
-	for (uint16_t i = 0; i < cellsClosedVector.size(); i++) {
-		cellsAll.push_back(&aStarGrid.cellGet(cellsClosedVector[i]));
-	}
-	// reset data for all cells we modified
-	cellsResetData(cellsAll);
 
 	return path;
 }
@@ -222,7 +196,7 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointEnd, Entity& entity) {
 
 	sf::Vector2f pointStart = entityComponentPosition->position;
 
-	AStarGrid& aStarGrid = GameLevelGrid::levelGet(entityComponentPosition->worldPosition.level)->aStarGrid;
+	AStarGrid& aStarGrid = GameLevelGrid::levelGet(entity.levelId)->aStarGrid;
 
 	return pathGet(pointStart, pointEnd, aStarGrid);
 }

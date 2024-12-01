@@ -341,18 +341,16 @@ namespace EntityComponents {
 		ComponentPosition() {
 			hasSystem = true;
 		};
-		ComponentPosition(WorldPosition _worldPosition) :
+		ComponentPosition(sf::Vector2f _position) :
 			ComponentPosition()
 		{
-			worldPosition = _worldPosition;
-			position = worldPosition.position;
+			position = _position;
 		};
 
-		WorldPosition worldPosition;
-		sf::Vector2f& position = worldPosition.position;
+		sf::Vector2f position;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentPosition(worldPosition));
+			return std::unique_ptr<Duplicatable>(new ComponentPosition(position));
 		};
 	};
 	struct ComponentRotation final : public Component {

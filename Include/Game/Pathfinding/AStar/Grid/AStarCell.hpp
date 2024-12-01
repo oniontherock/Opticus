@@ -47,6 +47,7 @@ struct AStarCell {
 	void resetPathingData();
 
 	bool operator< (const AStarCell& other) const;
+	bool operator<= (const AStarCell& other) const;
 	bool operator== (const AStarCell& other) const;
 	bool operator!= (const AStarCell& other) const;
 

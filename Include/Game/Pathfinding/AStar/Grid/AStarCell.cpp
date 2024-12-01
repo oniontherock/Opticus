@@ -20,8 +20,12 @@ AStarCell::AStarCell(AStarCellPosition _cellPositionGrid, sf::Vector2f aStarGrid
 }
 
 bool AStarCell::operator< (const AStarCell& other) const {
-	return (costF < other.costF);// || (costF == other.costF && costH < other.costH);
+	return (costF < other.costF);
 }
+bool AStarCell::operator<= (const AStarCell& other) const {
+	return (costF <= other.costF);
+}
+
 bool AStarCell::operator== (const AStarCell& other) const {
 	return cellPositionGrid == other.cellPositionGrid;
 }

@@ -74,9 +74,13 @@ void EntityComponents::componentIDsInitialize() {
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
-
+	
+	// sprites/drawing
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTargetingDrawer>>();
+	// audio playing/listening
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentAudioPlayer>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentAudioListener>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 	
@@ -237,6 +241,7 @@ void EntityComponents::componentTemplatesInitialize() {
 				}),
 			createComponentPairFromType<ComponentObjectsGetAtMouse>(),
 			createComponentPairFromType<ComponentOrderFollowTargeter>(),
+			createComponentPairFromType<ComponentAudioListener>(),
 		}
 		);
 		ComponentTemplateManager::componentTemplateAdd(
@@ -305,6 +310,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		})),
 		createComponentPairFromType<ComponentActorWanderSelector>(),
 		createComponentPairFromType<ComponentFollowerTracker>(),
+		createComponentPairFromType<ComponentAudioPlayer>(),
 		});
 }
 
@@ -423,7 +429,7 @@ void ComponentRotation::system(Entity& entity) {
 	}
 }
 void ComponentSprite::system(Entity& entity) {
-	
+
 	if (!entity.entityComponentHas<ComponentPosition>()) return;
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
@@ -1417,5 +1423,31 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 
 	AStarPathDrawer::pathDraw(path);
 }
+void ComponentAudioPlayer::system(Entity& entity) {
 
+	sf::SoundBuffer& soundBuffer = AudioStore::soundBufferStore.fileGetOrLoadFromName("SFX/Footstep1");
+
+	static sf::Sound sound(soundBuffer);
+	
+	// if has position, place sound at position, else mark as relative to listener
+	if (entity.entityComponentHas<ComponentPosition>()) {
+		auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+		sound.setPosition(componentPosition->x, componentPosition->y, 0);
+		sound.setMinDistance(128);
+		sound.setAttenuation(8);
+	}
+	else {
+		sound.setRelativeToListener(true);
+	}
+
+	if (sound.getStatus() != sf::Sound::Playing) sound.play();
+
+}
+void ComponentAudioListener::system(Entity& entity) {
+
+	if (!entity.entityComponentHas<ComponentPosition>()) return;
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+	sf::Listener::setPosition(componentPosition->position.x, componentPosition->position.y, 0);
+}
 #pragma endregion Systems

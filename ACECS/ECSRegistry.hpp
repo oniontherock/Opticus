@@ -18,6 +18,7 @@
 #include "../Include/Game/World/Objects/ObjectTypes.hpp"
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
+#include <Audio/AudioStore.hpp>
 #include <functional>
 
 namespace ECSRegistry {
@@ -361,6 +362,8 @@ namespace EntityComponents {
 		};
 
 		sf::Vector2f position;
+		float& x = position.x;
+		float& y = position.y;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentPosition(position));
@@ -872,6 +875,30 @@ namespace EntityComponents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentAStarPathHolder());
+		};
+	};
+	struct ComponentAudioPlayer final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentAudioPlayer() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentAudioPlayer());
+		};
+	};
+	struct ComponentAudioListener final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentAudioListener() {
+			hasSystem = true;
+		};
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentAudioListener());
 		};
 	};
 }

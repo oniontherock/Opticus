@@ -1,8 +1,8 @@
 #ifndef __MEMORY_HOLDER_VISION_H__
 #define __MEMORY_HOLDER_VISION_H__
 
-#include "../../../Common/Cooldown.hpp"
-#include "../../../Common/TimeHandler.hpp"
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include <SFML/Graphics.hpp>
 #include <vector>
 #include <World/LevelTypeDefinitions.hpp>

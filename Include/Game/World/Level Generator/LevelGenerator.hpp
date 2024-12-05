@@ -1,8 +1,8 @@
 #ifndef __LEVEL_GENERATOR_H__
 #define __LEVEL_GENERATOR_H__
 
-#include "../../../Common/VectorMath.hpp"
-#include "../../../Common/Math.hpp"
+#include <Auxiliary/VectorMath.hpp>
+#include <Auxiliary/Math.hpp>
 #include "../Distortions/WorldDistortion.hpp"
 #include "../Distortions/WorldDistortionGrid.hpp"
 #include "../Room Grid/RoomGrid.hpp"

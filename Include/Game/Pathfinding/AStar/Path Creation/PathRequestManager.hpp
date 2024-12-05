@@ -1,7 +1,7 @@
 #ifndef __PATH_REQUEST_MANAGER_H__
 #define __PATH_REQUEST_MANAGER_H__
 
-#include "../../../../Common/TimeHandler.hpp"
+#include <Auxiliary/TimeHandler.hpp>
 #include <SFML/System/Vector2.hpp>
 #include "AStarPathfinder.hpp"
 #include <ECS/TypeDefinitions.hpp>

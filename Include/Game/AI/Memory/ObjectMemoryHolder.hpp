@@ -1,8 +1,8 @@
 #ifndef __OBJECT_MEMORY_HOLDER_H__
 #define __OBJECT_MEMORY_HOLDER_H__
 
-#include "../../../Common/Cooldown.hpp"
-#include "../../../Common/TimeHandler.hpp"
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include "../../World/Objects/ObjectTypes.hpp"
 #include "../../World/Objects/ObjectRegistry.hpp"
 #include <ECS/TypeDefinitions.hpp>

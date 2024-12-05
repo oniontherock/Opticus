@@ -1,11 +1,12 @@
 #ifndef __OBJECT_CELL_H__
 #define __OBJECT_CELL_H__
 
+#include <Auxiliary/TimeHandler.hpp>
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include <ECS/TypeDefinitions.hpp>
-#include <vector>
 #include <set>
-#include "../../../../Common/Cooldown.hpp"
-#include "../../../../Common/TimeHandler.hpp"
+#include <vector>
 
 // an object that contains a list of EntityIds.
 // for moving objects, they must remove their previous position from the object grid,

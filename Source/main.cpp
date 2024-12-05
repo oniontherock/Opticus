@@ -1,11 +1,11 @@
 ﻿#include "../ACECS/ACECS.hpp"
-#include "../Include/Common/TimeHandler.hpp"
+#include <Auxiliary/TimeHandler.hpp>
 #include "Auxiliary/ConsoleHandler.hpp"
 #include "Graphics/WindowHolder.hpp"
 #include "Input/Input Events/InputManager.hpp"
 #include <iostream>
 #include <iostream>
-#include "../Include/Common/Math.hpp"
+#include <Auxiliary/Math.hpp>
 #include <SFML/Window.hpp>
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "Json.hpp"

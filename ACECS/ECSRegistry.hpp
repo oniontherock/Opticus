@@ -3,7 +3,7 @@
 
 #include "../ACECS/Panels.hpp"
 #include "../Include/Common/DataCache.hpp"
-#include "../Include/Common/Math.hpp"
+#include <Auxiliary/Math.hpp>
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementTypes.hpp"

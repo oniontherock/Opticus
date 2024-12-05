@@ -1,6 +1,6 @@
 #include "ACECS.hpp"
 
-#include "../Include/Common/NumberGenerator.hpp"
+#include <Auxiliary/NumberGenerator.hpp>
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"

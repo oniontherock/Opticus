@@ -1,7 +1,7 @@
 #include "Panels.hpp"
 
-#include "../Include/Common/Math.hpp"
-#include "../Include/Common/VectorMath.hpp"
+#include <Auxiliary/Math.hpp>
+#include <Auxiliary/VectorMath.hpp>
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
 #include "../Include/Debugging/AStarPathDrawer.hpp"

@@ -1,9 +1,9 @@
 #ifndef __WORLD_DISTORTION_H__
 #define __WORLD_DISTORTION_H__
 
-#include "../../../Common/VectorMath.hpp"
-#include "../../../Common/Cooldown.hpp"
-#include "../../../Common/TimeHandler.hpp"
+#include <Auxiliary/VectorMath.hpp>
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include <functional>
 
 // distorts a heading and a position, can have a capture list for special behaviors

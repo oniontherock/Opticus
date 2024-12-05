@@ -1,6 +1,6 @@
 #include "MemoryHolderVision.hpp"
-#include "../../../Common/VectorMath.hpp"
-#include "../../../Common/Math.hpp"
+#include <Auxiliary/VectorMath.hpp>
+#include <Auxiliary/Math.hpp>
 
 MemoryHolderVision::MemoryHolderVision() {
 	memorySize = sf::Vector2f(1, 1);

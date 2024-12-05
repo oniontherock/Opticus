@@ -1,9 +1,9 @@
 #ifndef __VISION_CASTER_H__
 #define __VISION_CASTER_H__
 
-#include "../../../Common/Cooldown.hpp"
-#include "../../../Common/Math.hpp"
-#include "../../../Common/TimeHandler.hpp"
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/Math.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include "../ACECS/GameLevel.hpp"
 #include "../ACECS/Panels.hpp"
 #include "../RayCaster.hpp"

@@ -145,8 +145,6 @@
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
     <ClCompile Include="Include\Common\DataCache.cpp" />
-    <ClCompile Include="Include\Common\Cooldown.cpp" />
-    <ClCompile Include="Include\Common\TimeHandler.cpp" />
     <ClCompile Include="Include\Debugging\AStarPathDrawer.cpp" />
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Data\ActorDataHolder.cpp" />
@@ -201,13 +199,8 @@
     <ClInclude Include="ACECS\GameLevel.hpp" />
     <ClInclude Include="ACECS\GameStates.hpp" />
     <ClInclude Include="ACECS\Panels.hpp" />
-    <ClInclude Include="Include\Common\Cooldown.hpp" />
     <ClInclude Include="Include\Common\DataCache.hpp" />
     <ClInclude Include="Include\Common\Grid.hpp" />
-    <ClInclude Include="Include\Common\Math.hpp" />
-    <ClInclude Include="Include\Common\NumberGenerator.hpp" />
-    <ClInclude Include="Include\Common\TimeHandler.hpp" />
-    <ClInclude Include="Include\Common\VectorMath.hpp" />
     <ClInclude Include="Include\Debugging\AStarPathDrawer.hpp" />
     <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.hpp" />

@@ -1,7 +1,7 @@
 #ifndef __AI_STATES_H__
 #define __AI_STATES_H__
 
-#include "../../../../Common/Cooldown.hpp"
+#include <Auxiliary/Cooldown.hpp>
 #include "../UtilityState.hpp"
 #include <ECS/Entities/Entity.hpp>
 

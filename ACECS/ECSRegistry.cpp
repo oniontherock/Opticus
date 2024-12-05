@@ -321,10 +321,11 @@ using namespace EntityComponents;
 using namespace EntityEvents;
 
 // if you need to include a certain file for a system, include it here.
-#include "../Include/Common/VectorMath.hpp"
-#include "../Include/Common/TimeHandler.hpp"
+#include <Auxiliary/VectorMath.hpp>
+#include <Audio/SoundHandler.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include "../Include/Game/World/Objects/ObjectRegistry.hpp"
-#include "../Include/Common/NumberGenerator.hpp"
+#include <Auxiliary/NumberGenerator.hpp>
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
 #include "../Include/Debugging/AStarPathDrawer.hpp"
@@ -1424,11 +1425,23 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 	AStarPathDrawer::pathDraw(path);
 }
 void ComponentAudioPlayer::system(Entity& entity) {
-
-	sf::SoundBuffer& soundBuffer = AudioStore::soundBufferStore.fileGetOrLoadFromName("SFX/Footstep1");
-
-	static sf::Sound sound(soundBuffer);
 	
+	static bool asdf = false;
+	if (!asdf) {
+		asdf = true;
+
+		for (uint16_t i = 1; i <= 4; i++) {
+			sf::SoundBuffer& soundBuffer = AudioStore::soundBufferStore.fileGetOrLoadFromName("SFX/Footstep" + std::to_string(i));
+
+			sf::Sound sound(soundBuffer);
+			sound.setVolume(2);
+
+			SoundHandler::soundAdd("HumanFootstep", sound);
+		}
+	}
+
+	sf::Sound sound = SoundHandler::soundGetOfType("HumanFootstep");
+
 	// if has position, place sound at position, else mark as relative to listener
 	if (entity.entityComponentHas<ComponentPosition>()) {
 		auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
@@ -1440,7 +1453,10 @@ void ComponentAudioPlayer::system(Entity& entity) {
 		sound.setRelativeToListener(true);
 	}
 
-	if (sound.getStatus() != sf::Sound::Playing) sound.play();
+	if (sound.getStatus() != sf::Sound::Playing) {
+		sound.play();
+		std::cout << "burger" << std::endl;
+	}
 
 }
 void ComponentAudioListener::system(Entity& entity) {
@@ -1450,4 +1466,5 @@ void ComponentAudioListener::system(Entity& entity) {
 
 	sf::Listener::setPosition(componentPosition->position.x, componentPosition->position.y, 0);
 }
+
 #pragma endregion Systems

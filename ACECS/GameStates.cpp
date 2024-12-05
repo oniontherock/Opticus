@@ -1,6 +1,6 @@
 #include "GameStates.hpp"
 
-#include "../Include/Common/Math.hpp"
+#include <Auxiliary/Math.hpp>
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
@@ -8,7 +8,7 @@
 #include "Graphics.hpp"
 #include "Panels.hpp"
 #include "World/LevelUpdater.hpp"
-#include "../Include/Common/NumberGenerator.hpp"
+#include <Auxiliary/NumberGenerator.hpp>
 
 void GameStatePlay::gameStateUpdate() {
 

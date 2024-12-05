@@ -1,5 +1,5 @@
 #include "AIStates.hpp"
-#include "../../../../Common/NumberGenerator.hpp"
+#include <Auxiliary/NumberGenerator.hpp>
 #include "../../Actors/Orders/OrderHandler.hpp"
 #include "../../../ACECS/ECSRegistry.hpp"
 

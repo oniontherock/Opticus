@@ -293,24 +293,37 @@ namespace EntityComponents {
 		ComponentSprite() {
 			hasSystem = true;
 		};
-		ComponentSprite(std::string filepath) :
+		// constructor that takes file name and extension, then loads/gets an image from the imageStore, and loads the texture with that image
+		ComponentSprite(std::string _fileName, std::string _fileExtension) :
 			ComponentSprite()
 		{
-			if (!texture.loadFromFile(filepath)) {
-				ConsoleHandler::consolePrintErr("Texture loading failed! Invalid file path: \"" + filepath + "\"");
+			fileName = _fileName;
+			fileExtension = _fileExtension;
+			
+			// if texture does exist, get/load image from the file name and extension, then create texture with that image
+			if (!GraphicsStore::textureStore.objectExists(fileName)) {
+
+				sf::Image& image = GraphicsStore::imageStore.fileGetOrLoadFromName(fileName, fileExtension);
+
+				sf::Texture texture;
+				texture.loadFromImage(image);
+
+				GraphicsStore::textureStore.objectAddFromInstance(fileName, texture);
 			}
 		};
-		ComponentSprite(sf::Texture _texture) :
-			ComponentSprite()
-		{
-			texture = _texture;
-		};
+		ComponentSprite(std::string _fileName) :
+			ComponentSprite(_fileName, GraphicsStore::imageStore.extensionDefaultGet())
+		{};
 
-		sf::Texture texture;
+		// the name of the file for the texture
+		std::string fileName;
+		// the name of the extension for the texture
+		std::string fileExtension;
+
 		sf::Sprite sprite;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentSprite(texture));
+			return std::unique_ptr<Duplicatable>(new ComponentSprite(fileName, fileExtension));
 		};
 	};
 	// creates an EventRotate every frame that linearly interpolates towards the mouse

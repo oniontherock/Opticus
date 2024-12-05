@@ -133,7 +133,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSpriteDynamicRegister>(),
-			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture"),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -146,7 +146,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSpriteStaticRegister>(),
-			createComponentPairFromType<ComponentSprite>("Art/Error texture.png"),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture"),
 		}
 		);
 
@@ -208,7 +208,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
-			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member"),
 			createComponentPairFromType<ComponentOrderTransmitByInput>(),
 			createComponentPairFromType<ComponentOrderTargeter>(),
 			createComponentPairFromType<ComponentOrderTransmitter>(),
@@ -254,7 +254,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::SquadMember),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f + 64.f, 256.f)),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
-			createComponentPairFromType<ComponentSprite>("Art/Squad Member.png"),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member"),
 			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
 
 			auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");
@@ -427,6 +427,8 @@ void ComponentSprite::system(Entity& entity) {
 	if (!entity.entityComponentHas<ComponentPosition>()) return;
 
 	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
+
+	sf::Texture& texture = GraphicsStore::textureStore.objectGet(fileName);
 
 	sprite.setTexture(texture);
 	sprite.setOrigin(sf::Vector2f(texture.getSize()) / 2.f);

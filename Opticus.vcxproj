@@ -241,11 +241,14 @@
     <Image Include="Art\Test Image.png" />
   </ItemGroup>
   <ItemGroup>
-    <Media Include="SFX\Beep.wav" />
-    <Media Include="SFX\footstep1.wav" />
-    <Media Include="SFX\footstep2.wav" />
-    <Media Include="SFX\footstep3.wav" />
-    <Media Include="SFX\footstep4.wav" />
+    <Media Include="SFX\Footstep1.wav" />
+    <Media Include="SFX\Footstep2.wav" />
+    <Media Include="SFX\Footstep3.wav" />
+    <Media Include="SFX\Footstep4.wav" />
+    <Media Include="SFX\Footstep5.wav" />
+    <Media Include="SFX\Footstep6.wav" />
+    <Media Include="SFX\Footstep7.wav" />
+    <Media Include="SFX\Footstep8.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

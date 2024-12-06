@@ -79,8 +79,8 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentOrderTargetingDrawer>>();
 	// audio playing/listening
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentAudioPlayer>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentAudioListener>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentAudioPlayOnMove>>();
 	
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentViewFollow>>();
 	
@@ -212,6 +212,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
+			createComponentPairFromType<ComponentAudioPlayOnMove>("HumanFootstep", sf::Vector2f(-0.25f, +0.25f), sf::Vector2f(-2.5f, +2.5f)),
 			createComponentPairFromType<ComponentSprite>("Art/Squad Member"),
 			createComponentPairFromType<ComponentOrderTransmitByInput>(),
 			createComponentPairFromType<ComponentOrderTargeter>(),
@@ -255,6 +256,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			/// list of components in template
 		{
 			createComponentPairFromType<ComponentActorMovementHandler>(ActorMovement::MovementType::Humanoid),
+			createComponentPairFromType<ComponentAudioPlayOnMove>("HumanFootstep", sf::Vector2f(-0.25f, +0.25f), sf::Vector2f(-2.5f, +2.5f)),
 			createComponentPairFromType<ComponentActorOrderReceiver>(),
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::SquadMember),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f + 64.f, 256.f)),
@@ -310,7 +312,6 @@ void EntityComponents::componentTemplatesInitialize() {
 		})),
 		createComponentPairFromType<ComponentActorWanderSelector>(),
 		createComponentPairFromType<ComponentFollowerTracker>(),
-		createComponentPairFromType<ComponentAudioPlayer>(),
 		});
 }
 
@@ -335,6 +336,8 @@ using namespace EntityEvents;
 #include <Graphics/WindowHolder.hpp>
 #include <Auxiliary/ConsoleHandler.hpp>
 #include <numeric>
+#include <Audio/SoundHandler.hpp>
+#include <Audio/SoundPlayer.hpp>
 
 
 // if the system is not using the entity parameter, remove it's name to avoid a C4100 error
@@ -539,8 +542,6 @@ void ComponentVisionCasterStatic::system(Entity& entity) {
 		return;
 	}
 
-	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
 	auto* componentVisionCasterHolder = entity.entityComponentGet<ComponentVisionCasterHolder>();
 	VisionCaster& visionCaster = componentVisionCasterHolder->visionCaster;
 
@@ -569,8 +570,6 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 
 	auto* componentVisionCasterHolder = entity.entityComponentGet<ComponentVisionCasterHolder>();
 	VisionCaster& visionCaster = componentVisionCasterHolder->visionCaster;
-
-	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
 
 	if (componentVisionCasterHolder->doUpdate) {
 		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(entity.levelId)->worldTextureDynamic);
@@ -732,7 +731,7 @@ void ComponentSpriteDynamicRegister::system(Entity& entity) {
 	GameLevelGrid::levelGet(entity.levelId)->dynamicSpriteEntityIds.push_back(entity.Id);
 
 	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
-}
+}      
 void ComponentSpriteStaticRegister::system(Entity& entity) {
 	try {
 		if (!entity.entityComponentHas<ComponentSprite>()) {
@@ -1424,41 +1423,6 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 
 	AStarPathDrawer::pathDraw(path);
 }
-void ComponentAudioPlayer::system(Entity& entity) {
-	
-	static bool asdf = false;
-	if (!asdf) {
-		asdf = true;
-
-		for (uint16_t i = 1; i <= 4; i++) {
-			sf::SoundBuffer& soundBuffer = AudioStore::soundBufferStore.fileGetOrLoadFromName("SFX/Footstep" + std::to_string(i));
-
-			sf::Sound sound(soundBuffer);
-			sound.setVolume(2);
-
-			SoundHandler::soundAdd("HumanFootstep", sound);
-		}
-	}
-
-	sf::Sound sound = SoundHandler::soundGetOfType("HumanFootstep");
-
-	// if has position, place sound at position, else mark as relative to listener
-	if (entity.entityComponentHas<ComponentPosition>()) {
-		auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
-		sound.setPosition(componentPosition->x, componentPosition->y, 0);
-		sound.setMinDistance(128);
-		sound.setAttenuation(8);
-	}
-	else {
-		sound.setRelativeToListener(true);
-	}
-
-	if (sound.getStatus() != sf::Sound::Playing) {
-		sound.play();
-		std::cout << "burger" << std::endl;
-	}
-
-}
 void ComponentAudioListener::system(Entity& entity) {
 
 	if (!entity.entityComponentHas<ComponentPosition>()) return;
@@ -1466,5 +1430,20 @@ void ComponentAudioListener::system(Entity& entity) {
 
 	sf::Listener::setPosition(componentPosition->position.x, componentPosition->position.y, 0);
 }
+void ComponentAudioPlayOnMove::system(Entity& entity) {
+	
+	if (!entity.entityComponentHas<ComponentPosition>()) return;
 
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+	constexpr float distToPlay = 48.f;
+
+	if (Vector2fMath::distSqrd(posLast, componentPosition->position) > distToPlay * distToPlay) {
+		sf::Sound sound = SoundHandler::soundGetOfTypeOffsetPitchAndVolume("HumanFootstep", -0.25f, 0.25f, -2.5f, 2.5f);
+		sound.setPosition(componentPosition->x, componentPosition->y, 0);
+		SoundPlayer::soundPlay(sound);
+
+		posLast = componentPosition->position;
+	}
+}
 #pragma endregion Systems

@@ -46,7 +46,7 @@ protected:
 
 	// cooldown between blurs
 	Cooldown blurCooldown = Cooldown(0.1f);
-	uint32_t timeOfLastBlur;
+	uint32_t timeOfLastBlur = 0;
 
 	// blurs the memory
 	void memoryBlur();

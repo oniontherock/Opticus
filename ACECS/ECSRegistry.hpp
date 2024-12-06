@@ -877,18 +877,6 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentAStarPathHolder());
 		};
 	};
-	struct ComponentAudioPlayer final : public Component {
-
-		void system(Entity& entity) final;
-
-		ComponentAudioPlayer() {
-			hasSystem = true;
-		};
-
-		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentAudioPlayer());
-		};
-	};
 	struct ComponentAudioListener final : public Component {
 
 		void system(Entity& entity) final;
@@ -900,6 +888,31 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentAudioListener());
 		};
+	};
+	struct ComponentAudioPlayOnMove final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentAudioPlayOnMove() {
+			hasSystem = true;
+		};
+		ComponentAudioPlayOnMove(std::string _soundName, sf::Vector2f _pitchOffset, sf::Vector2f _volumeOffset) :
+			ComponentAudioPlayOnMove()
+		{
+			soundName = _soundName;
+			pitchOffset = _pitchOffset;
+			volumeOffset = _volumeOffset;
+		};
+
+		std::string soundName;
+		sf::Vector2f pitchOffset;
+		sf::Vector2f volumeOffset;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentAudioPlayOnMove(soundName, pitchOffset, volumeOffset));
+		};
+	private:
+		sf::Vector2f posLast;
 	};
 }
 

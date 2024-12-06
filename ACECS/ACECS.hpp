@@ -14,7 +14,9 @@ private:
 	// game states are registered here
 	static void panelsRegister();
 	// game states are registered here
-	static void gameStateRegister();
+	static void gameStatesRegister();
+	// audio is registered here
+	static void audioRegister();
 public:
 	// initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 	// of course, certain modules do not have to be initialized if the user does not want them to be

@@ -1,6 +1,7 @@
 #include "ActorMovementFunctions.hpp"
 #include "../../../ACECS/ECSRegistry.hpp"
 #include "../../../Pathfinding/AStar/Grid/AStarGrid.hpp"
+#include <Auxiliary/NumberGenerator.hpp>
 #include "../../../ACECS/GameLevel.hpp"
 #include "../../../../Debugging/AStarPathDrawer.hpp"
 
@@ -31,12 +32,14 @@ void ActorMovement::turnTo(MovementType type, Entity& actor, sf::Vector2f positi
 void ActorMovement::goToHumanoid(Entity& actor, sf::Vector2f positionTo, float desiredDist) {
 	auto* componentPosition = actor.entityComponentGet<ComponentPosition>();
 
-	// return if we are already close enough to target
-	if (Vector2fMath::distSqrd(componentPosition->position, positionTo) < desiredDist * desiredDist) return;
-
-	float delta = float(TimeHandler::deltaSimulatedGet());
+	float distSqrd = Vector2fMath::distSqrd(componentPosition->position, positionTo);
 
 	constexpr float moveSpeed = 120.f;
+
+	// return if we are already close enough to target
+	if (distSqrd < desiredDist * desiredDist) return;
+
+	float delta = float(TimeHandler::deltaSimulatedGet());
 
 	auto* eventMove = actor.entityEventAddAndGet<EntityEvents::EventMove>();
 

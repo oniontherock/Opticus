@@ -1,6 +1,5 @@
 #include "ACECS.hpp"
 
-#include <Auxiliary/NumberGenerator.hpp>
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -9,6 +8,8 @@
 #include "Input.hpp"
 #include "Panels.hpp"
 #include "World.hpp"
+#include <Audio/SoundHandler.hpp>
+#include <Auxiliary/NumberGenerator.hpp>
 #include <cmath>
 
 void Engine::inputsRegister() {
@@ -46,7 +47,7 @@ void Engine::panelsRegister() {
 }
 
 // game states are registered here
-void Engine::gameStateRegister() {
+void Engine::gameStatesRegister() {
 
 	GameStateHandler::gameStateAdd(GameStateUniquePtr(new GameStatePlay(
 		/// transitions
@@ -93,7 +94,19 @@ void Engine::gameStateRegister() {
 	GameStateHandler::gameStatesAddedStatesFinalize();
 	GameStateHandler::gameStateForceSet(GameStateTypes::Play);
 }
+void Engine::audioRegister() {
+	// register human footsteps
+	for (uint16_t i = 1; i <= 8; i++) {
 
+		sf::Sound soundCur(AudioStore::soundBufferStore.fileGetOrLoadFromName("SFX/Footstep" + std::to_string(i)));
+
+		soundCur.setMinDistance(256);
+		soundCur.setAttenuation(12);
+		soundCur.setVolume(25);
+
+		SoundHandler::soundAdd("HumanFootstep", soundCur);
+	}
+}
 // initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 // of course, certain modules do not have to be initialized if the user does not want them to be
 void Engine::engineInitialize() {
@@ -106,7 +119,8 @@ void Engine::engineInitialize() {
 	inputsRegister();
 	panelsRegister();
 	ECSRegistry::ECSInitialize();
-	gameStateRegister();
+	audioRegister();
+	gameStatesRegister();
 }
 // updates the engines input
 void Engine::engineInputUpdate(sf::RenderWindow& window) {

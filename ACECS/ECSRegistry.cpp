@@ -726,8 +726,6 @@ void ComponentSpriteDynamicRegister::system(Entity& entity) {
 		return;
 	}
 
-	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
-
 	GameLevelGrid::levelGet(entity.levelId)->dynamicSpriteEntityIds.push_back(entity.Id);
 
 	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
@@ -745,8 +743,6 @@ void ComponentSpriteStaticRegister::system(Entity& entity) {
 		ConsoleHandler::consolePrintErr("ComponentSpriteStaticRegister system failed: Exception: " + std::string(e));
 		return;
 	}
-
-	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
 
 	GameLevelGrid::levelGet(entity.levelId)->staticSpriteEntityIds.push_back(entity.Id);
 

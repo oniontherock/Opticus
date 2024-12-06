@@ -127,8 +127,8 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointStart, sf::Vector2f pointEn
 
 				if (x == 0 && y == 0) continue;
 
-				int16_t cellPosOffsetX = cellCurrent->cellPositionGrid.x + x;
-				int16_t cellPosOffsetY = cellCurrent->cellPositionGrid.y + y;
+				int16_t cellPosOffsetX = int16_t(cellCurrent->cellPositionGrid.x + x);
+				int16_t cellPosOffsetY = int16_t(cellCurrent->cellPositionGrid.y + y);
 
 				if (!aStarGrid.cellPosIsInGrid(cellPosOffsetX, cellPosOffsetY)) continue;
 

@@ -3,6 +3,7 @@
 
 #include "Graphics.hpp"
 #include "SFML/Graphics.hpp"
+#include "SaveOperations.hpp"
 
 #define GAME_STATE_FUNCTION []()
 #define PANEL_DRAW_FUNCTION [](Panel& panel)

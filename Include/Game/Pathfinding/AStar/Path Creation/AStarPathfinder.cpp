@@ -201,7 +201,7 @@ AStarPath AStarPathfinder::pathGet(sf::Vector2f pointEnd, Entity& entity) {
 	return pathGet(pointStart, pointEnd, aStarGrid);
 }
 AStarPath AStarPathfinder::pathGet(sf::Vector2f pointEnd, EntityId entityId) {
-	pathGet(pointEnd, EntityManager::entityGet(entityId));
+	return pathGet(pointEnd, EntityManager::entityGet(entityId));
 }
 
 

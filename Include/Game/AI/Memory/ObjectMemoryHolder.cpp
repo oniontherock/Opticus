@@ -93,7 +93,7 @@ bool ObjectMemoryHolder::memoryHas(EntityId entityId, ObjectType objectType) {
 	return memoryHas(entityId, static_cast<uint16_t>(objectType));
 }
 bool ObjectMemoryHolder::memoryHas(EntityId entityId) {
-	return memoryHas(static_cast<uint16_t>(ObjectRegistry::entityObjectTypeGet(entityId)));
+	return memoryHas(entityId, static_cast<uint16_t>(ObjectRegistry::entityObjectTypeGet(entityId)));
 }
 
 bool ObjectMemoryHolder::memoryHasType(uint16_t objectType) {

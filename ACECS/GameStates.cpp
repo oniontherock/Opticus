@@ -89,6 +89,7 @@ void GameStatePlay::levelGenerate() {
 	gameLevel->roomGridGenerate();
 }
 void GameStatePause::gameStateUpdate() {
+	WindowHolder::windowGet().close();
 }
 
 

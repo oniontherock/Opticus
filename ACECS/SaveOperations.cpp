@@ -77,7 +77,6 @@ std::ifstream& operator>> (std::ifstream& str, AStarGrid& item) {
 	str >> item.cellSize;
 	str >> item.gridSizeFull;
 
-	//item.cells.resize(item.gridSize.x);
 	for (uint32_t x = 0; x < item.gridSize.x; x++) {
 		for (uint32_t y = 0; y < item.gridSize.y; y++) {
 			str >> item.cells[x][y];
@@ -111,13 +110,11 @@ std::ofstream& operator<< (std::ofstream& str, ObjectGrid& item) {
 	return str;
 }
 std::ifstream& operator>> (std::ifstream& str, ObjectGrid& item) {
-	std::cout << "what" << std::endl;
 	str >> item.gridSize;
 	str >> item.cellCount;
 	str >> item.cellSize;
 	str >> item.gridSizeFull;
 
-	//item.cells.resize(item.gridSize.x);
 	for (uint32_t x = 0; x < item.gridSize.x; x++) {
 		for (uint32_t y = 0; y < item.gridSize.y; y++) {
 			str >> item.cells[x][y];
@@ -126,3 +123,17 @@ std::ifstream& operator>> (std::ifstream& str, ObjectGrid& item) {
 
 	return str;
 }
+
+std::ofstream& operator<< (std::ofstream& str, Entity& item) {
+	str << item.Id;
+	str << item.updateType;
+	str << item.levelId;
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, Entity& item) {
+	str >> item.Id;
+	str >> item.updateType;
+	str >> item.levelId;
+	return str;
+}
+

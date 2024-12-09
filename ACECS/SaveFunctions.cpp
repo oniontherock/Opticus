@@ -1,5 +1,6 @@
 #include "SaveOperations.hpp"
 #include <Saving/SaveDirector.hpp>
+#include <ECS/Entities/EntityManager.hpp>
 #include "GameLevel.hpp"
 
 // this file is for defining the SaveDirector's saving/loading functions for the game specific data.
@@ -15,6 +16,14 @@ void SaveDirector::gameDataSave() {
 			}
 		}
 	}
+	
+	//// save entity count
+	//size_t entitiesCount = EntityManager::entitiesVector.size();
+	//SaveHandler::objectSave(entitiesCount);
+	//// save entities
+	//for (uint32_t i = 0; i < EntityManager::entitiesVector.size(); i++) {
+	//	SaveHandler::objectSave<Entity&>(EntityManager::entitiesVector[i]);
+	//}
 }
 void SaveDirector::gameDataLoad() {
 	// load levels
@@ -27,4 +36,15 @@ void SaveDirector::gameDataLoad() {
 			}
 		}
 	}
+	//// load entity count
+	//size_t entitiesCount;
+	//SaveHandler::objectLoad(entitiesCount);
+	//// load entities
+	//for (uint32_t i = 0; i < entitiesCount; i++) {
+	//	Entity entityCur;
+	//	SaveHandler::objectLoad(entityCur);
+
+	//	EntityManager::entitiesVector[entityCur.Id] = entityCur;
+
+	//}
 }

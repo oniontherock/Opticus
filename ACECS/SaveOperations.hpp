@@ -2,9 +2,11 @@
 #define __SAVE_OPERATIONS_H__
 
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "SaveOperations.hpp"
 #include <array>
+#include <ECS/Entities/Entity.hpp>
 #include <fstream>
 #include <iostream>
 #include <Saving/SaveHandler.hpp>
@@ -119,5 +121,21 @@ std::ifstream& operator>> (std::ifstream& str, ObjectCell& item);
 std::ofstream& operator<< (std::ofstream& str, ObjectGrid& item);
 // ObjectGrid in
 std::ifstream& operator>> (std::ifstream& str, ObjectGrid& item);
+
+#pragma region ECS Saving
+
+// Entity out
+std::ofstream& operator<< (std::ofstream& str, Entity& item);
+// Entity in
+std::ifstream& operator>> (std::ifstream& str, Entity& item);
+
+#pragma region Component Saving
+//std::ofstream& operator<< (std::ofstream& str, ComponentPos& item);
+//// Entity in
+//std::ifstream& operator>> (std::ifstream& str, Entity& item);
+
+
+#pragma endregion
+#pragma endregion
 
 #endif

@@ -3,15 +3,15 @@
 
 
 void ObjectCell::idAdd(EntityId id) {
-	idsVector.insert(id);
+	idsSet.insert(id);
 }
 void ObjectCell::idRemove(EntityId id) {
-	idsVector.erase(id);
+	idsSet.erase(id);
 }
 bool ObjectCell::idHas(EntityId id) {
-	return idsVector.count(id);
+	return idsSet.count(id);
 }
 const std::set<EntityId>& ObjectCell::idsGet() {
-	return idsVector;
+	return idsSet;
 }
 

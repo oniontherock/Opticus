@@ -58,6 +58,24 @@ std::ifstream& operator>> (std::ifstream& str, std::vector<T>& item) {
 	return str;
 }
 
+
+// set<T> out
+template <typename T>
+std::ofstream& operator<< (std::ofstream& str, std::set<T>& item) {
+	std::vector<T> vector(item.begin(), item.end());
+	str << vector;
+	return str;
+}
+// set<T> in
+template <typename T>
+std::ifstream& operator>> (std::ifstream& str, std::set<T>& item) {
+	std::vector<T> vector;
+	str >> vector;
+	item = std::set<T>(vector.begin(), vector.end());
+	return str;
+}
+
+
 // sf::Vector<T> out
 template <typename T>
 std::ofstream& operator<< (std::ofstream& str, sf::Vector2<T>& item) {
@@ -92,16 +110,14 @@ std::ofstream& operator<< (std::ofstream& str, AStarGrid& item);
 // AStarGrid in
 std::ifstream& operator>> (std::ifstream& str, AStarGrid& item);
 
+// ObjectCell out
+std::ofstream& operator<< (std::ofstream& str, ObjectCell& item);
+// ObjectCell in
+std::ifstream& operator>> (std::ifstream& str, ObjectCell& item);
 
-//// DistortionGrid out
-//std::ofstream& operator<< (std::ofstream& str, WorldDistortion& item);
-//// DistortionGrid in
-//std::ifstream& operator>> (std::ifstream& str, WorldDistortion& item);
-//
-//// DistortionGrid out
-//std::ofstream& operator<< (std::ofstream& str, WorldDistortionGrid& item);
-//// DistortionGrid in
-//std::ifstream& operator>> (std::ifstream& str, WorldDistortionGrid& item);
-
+// ObjectGrid out
+std::ofstream& operator<< (std::ofstream& str, ObjectGrid& item);
+// ObjectGrid in
+std::ifstream& operator>> (std::ifstream& str, ObjectGrid& item);
 
 #endif

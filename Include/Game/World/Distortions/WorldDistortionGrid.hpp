@@ -16,6 +16,9 @@ typedef sf::Vector2u DistortionCellVector;
 
 struct WorldDistortionGrid : Grid<WorldDistortion> {
 
+	friend std::ofstream& operator<<(std::ofstream& str, WorldDistortionGrid& item);
+	friend std::ifstream& operator>>(std::ifstream& str, WorldDistortionGrid& item);
+
 	WorldDistortionGrid(uint32_t gridSizeX, uint32_t gridSizeY);
 
 	// the size of the distortion cells.

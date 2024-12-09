@@ -31,8 +31,6 @@ struct GameLevel : public BaseLevel {
 
 	bool firstRun = true;
 
-	int saveTest = 0;
-
 	WorldDistortionGrid distortionGrid;
 	ObjectGrid objectGrid;
 	RoomGrid roomGrid;

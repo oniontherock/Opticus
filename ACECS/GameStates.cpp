@@ -38,16 +38,18 @@ void GameStatePlay::gameStateUpdate() {
 	}
 
 	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+	sf::Vector2f mousePos = PanelManager::panelGet(PanelName::GameView).viewMousePositionGet();
+	
 	if (InputInterface::inputGetActive("Cell Invalidate")) {
-
-		sf::Vector2f mousePos = PanelManager::panelGet(PanelName::GameView).viewMousePositionGet();
-
 		levelActive->aStarGrid.cellGetFromWorld(mousePos).valid = false;
 	}
-
-	levelActive->saveTest += 1;
-
-	std::cout << levelActive->saveTest << std::endl;
+	if (InputInterface::inputGetActive("Cell Distort")) {
+		levelActive->distortionGrid.cellGetFromWorld(mousePos).distortionAdd(Distortion(
+			[](sf::Vector2f& heading, sf::Vector2f& position) {
+				heading *= 0.999f;
+			}, Cooldown(25.f)
+		));
+	}
 
 	LevelUpdater::levelsUpdate();
 }

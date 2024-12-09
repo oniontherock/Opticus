@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 #include <SFML/System/Vector2.hpp>
+#include <iostream>
 
 template <class C>
 class Grid {

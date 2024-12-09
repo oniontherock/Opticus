@@ -21,9 +21,13 @@ struct ObjectCell {
 	bool idHas(EntityId id);
 	// returns a const reference to the idsVector
 	const std::set<EntityId>& idsGet();
+
+	friend std::ofstream& operator<<(std::ofstream& str, ObjectCell& item);
+	friend std::ifstream& operator>>(std::ifstream& str, ObjectCell& item);
+
 private:
 	// vector of EntityIds,
-	std::set<EntityId> idsVector;
+	std::set<EntityId> idsSet;
 };
 
 #endif

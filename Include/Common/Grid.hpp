@@ -2,6 +2,7 @@
 #define __GRID_H__
 
 #include <vector>
+#include <fstream>
 #include <SFML/System/Vector2.hpp>
 
 template <class C>

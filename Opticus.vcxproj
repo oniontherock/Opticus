@@ -186,7 +186,6 @@
     <None Include="Include\Shaders\Raycasting\RayPositionsToWorldColors.glsl" />
     <None Include="packages.config" />
     <None Include="PropertySheet.props" />
-    <None Include="save.dat" />
     <Text Include="readme.txt">
       <DeploymentContent>false</DeploymentContent>
     </Text>

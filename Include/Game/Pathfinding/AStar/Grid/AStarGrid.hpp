@@ -9,8 +9,11 @@
 typedef std::vector<sf::Vector2f> AStarPath;
 
 class AStarGrid : public Grid<AStarCell> {
-
 public:
+
+	friend std::ofstream& operator<<(std::ofstream& str, AStarGrid& item);
+	friend std::ifstream& operator>>(std::ifstream& str, AStarGrid& item);
+
 	AStarGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
 
 	void cellUpdateNeighbors(CellCoordinate cellX, CellCoordinate cellY, WorldDistortionGrid& distortionGrid);

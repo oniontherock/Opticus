@@ -1,6 +1,5 @@
-#include "ACECS.hpp"
-
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "ACECS.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "GameState.hpp"
@@ -11,6 +10,7 @@
 #include <Audio/SoundHandler.hpp>
 #include <Auxiliary/NumberGenerator.hpp>
 #include <cmath>
+#include <Saving/SaveDirector.hpp>
 
 void Engine::inputsRegister() {
 	InputInterface::inputRegister("Pause", KeySet{ KeyEvent("Escape", Pressed) });
@@ -128,7 +128,7 @@ void Engine::engineInputUpdate(sf::RenderWindow& window) {
 
 	InputInterface::eventsProcess(window);
 }
-// update certain modules of the engine, like the input system, and the game state.
+// update certain modules of the engine, like the game state.
 // note that certain modules, like the ECS system, are updated inside the GameStateHandler,
 // because you don't want to update the ECS system if the GameState is currently paused, for example.
 void Engine::engineUpdate() {
@@ -149,4 +149,18 @@ void Engine::engineTerminate() {
 	ECSRegistry::ECSTerminate();
 	GameStateHandler::gameStatesAllTerminate();
 	PanelManager::panelManagerTerminate();
+}
+
+void Engine::engineSave() {
+	SaveDirector::saveBegin();
+	SaveDirector::gameDataSave();
+	SaveDirector::saveEnd();
+}
+void Engine::engineLoad() {
+	// only load if a save file exists
+	if (SaveHandler::saveFileExists()) {
+		SaveDirector::loadBegin();
+		SaveDirector::gameDataLoad();
+		SaveDirector::loadEnd();
+	}
 }

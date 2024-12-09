@@ -3,7 +3,6 @@
 
 #include "Graphics.hpp"
 #include "SFML/Graphics.hpp"
-#include "SaveOperations.hpp"
 
 #define GAME_STATE_FUNCTION []()
 #define PANEL_DRAW_FUNCTION [](Panel& panel)
@@ -19,6 +18,10 @@ private:
 	// audio is registered here
 	static void audioRegister();
 public:
+	// saves the engine
+	static void engineSave();
+	// loads the engine, doesn't load if save file doesn't exist
+	static void engineLoad();
 	// initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 	// of course, certain modules do not have to be initialized if the user does not want them to be
 	static void engineInitialize();

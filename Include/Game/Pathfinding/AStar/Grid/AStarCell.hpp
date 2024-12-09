@@ -48,8 +48,11 @@ struct AStarCell {
 
 	bool operator< (const AStarCell& other) const;
 	bool operator<= (const AStarCell& other) const;
+	bool operator> (const AStarCell& other) const;
+	bool operator>= (const AStarCell& other) const;
 	bool operator== (const AStarCell& other) const;
 	bool operator!= (const AStarCell& other) const;
+	void operator= (const AStarCell& other);
 
 	// whether this cell is valid for pathfinding, if not, the cell is treated like a wall
 	bool valid = true;

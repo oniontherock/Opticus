@@ -78,7 +78,7 @@ AStarCostValue AStarPathfinder::cellDistanceGet(AStarCellPosition cellPosFrom, A
 
 struct AStarCellComparator {
 	bool operator() (AStarCell* a, AStarCell* b) {
-		return *b <= *a;
+		return *a > *b;
 	}
 };
 struct CellHeap : std::priority_queue<AStarCell*, std::vector<AStarCell*>, AStarCellComparator> {
@@ -92,11 +92,6 @@ public:
 			first++;
 		}
 		return false;
-	}
-};
-struct SetComparator {
-	bool operator() (const AStarCellPosition& a, const AStarCellPosition& b) const {
-		return (a.x < b.x) && (a.y < b.y);
 	}
 };
 

@@ -1387,6 +1387,7 @@ void ComponentAStarPathHolder::system(Entity& entity) {
 				endTarget = events[i]->positionTo;
 
 				path = AStarPathfinder::pathGet(componentPosition->position, endTarget, aStarGrid);
+
 				if (path.size() > 0) {
 					pathTarget = path.back();
 				}

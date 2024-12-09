@@ -144,6 +144,7 @@
     <ClCompile Include="ACECS\GameLevel.cpp" />
     <ClCompile Include="ACECS\GameStates.cpp" />
     <ClCompile Include="ACECS\Panels.cpp" />
+    <ClCompile Include="ACECS\SaveFunctions.cpp" />
     <ClCompile Include="ACECS\SaveOperations.cpp" />
     <ClCompile Include="Include\Common\DataCache.cpp" />
     <ClCompile Include="Include\Debugging\AStarPathDrawer.cpp" />

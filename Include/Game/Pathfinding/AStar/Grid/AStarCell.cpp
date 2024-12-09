@@ -25,12 +25,30 @@ bool AStarCell::operator< (const AStarCell& other) const {
 bool AStarCell::operator<= (const AStarCell& other) const {
 	return (costF <= other.costF);
 }
-
+bool AStarCell::operator> (const AStarCell& other) const {
+	return (costF > other.costF);
+}
+bool AStarCell::operator>= (const AStarCell& other) const {
+	return (costF >= other.costF);
+}
 bool AStarCell::operator== (const AStarCell& other) const {
 	return cellPositionGrid == other.cellPositionGrid;
 }
 bool AStarCell::operator!= (const AStarCell& other) const {
 	return cellPositionGrid != other.cellPositionGrid;
+}
+void AStarCell::operator= (const AStarCell& other) {
+	costG = other.costG;
+	costH = other.costH;
+	costF = other.costF;
+
+	valid = other.valid;
+	cellParent = other.cellParent;
+
+	cellPositionGrid.x = other.cellPositionGrid.x;
+	cellPositionGrid.y = other.cellPositionGrid.y;
+	cellPositionWorld.x = other.cellPositionWorld.x;
+	cellPositionWorld.y = other.cellPositionWorld.y;
 }
 
 void AStarCell::resetCosts() {

@@ -37,13 +37,17 @@ void GameStatePlay::gameStateUpdate() {
 		firstUpdate = true;
 	}
 
+	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 	if (InputInterface::inputGetActive("Cell Invalidate")) {
-		GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
 		sf::Vector2f mousePos = PanelManager::panelGet(PanelName::GameView).viewMousePositionGet();
 
 		levelActive->aStarGrid.cellGetFromWorld(mousePos).valid = false;
 	}
+
+	levelActive->saveTest += 1;
+
+	std::cout << levelActive->saveTest << std::endl;
 
 	LevelUpdater::levelsUpdate();
 }

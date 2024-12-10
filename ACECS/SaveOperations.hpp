@@ -1,16 +1,17 @@
 #ifndef __SAVE_OPERATIONS_H__
 #define __SAVE_OPERATIONS_H__
 
+#include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "SaveOperations.hpp"
-#include <array>
 #include <ECS.hpp>
 #include <ECS/Entities/Entity.hpp>
 #include <fstream>
 #include <iostream>
 #include <Saving/SaveHandler.hpp>
+#include <unordered_map>
 #include <vector>
 
 // reinterpret_casts T& into a char*. just used to write quicker, so we don't have to manually type reinterpret_cast every time.
@@ -114,6 +115,7 @@ std::ifstream& operator>> (std::ifstream& str, sf::Vector3<T>& item) {
 	return str;
 }
 
+
 // string out
 std::ofstream& operator<< (std::ofstream& str, std::string& item);
 // string in
@@ -160,13 +162,31 @@ std::ofstream& operator<< (std::ofstream& str, Cooldown& item);
 // Cooldown in
 std::ifstream& operator>> (std::ifstream& str, Cooldown& item);
 
-#pragma region ECS Saving
+// ObjectVision out
+std::ofstream& operator<< (std::ofstream& str, ObjectVision& item);
+// ObjectVision in
+std::ifstream& operator>> (std::ifstream& str, ObjectVision& item);
 
+// ObjectMemoryHolder out
+std::ofstream& operator<< (std::ofstream& str, ObjectMemoryHolder& item);
+// ObjectMemoryHolder in
+std::ifstream& operator>> (std::ifstream& str, ObjectMemoryHolder& item);
+
+// ActorDataHolder out
+std::ofstream& operator<< (std::ofstream& str, ActorDataHolder& item);
+// ActorDataHolder in
+std::ifstream& operator>> (std::ifstream& str, ActorDataHolder& item);
+
+// UtilityStateManager out
+std::ofstream& operator<< (std::ofstream& str, UtilityStateManager& item);
+// UtilityStateManager in
+std::ifstream& operator>> (std::ifstream& str, UtilityStateManager& item);
+
+#pragma region ECS Saving
 // Entity out
 std::ofstream& operator<< (std::ofstream& str, Entity& item);
 // Entity in
 std::ifstream& operator>> (std::ifstream& str, Entity& item);
-
 #pragma endregion
 
 #endif

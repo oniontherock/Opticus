@@ -55,6 +55,9 @@ struct ObjectMemoryHolder {
 	// error if the memory does not exist.
 	ObjectMemory& memoryGetFromId(EntityId entityId);
 
+	friend std::ofstream& operator<<(std::ofstream& str, ObjectMemoryHolder& item);
+	friend std::ifstream& operator>>(std::ifstream& str, ObjectMemoryHolder& item);
+
 private:
 	void objectMemoriesCreate();
 	void objectMemoriesClear();

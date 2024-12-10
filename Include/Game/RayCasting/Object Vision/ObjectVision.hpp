@@ -24,6 +24,9 @@ struct ObjectVision : public RayCaster {
 
 	ObjectIdVector& objectsSeenGet();
 
+	friend std::ofstream& operator<<(std::ofstream& str, ObjectVision& item);
+	friend std::ifstream& operator>>(std::ifstream& str, ObjectVision& item);
+
 protected:
 
 	// set of EntityIdObjectTypePairs

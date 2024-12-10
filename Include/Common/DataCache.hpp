@@ -29,6 +29,9 @@ struct DataCache {
 	bool dataHas(DataKey dataKey) const;
 	// clears all data from the dataUMap
 	void dataClear();
+
+	friend std::ofstream& operator<<(std::ofstream& str, DataCache& item);
+	friend std::ifstream& operator>>(std::ifstream& str, DataCache& item);
 private:
 
 	// map of all data contained in the cache

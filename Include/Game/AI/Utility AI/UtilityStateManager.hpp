@@ -33,6 +33,9 @@ class UtilityStateManager {
 
 public:
 
+	friend std::ofstream& operator<<(std::ofstream& str, UtilityStateManager& item);
+	friend std::ifstream& operator>>(std::ifstream& str, UtilityStateManager& item);
+
 	UtilityStateManager();
 	UtilityStateManager(std::vector<UtilityStates::StateBase*> _statesVector);
 	UtilityStateManager(UtilityStateManager& other);

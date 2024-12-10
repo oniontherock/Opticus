@@ -82,6 +82,9 @@ struct ActorDataHolder : DataCache {
 	// update the emotions based off the contents of the blackboard using the emotionUpdateFunction
 	void emotionsUpdate(const ActorBlackboard& actorBlackboard);
 
+	friend std::ofstream& operator<<(std::ofstream& str, ActorDataHolder& item);
+	friend std::ifstream& operator>>(std::ifstream& str, ActorDataHolder& item);
+
 private:
 
 	// vector of traits, trait values range from 0-100

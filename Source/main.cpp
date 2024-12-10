@@ -43,7 +43,6 @@ int main() {
 	////	cout << e << endl;
 	////}
 
-
 	TimeHandler::deltaCompute();
 
 	srand(TimeHandler::timeRealGet());

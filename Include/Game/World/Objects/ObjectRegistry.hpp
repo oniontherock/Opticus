@@ -5,7 +5,7 @@
 #include <ECS/TypeDefinitions.hpp>
 #include <vector>
 
-class SaveDirector;
+struct SaveDirector;
 
 // holds a vector of every entity's ObjectType,
 // if an entity doesn't have a type, it is marked as ObjectTypes::Null.
@@ -17,7 +17,7 @@ struct ObjectRegistry {
 	// assigns an ObjectType to an EntityId
 	static const ObjectType entityObjectTypeGet(EntityId id);
 
-	friend class SaveDirector;
+	friend struct SaveDirector;
 
 private:
 	// list of ObjectTypes accessed by EntityIds.

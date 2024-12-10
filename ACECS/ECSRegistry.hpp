@@ -404,6 +404,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentRotation(rotation));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	// holds an instance of the VisionCaster class for use by ComponentVisionCasterStatic and ComponentVisionCasterDynamic
 	struct ComponentVisionCasterHolder final : public Component {
@@ -525,6 +528,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentDistortionRadius(distortionRadius, distortion));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	// assigns the ObjectType in the ObjectRegistry for the entity to be the specified objectType, then deletes itself
 	struct ComponentObjectTypeAssigner final : public Component {
@@ -571,6 +577,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectGridInhabiterRadius(radius));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	// gets a list of seen objects using an ObjectVision and creates an EventObjectSeen with them.
 	struct ComponentObjectVision final : public Component {
@@ -596,10 +605,12 @@ namespace EntityComponents {
 		// cooldown for when the finish updates
 		Cooldown cooldownVisionUpdate;
 
-
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectVision(objectVision, cooldownVisionUpdate));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentObjectMemory final : public Component {
 
@@ -621,6 +632,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectMemory(objectMemoryHolder));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentObjectMemoryDebug final : public Component {
 
@@ -668,6 +682,10 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorData(actorDataHolder));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+
 	};
 	struct ComponentActorBlackboard final : public Component {
 
@@ -706,6 +724,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorBlackboard(actorBlackboard, updateFunc));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentActorStateManager final : public Component {
 
@@ -725,6 +746,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorStateManager(stateManager));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentActorWanderSelector final : public Component {
 
@@ -770,6 +794,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentActorMovementHandler(movementType));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentOrderTransmitByInput final : public Component {
 
@@ -806,8 +833,6 @@ namespace EntityComponents {
 		ComponentOrderFollowTargeter() {
 			hasSystem = true;
 		};
-
-		std::set<EntityId> actorsTargeted;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentOrderFollowTargeter());
@@ -902,6 +927,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentAStarPathHolder());
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentAudioListener final : public Component {
 
@@ -937,6 +965,10 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentAudioPlayOnMove(soundName, pitchOffset, volumeOffset));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+
 	private:
 		sf::Vector2f posLast;
 	};

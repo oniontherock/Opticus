@@ -391,7 +391,6 @@ void ComponentRotateToMouse::system(Entity& entity) {
 	}
 }
 void ComponentPosition::system(Entity& entity) {
-
 	if (entity.entityEventHas<EventMove>()) {
 		auto* movedEvent = entity.entityEventAddAndGet<EventMoved>();
 
@@ -1326,13 +1325,13 @@ void ComponentOrderFollowTargeter::system(Entity& entity) {
 		// get OrderType of current order
 		OrderType orderType = orderData.dataGet<OrderType>("OrderType");
 
-		// does the OrderType is equal to a follow type?
+		// is the OrderType equal to a follow type?
 		if (orderType == OrderType::ActorFollow || orderType == OrderType::ActorFollowTactical) {
 
 			// iterate over all objects at the mouse
 			for (std::set<EntityId>::iterator itr = eventObjectsAtMouse->atMouseObjects.begin(); itr != eventObjectsAtMouse->atMouseObjects.end(); itr++) {
 
-				// skip if the current object at the mouse is one of the objects that the current order for
+				// skip if the current object at the mouse is one of the objects that the current order is for
 				if (orderData.dataGet<OrderToSet>("OrderToIds").contains(*itr)) {
 					continue;
 				}		

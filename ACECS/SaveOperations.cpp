@@ -22,6 +22,7 @@ std::ifstream& operator>> (std::ifstream& str, std::string& item) {
 
 std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 
+	str << item.entities;
 	str << item.levelSize;
 	str << item.idPlayer;
 	str << item.dynamicSpriteEntityIds;
@@ -39,6 +40,7 @@ std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 }
 std::ifstream& operator>> (std::ifstream& str, GameLevel& item) {
 
+	str >> item.entities;
 	str >> item.levelSize;
 	str >> item.idPlayer;
 	str >> item.dynamicSpriteEntityIds;
@@ -229,6 +231,7 @@ void EntityComponents::ComponentVisionCasterHolder::load(std::ifstream& str) {
 	str >> updateCooldown;
 	str >> doUpdate;
 }
+
 void EntityComponents::ComponentMemoryVision::save(std::ofstream& str) {
 	str << cameraMovedAmountTotal;
 	str << memoryHolder;
@@ -238,8 +241,14 @@ void EntityComponents::ComponentMemoryVision::load(std::ifstream& str) {
 	str >> memoryHolder;
 }
 
-#pragma endregion
+void EntityComponents::ComponentViewFollow::save(std::ofstream& str) {
+	str << panelViewToFollow;
+}
+void EntityComponents::ComponentViewFollow::load(std::ifstream& str) {
+	str >> panelViewToFollow;
+}
 
+#pragma endregion
 
 std::ofstream& operator<< (std::ofstream& str, VisionCaster& item) {
 	str << item.castPosition;

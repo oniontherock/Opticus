@@ -501,6 +501,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentViewFollow(panelViewToFollow));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentDistortionRadius final : public Component {
 

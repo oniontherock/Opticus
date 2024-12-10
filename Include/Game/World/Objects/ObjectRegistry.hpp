@@ -5,6 +5,8 @@
 #include <ECS/TypeDefinitions.hpp>
 #include <vector>
 
+class SaveDirector;
+
 // holds a vector of every entity's ObjectType,
 // if an entity doesn't have a type, it is marked as ObjectTypes::Null.
 struct ObjectRegistry {
@@ -14,6 +16,9 @@ struct ObjectRegistry {
 	static void entityObjectTypeRemove(EntityId id);
 	// assigns an ObjectType to an EntityId
 	static const ObjectType entityObjectTypeGet(EntityId id);
+
+	friend class SaveDirector;
+
 private:
 	// list of ObjectTypes accessed by EntityIds.
 	// each entity can have only one ObjectType, not every entity must have an ObjectType.

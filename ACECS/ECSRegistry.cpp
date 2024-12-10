@@ -391,6 +391,7 @@ void ComponentRotateToMouse::system(Entity& entity) {
 	}
 }
 void ComponentPosition::system(Entity& entity) {
+
 	if (entity.entityEventHas<EventMove>()) {
 		auto* movedEvent = entity.entityEventAddAndGet<EventMoved>();
 

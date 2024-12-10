@@ -134,12 +134,6 @@ void Engine::engineInputUpdate(sf::RenderWindow& window) {
 // because you don't want to update the ECS system if the GameState is currently paused, for example.
 void Engine::engineUpdate() {
 	GameStateHandler::gameStateProcess();
-
-	static int a = 0;
-	if (a == 0) {
-		a++;
-		engineLoad();
-	}
 }
 void Engine::engineDraw(sf::RenderWindow& renderWindowMain) {
 

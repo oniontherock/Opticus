@@ -59,6 +59,5 @@ void SaveDirector::gameDataLoad() {
 		
 		// load entity's id
 		SaveHandler::objectLoadIgnoreErrors(entityIdCur);
-		std::cout << "entity id: " << entityIdCur << std::endl;
 	} while (entityIdCur < MAX_ENTITIES);
 }

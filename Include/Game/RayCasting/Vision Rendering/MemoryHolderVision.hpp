@@ -26,6 +26,9 @@ struct MemoryHolderVision {
 	// returns a reference to the textureMemory
 	sf::RenderTexture& memoryGet();
 
+	friend std::ofstream& operator<<(std::ofstream& str, MemoryHolderVision& item);
+	friend std::ifstream& operator>>(std::ifstream& str, MemoryHolderVision& item);
+
 protected:
 
 	// the texture used to record memories
@@ -35,7 +38,7 @@ protected:
 	sf::Vector2f memoryMovementTotal;
 	// the amount of memoryMovement needed to actually update the scroll,
 	// this has to be at least 1, because the memory cannot be scrolled by anything less than 1, since pixels can only be moved by integers.
-	const float memoryMovementStep = 1.f;
+	static constexpr float memoryMovementStep = 1.f;
 
 	//// noise texture used by spriteNoise
 	//sf::Texture textureNoise;
@@ -48,6 +51,7 @@ protected:
 	Cooldown blurCooldown = Cooldown(0.1f);
 	uint32_t timeOfLastBlur = 0;
 
+	void textureMemoryInitialize();
 	// blurs the memory
 	void memoryBlur();
 

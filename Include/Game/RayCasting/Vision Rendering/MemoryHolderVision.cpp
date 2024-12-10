@@ -4,28 +4,32 @@
 
 MemoryHolderVision::MemoryHolderVision() {
 	memorySize = sf::Vector2f(1, 1);
-	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
+	textureMemoryInitialize();
 
 	//initializeNoise();
 }
 MemoryHolderVision::MemoryHolderVision(sf::Vector2f _memorySize) {
 	memorySize = _memorySize;
-	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
+	textureMemoryInitialize();
 
 	//initializeNoise();
 }
 MemoryHolderVision::MemoryHolderVision(const MemoryHolderVision& other) {
 	memorySize = other.memorySize;
-	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
+	textureMemoryInitialize();
 
 	//initializeNoise();
 }
 void MemoryHolderVision::operator= (const MemoryHolderVision& other) {
 	memorySize = other.memorySize;
-	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
+	textureMemoryInitialize();
 
 	//initializeNoise();
 }
+void MemoryHolderVision::textureMemoryInitialize() {
+	textureMemory.create(uint32_t(memorySize.x), uint32_t(memorySize.y));
+}
+
 //
 //void MemoryHolderVision::initializeNoise() {
 //	textureNoise.loadFromFile("Art/Cobweb Noise.jpg");

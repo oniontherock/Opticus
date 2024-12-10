@@ -187,6 +187,7 @@ std::ifstream& operator>> (std::ifstream& str, Entity& item) {
 	return str;
 }
 
+#pragma region Components
 void EntityComponents::ComponentPosition::save(std::ofstream& str) {
 	str << position;
 }
@@ -202,4 +203,90 @@ void EntityComponents::ComponentSprite::load(std::ifstream& str) {
 	str >> fileName;
 	str >> fileExtension;
 	textureInitialize();
+}
+
+void EntityComponents::ComponentMoveByInput::save(std::ofstream& str) {
+	str << moveSpeed;
+}
+void EntityComponents::ComponentMoveByInput::load(std::ifstream& str) {
+	str >> moveSpeed;
+}
+
+void EntityComponents::ComponentRotateToMouse::save(std::ofstream& str) {
+	str << turnSpeed;
+}
+void EntityComponents::ComponentRotateToMouse::load(std::ifstream& str) {
+	str >> turnSpeed;
+}
+
+void EntityComponents::ComponentVisionCasterHolder::save(std::ofstream& str) {
+	str << visionCaster;
+	str << updateCooldown;
+	str << doUpdate;
+}
+void EntityComponents::ComponentVisionCasterHolder::load(std::ifstream& str) {
+	str >> visionCaster;
+	str >> updateCooldown;
+	str >> doUpdate;
+}
+void EntityComponents::ComponentMemoryVision::save(std::ofstream& str) {
+	str << cameraMovedAmountTotal;
+	str << memoryHolder;
+}
+void EntityComponents::ComponentMemoryVision::load(std::ifstream& str) {
+	str >> cameraMovedAmountTotal;
+	str >> memoryHolder;
+}
+
+#pragma endregion
+
+
+std::ofstream& operator<< (std::ofstream& str, VisionCaster& item) {
+	str << item.castPosition;
+	str << item.castAngle;
+	str << item.cameraCenterGlobal;
+	str << item.cameraCenterLocal;
+	str << item.visionImageCenter;
+
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, VisionCaster& item) {
+	str >> item.castPosition;
+	str >> item.castAngle;
+	str >> item.cameraCenterGlobal;
+	str >> item.cameraCenterLocal;
+	str >> item.visionImageCenter;
+
+	return str;
+}
+std::ofstream& operator<< (std::ofstream& str, MemoryHolderVision& item) {
+	str << item.blurCooldown;
+	str << item.memoryMovementTotal;
+	str << item.timeOfLastBlur;
+	str << item.memorySize;
+
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, MemoryHolderVision& item) {
+	str >> item.blurCooldown;
+	str >> item.memoryMovementTotal;
+	str >> item.timeOfLastBlur;
+	str >> item.memorySize;
+
+	item.textureMemoryInitialize();
+
+	return str;
+}
+
+std::ofstream& operator<< (std::ofstream& str, Cooldown& item) {
+	str << item.target;
+	str << item.value;
+
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, Cooldown& item) {
+	str >> item.target;
+	str >> item.value;
+
+	return str;
 }

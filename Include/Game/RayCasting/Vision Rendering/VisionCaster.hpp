@@ -29,6 +29,9 @@ struct VisionCaster : public RayCaster {
 
 	const sf::RenderTexture& visionTextureGet();
 
+	friend std::ofstream& operator<<(std::ofstream& str, VisionCaster& item);
+	friend std::ifstream& operator>>(std::ifstream& str, VisionCaster& item);
+
 protected:
 	
 	sf::RenderTexture visionTexture;

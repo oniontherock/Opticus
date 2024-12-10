@@ -260,6 +260,8 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentMoveByInput(moveSpeed));
 		};
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	// registers this entity as having a dynamic sprite in the GameLevel then terminates itself
 	struct ComponentSpriteDynamicRegister final : public Component {
@@ -355,6 +357,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentRotateToMouse(turnSpeed));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentPosition final : public Component {
 
@@ -424,6 +429,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentVisionCasterHolder(visionCaster));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentVisionCasterStatic final : public Component {
 
@@ -470,6 +478,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentMemoryVision(memoryHolder));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	struct ComponentViewFollow final : public Component {
 

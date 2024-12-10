@@ -145,6 +145,21 @@ std::ofstream& operator<< (std::ofstream& str, ObjectGrid& item);
 // ObjectGrid in
 std::ifstream& operator>> (std::ifstream& str, ObjectGrid& item);
 
+// VisionCaster out
+std::ofstream& operator<< (std::ofstream& str, VisionCaster& item);
+// VisionCaster in
+std::ifstream& operator>> (std::ifstream& str, VisionCaster& item);
+
+// MemoryHolderVision out
+std::ofstream& operator<< (std::ofstream& str, MemoryHolderVision& item);
+// MemoryHolderVision in
+std::ifstream& operator>> (std::ifstream& str, MemoryHolderVision& item);
+
+// Cooldown out
+std::ofstream& operator<< (std::ofstream& str, Cooldown& item);
+// Cooldown in
+std::ifstream& operator>> (std::ifstream& str, Cooldown& item);
+
 #pragma region ECS Saving
 
 // Entity out
@@ -152,13 +167,6 @@ std::ofstream& operator<< (std::ofstream& str, Entity& item);
 // Entity in
 std::ifstream& operator>> (std::ifstream& str, Entity& item);
 
-#pragma region Component Saving
-//std::ofstream& operator<< (std::ofstream& str, ComponentPos& item);
-//// Entity in
-//std::ifstream& operator>> (std::ifstream& str, Entity& item);
-
-
-#pragma endregion
 #pragma endregion
 
 #endif

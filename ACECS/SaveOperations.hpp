@@ -6,6 +6,7 @@
 #include "GameLevel.hpp"
 #include "SaveOperations.hpp"
 #include <array>
+#include <ECS.hpp>
 #include <ECS/Entities/Entity.hpp>
 #include <fstream>
 #include <iostream>
@@ -78,7 +79,7 @@ std::ifstream& operator>> (std::ifstream& str, std::set<T>& item) {
 }
 
 
-// sf::Vector<T> out
+// sf::Vector2<T> out
 template <typename T>
 std::ofstream& operator<< (std::ofstream& str, sf::Vector2<T>& item) {
 	str << item.x;
@@ -86,7 +87,7 @@ std::ofstream& operator<< (std::ofstream& str, sf::Vector2<T>& item) {
 
 	return str;
 }
-// sf::Vector<T> in
+// sf::Vector2<T> in
 template <typename T>
 std::ifstream& operator>> (std::ifstream& str, sf::Vector2<T>& item) {
 	str >> item.x;
@@ -94,7 +95,29 @@ std::ifstream& operator>> (std::ifstream& str, sf::Vector2<T>& item) {
 
 	return str;
 }
+// sf::Vector3<T> out
+template <typename T>
+std::ofstream& operator<< (std::ofstream& str, sf::Vector3<T>& item) {
+	str << item.x;
+	str << item.y;
+	str << item.z;
 
+	return str;
+}
+// sf::Vector3<T> in
+template <typename T>
+std::ifstream& operator>> (std::ifstream& str, sf::Vector3<T>& item) {
+	str >> item.x;
+	str >> item.y;
+	str >> item.z;
+
+	return str;
+}
+
+// string out
+std::ofstream& operator<< (std::ofstream& str, std::string& item);
+// string in
+std::ifstream& operator>> (std::ifstream& str, std::string& item);
 
 // BaseLevelPtr / GameLevel Out
 std::ofstream& operator<< (std::ofstream& str, GameLevel& item);

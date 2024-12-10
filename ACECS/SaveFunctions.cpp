@@ -17,13 +17,20 @@ void SaveDirector::gameDataSave() {
 		}
 	}
 	
-	//// save entity count
-	//size_t entitiesCount = EntityManager::entitiesVector.size();
-	//SaveHandler::objectSave(entitiesCount);
-	//// save entities
-	//for (uint32_t i = 0; i < EntityManager::entitiesVector.size(); i++) {
-	//	SaveHandler::objectSave<Entity&>(EntityManager::entitiesVector[i]);
-	//}
+
+	// save entities
+	for (uint32_t entityIdCur = 0; entityIdCur < EntityManager::entitiesVector.size(); entityIdCur++) {
+		if (EntityManager::entityIdsSet.contains(entityIdCur)) continue;
+
+		// save entity's id
+		SaveHandler::objectSaveIgnoreErrors(entityIdCur);
+		// save entity's data
+		SaveHandler::objectSaveIgnoreErrors<Entity&>(EntityManager::entitiesVector[entityIdCur]);
+	}
+	// used for breaking the loading loop, which checks when a value exceeds another value, so obviously this will exceed that value.
+	EntityId loopBreaker = MAX_ENTITIES;
+	SaveHandler::objectSaveIgnoreErrors(loopBreaker);
+
 }
 void SaveDirector::gameDataLoad() {
 	// load levels
@@ -36,15 +43,22 @@ void SaveDirector::gameDataLoad() {
 			}
 		}
 	}
-	//// load entity count
-	//size_t entitiesCount;
-	//SaveHandler::objectLoad(entitiesCount);
-	//// load entities
-	//for (uint32_t i = 0; i < entitiesCount; i++) {
-	//	Entity entityCur;
-	//	SaveHandler::objectLoad(entityCur);
+	// load entities
+	EntityId entityIdCur;
+	// initialize entityIdCur
+	SaveHandler::objectLoadIgnoreErrors(entityIdCur);
+	do {
 
-	//	EntityManager::entitiesVector[entityCur.Id] = entityCur;
-
-	//}
+		//std::cout << "entity id: " << entityIdCur << std::endl;
+		// initialize entity in EntityManager
+		EntityManager::entityCreateWithId(entityIdCur);
+		// get entity reference
+		Entity& entity = EntityManager::entityGet(entityIdCur);
+		//load entity's data
+		SaveHandler::objectLoadIgnoreErrors(entity);
+		
+		// load entity's id
+		SaveHandler::objectLoadIgnoreErrors(entityIdCur);
+		std::cout << "entity id: " << entityIdCur << std::endl;
+	} while (entityIdCur < MAX_ENTITIES);
 }

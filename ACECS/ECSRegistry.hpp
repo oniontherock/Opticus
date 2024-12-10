@@ -301,6 +301,28 @@ namespace EntityComponents {
 			fileName = _fileName;
 			fileExtension = _fileExtension;
 			
+			textureInitialize();
+		};
+		ComponentSprite(std::string _fileName) :
+			ComponentSprite(_fileName, GraphicsStore::imageStore.extensionDefaultGet())
+		{};
+
+		// the name of the file for the texture
+		std::string fileName = "Art/Error texture";
+		// the name of the extension for the texture
+		std::string fileExtension = "png";
+
+		sf::Sprite sprite;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentSprite(fileName, fileExtension));
+		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+
+	private:
+		void textureInitialize() {
 			// if texture does exist, get/load image from the file name and extension, then create texture with that image
 			if (!GraphicsStore::textureStore.objectExists(fileName)) {
 
@@ -311,21 +333,7 @@ namespace EntityComponents {
 
 				GraphicsStore::textureStore.objectAddFromInstance(fileName, texture);
 			}
-		};
-		ComponentSprite(std::string _fileName) :
-			ComponentSprite(_fileName, GraphicsStore::imageStore.extensionDefaultGet())
-		{};
-
-		// the name of the file for the texture
-		std::string fileName;
-		// the name of the extension for the texture
-		std::string fileExtension;
-
-		sf::Sprite sprite;
-
-		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentSprite(fileName, fileExtension));
-		};
+		}
 	};
 	// creates an EventRotate every frame that linearly interpolates towards the mouse
 	struct ComponentRotateToMouse final : public Component {
@@ -368,6 +376,10 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentPosition(position));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+
 	};
 	struct ComponentRotation final : public Component {
 

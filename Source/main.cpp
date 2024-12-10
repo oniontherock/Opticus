@@ -53,7 +53,7 @@ int main() {
 	//WindowHolder::windowGet().setFramerateLimit(60);
 
 	Engine::engineInitialize();
-	Engine::engineLoad();
+	//Engine::engineLoad();
 
 	uint32_t frames = 0;
 	double frameTimer = 0.0;

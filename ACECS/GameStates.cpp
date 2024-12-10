@@ -31,13 +31,13 @@ void GameStatePlay::gameStateUpdate() {
 		break;
 	}
 
+	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
-	if (!firstUpdate) {
+	if (levelActive->firstRun) {
 		gameStateStart();
-		firstUpdate = true;
+		levelActive->firstRun = false;
 	}
 
-	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 	sf::Vector2f mousePos = PanelManager::panelGet(PanelName::GameView).viewMousePositionGet();
 	
 	if (InputInterface::inputGetActive("Cell Invalidate")) {

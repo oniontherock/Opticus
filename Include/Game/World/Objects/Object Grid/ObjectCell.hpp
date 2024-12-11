@@ -19,6 +19,8 @@ struct ObjectCell {
 	void idRemove(EntityId id);
 	// check if the cell contains the id
 	bool idHas(EntityId id);
+	// returns whether the cell has any ids
+	bool hasAny();
 	// returns a const reference to the idsVector
 	const std::set<EntityId>& idsGet();
 

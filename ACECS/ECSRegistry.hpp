@@ -3,7 +3,6 @@
 
 #include "../ACECS/Panels.hpp"
 #include "../Include/Common/DataCache.hpp"
-#include <Auxiliary/Math.hpp>
 #include "../Include/Game/AI/Actors/Blackboard/ActorBlackboard.hpp"
 #include "../Include/Game/AI/Actors/Data/ActorDataHolder.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementTypes.hpp"
@@ -11,6 +10,7 @@
 #include "../Include/Game/AI/Actors/Orders/OrderTypes.hpp"
 #include "../Include/Game/AI/Memory/ObjectMemoryHolder.hpp"
 #include "../Include/Game/AI/Utility AI/UtilityStateManager.hpp"
+#include "../Include/Game/GameData.hpp"
 #include "../Include/Game/Pathfinding/AStar/Path Creation/AStarPathfinder.hpp"
 #include "../Include/Game/RayCasting/Object Vision/ObjectVision.hpp"
 #include "../Include/Game/RayCasting/Vision Rendering/MemoryHolderVision.hpp"
@@ -19,6 +19,7 @@
 #include "ECS.hpp"
 #include "SFML/Graphics.hpp"
 #include <Audio/AudioStore.hpp>
+#include <Auxiliary/Math.hpp>
 #include <functional>
 
 namespace ECSRegistry {
@@ -238,6 +239,20 @@ namespace EntityEvents {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new EventPath());
+		};
+	};
+	struct EventObjectNear final : public Event {
+
+		EventObjectNear() { clear(); };
+
+		std::set<EntityId> entitiesNear;
+
+		void clear() final {
+			entitiesNear.clear();
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new EventObjectNear());
 		};
 	};
 }
@@ -971,6 +986,42 @@ namespace EntityComponents {
 
 	private:
 		sf::Vector2f posLast;
+	};
+
+	struct ComponentEventOnObjectNear final : public Component {
+
+		void system(Entity& entity) final;
+
+		ComponentEventOnObjectNear() {
+			hasSystem = true;
+			radius = 0.f;
+		};
+		ComponentEventOnObjectNear(float _radius) :
+			ComponentEventOnObjectNear()
+		{
+			radius = _radius;
+		};
+
+		float radius;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentEventOnObjectNear(radius));
+		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+	};
+
+	struct ComponentWinOnPlayerNear final : public Component {
+		void system(Entity& entity) final;
+
+		ComponentWinOnPlayerNear() {
+			hasSystem = true;
+		}
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new ComponentWinOnPlayerNear());
+		}
 	};
 }
 

@@ -45,6 +45,12 @@ void Engine::panelsRegister() {
 		PanelRect(0, 0, 1280, 720), // world coordinates
 		sf::Color::Black
 	)));
+
+	panelAdd(PanelTypes::WinScreen, PanelPtr(new PanelWinScreen(
+		PanelRect(0, 0, 1280, 720), // screen coordinates
+		PanelRect(0, 0, 1280, 720), // world coordinates
+		sf::Color::Black
+	)));
 }
 
 // game states are registered here
@@ -89,6 +95,18 @@ void Engine::gameStatesRegister() {
 		// note the commas after every panel name, without commas every name will become a single string
 		{
 			PanelTypes::GameView,
+		}
+		)));
+	GameStateHandler::gameStateAdd(GameStateUniquePtr(new GameStateWin(
+		/// transitions
+		// vector of GameStateTransitions, and their inputs
+		{
+		},
+		/// panels
+		// the panels belonging to this GameState,
+		// note the commas after every panel name, without commas every name will become a single string
+		{
+			PanelTypes::WinScreen,
 		}
 		)));
 

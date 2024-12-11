@@ -155,6 +155,7 @@
     <ClCompile Include="Include\Game\AI\Memory\ObjectMemoryHolder.cpp" />
     <ClCompile Include="Include\Game\AI\Utility AI\States\AIStates.cpp" />
     <ClCompile Include="Include\Game\AI\Utility AI\UtilityStateManager.cpp" />
+    <ClCompile Include="Include\Game\GameData.cpp" />
     <ClCompile Include="Include\Game\Pathfinding\AStar\Grid\AStarCell.cpp" />
     <ClCompile Include="Include\Game\Pathfinding\AStar\Grid\AStarGrid.cpp" />
     <ClCompile Include="Include\Game\Pathfinding\AStar\Grid\AStarGridCourse.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="Include\Game\AI\Utility AI\States\AIStates.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\UtilityState.hpp" />
     <ClInclude Include="Include\Game\AI\Utility AI\UtilityStateManager.hpp" />
+    <ClInclude Include="Include\Game\GameData.hpp" />
     <ClInclude Include="Include\Game\Pathfinding\AStar\Grid\AStarCell.hpp" />
     <ClInclude Include="Include\Game\Pathfinding\AStar\Grid\AStarGrid.hpp" />
     <ClInclude Include="Include\Game\Pathfinding\AStar\Grid\AStarGridCourse.hpp" />
@@ -252,6 +254,9 @@
     <Media Include="SFX\Footstep6.wav" />
     <Media Include="SFX\Footstep7.wav" />
     <Media Include="SFX\Footstep8.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="Art\Basic bitmap.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

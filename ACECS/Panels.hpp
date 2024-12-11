@@ -6,6 +6,7 @@
 
 enum PanelTypes : uint16_t {
 	GameView,
+	WinScreen,
 };
 
 struct PanelGameView : public Panel {
@@ -34,5 +35,24 @@ private:
 	void hudDraw(GameLevel* levelActive);
 };
 
+struct PanelWinScreen : public Panel {
+	using Panel::Panel;
+
+	enum Modes {
+		Normal,
+	};
+
+	Modes mode = Normal;
+
+	void panelUpdate() final;
+
+private:
+	void checkModeChange();
+
+	// draws background of win screen
+	void backgroundDraw();
+	// draws win text
+	void textDraw();
+};
 
 #endif

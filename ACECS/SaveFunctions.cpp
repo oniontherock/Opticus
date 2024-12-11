@@ -21,6 +21,8 @@ void SaveDirector::gameDataSave() {
 
 	SaveHandler::objectSave(ObjectRegistry::objectsVector);
 
+	SaveHandler::objectSave(EntityManager::entitiesIntangible);
+
 	// save entities
 	for (uint32_t entityIdCur = 0; entityIdCur < EntityManager::entitiesVector.size(); entityIdCur++) {
 		if (EntityManager::entityIdsSet.contains(entityIdCur)) continue;
@@ -33,6 +35,8 @@ void SaveDirector::gameDataSave() {
 	// used for breaking the loading loop, which checks when a value exceeds another value, so obviously this will exceed that value.
 	EntityId loopBreaker = MAX_ENTITIES;
 	SaveHandler::objectSaveIgnoreErrors(loopBreaker);
+
+	SaveHandler::objectSave(GameData::playerId);
 }
 void SaveDirector::gameDataLoad() {
 	// load levels
@@ -47,6 +51,8 @@ void SaveDirector::gameDataLoad() {
 	}
 
 	SaveHandler::objectLoad(ObjectRegistry::objectsVector);
+
+	SaveHandler::objectLoad(EntityManager::entitiesIntangible);
 
 	// load entities
 	EntityId entityIdCur;
@@ -64,4 +70,6 @@ void SaveDirector::gameDataLoad() {
 		// load entity's id
 		SaveHandler::objectLoadIgnoreErrors(entityIdCur);
 	} while (entityIdCur < MAX_ENTITIES);
+
+	SaveHandler::objectLoad(GameData::playerId);
 }

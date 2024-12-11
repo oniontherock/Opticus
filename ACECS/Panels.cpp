@@ -105,7 +105,7 @@ void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 void PanelGameView::playerDraw(GameLevel* levelActive) {
 
 	// draw player memory
-	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
+	Entity& player = EntityManager::entityGet(GameData::playerId);
 
 	auto* playerMemoryHolder = player.entityComponentGet<EntityComponents::ComponentMemoryVision>();
 
@@ -140,4 +140,26 @@ void PanelGameView::hudDraw(GameLevel* levelActive) {
 			}
 		}
 	}
+}
+
+void PanelWinScreen::panelUpdate() {
+
+	checkModeChange();
+
+	backgroundDraw();
+	textDraw();
+}
+void PanelWinScreen::checkModeChange() {
+}
+void PanelWinScreen::backgroundDraw() {
+}
+void PanelWinScreen::textDraw() {
+	sf::Text text;
+	sf::Font font;
+	font.loadFromFile("Art/Basic bitmap.ttf");
+	text.setFont(font);
+	text.setString("You Win!");
+
+	text.setPosition(500, 500);
+	objectDraw(text);
 }

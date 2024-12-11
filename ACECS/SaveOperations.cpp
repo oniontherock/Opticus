@@ -23,8 +23,8 @@ std::ifstream& operator>> (std::ifstream& str, std::string& item) {
 std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 
 	str << item.entities;
+	str << item.entitiesNoUpdate;
 	str << item.levelSize;
-	str << item.idPlayer;
 	str << item.dynamicSpriteEntityIds;
 	str << item.staticSpriteEntityIds;
 	str << item.firstRun;
@@ -41,8 +41,8 @@ std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 std::ifstream& operator>> (std::ifstream& str, GameLevel& item) {
 
 	str >> item.entities;
+	str >> item.entitiesNoUpdate;
 	str >> item.levelSize;
-	str >> item.idPlayer;
 	str >> item.dynamicSpriteEntityIds;
 	str >> item.staticSpriteEntityIds;
 	str >> item.firstRun;
@@ -380,6 +380,13 @@ void EntityComponents::ComponentAudioPlayOnMove::load(std::ifstream& str) {
 	str >> posLast;
 	str >> soundName;
 	str >> volumeOffset;
+}
+
+void EntityComponents::ComponentEventOnObjectNear::save(std::ofstream& str) {
+	str << radius;
+}
+void EntityComponents::ComponentEventOnObjectNear::load(std::ifstream& str) {
+	str >> radius;
 }
 
 #pragma endregion

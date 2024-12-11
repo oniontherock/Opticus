@@ -23,7 +23,6 @@ struct GameLevel : public BaseLevel {
 
 	sf::Vector2u levelSize;
 
-	EntityId idPlayer;
 	// list of EntityIds that contain dynamic sprite components
 	std::vector<EntityId> dynamicSpriteEntityIds;
 	// list of EntityIds that contain static sprite components

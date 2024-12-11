@@ -6,6 +6,7 @@
 enum GameStateTypes : uint16_t {
 	Play,
 	Pause,
+	Win,
 };
 
 struct GameStatePlay : public GameState {
@@ -47,5 +48,21 @@ struct GameStatePause : public GameState {
 	void gameStateUpdate() final;
 };
 
+struct GameStateWin : public GameState {
+
+	GameStateWin(std::vector<GameStateTransition> _transitions, std::vector<PanelName> _panelNames) :
+		GameState::GameState(_transitions, _panelNames)
+	{
+		id = GameStateTypes::Win;
+	}
+
+	enum Modes {
+		Normal,
+	};
+
+	Modes mode = Normal;
+
+	void gameStateUpdate() final;
+};
 
 #endif

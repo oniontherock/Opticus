@@ -1,13 +1,13 @@
-#include "GameStates.hpp"
-
-#include <Auxiliary/Math.hpp>
+#include "../Include/Game/GameData.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
+#include "GameStates.hpp"
 #include "Graphics.hpp"
 #include "Panels.hpp"
 #include "World/LevelUpdater.hpp"
+#include <Auxiliary/Math.hpp>
 #include <Auxiliary/NumberGenerator.hpp>
 
 void GameStatePlay::gameStateUpdate() {
@@ -66,8 +66,8 @@ void GameStatePlay::gameStateStart() {
 
 
 	// create player and assign the level's playerId to the id of the newly created player
-	levelActive->idPlayer = EntityManager::entityCreate(0, 0, 0, "Player");
-	Entity& player = EntityManager::entityGet(levelActive->idPlayer);
+	GameData::playerId = EntityManager::entityCreate(0, 0, 0, "Player");
+	Entity& player = EntityManager::entityGet(GameData::playerId);
 	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000, 2000);
 
 	float offset = 64;
@@ -83,6 +83,13 @@ void GameStatePlay::gameStateStart() {
 	EntityId spriteBId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
 	Entity& spriteB = EntityManager::entityGet(spriteBId);
 	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000-256, 2000+128);
+
+	EntityId targetPositionId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
+	Entity& targetPosition = EntityManager::entityGet(targetPositionId);
+	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
+	spriteB.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
+	spriteB.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
+
 }
 void GameStatePlay::levelGenerate() {
 
@@ -95,4 +102,7 @@ void GameStatePause::gameStateUpdate() {
 }
 
 
+void GameStateWin::gameStateUpdate() {
+
+}
 

@@ -1,11 +1,29 @@
+#include "../Include/Debugging/AStarPathDrawer.hpp"
+#include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
 #include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Objects/ObjectRegistry.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
+#include "Panels.hpp"
+#include <Audio/SoundHandler.hpp>
+#include <Audio/SoundPlayer.hpp>
+#include <Auxiliary/ConsoleHandler.hpp>
+#include <Auxiliary/NumberGenerator.hpp>
+#include <Auxiliary/TimeHandler.hpp>
+#include <Auxiliary/VectorMath.hpp>
+#include <GameState/GameStateHandler.hpp>
 #include <Graphics.hpp>
+#include <Graphics/WindowHolder.hpp>
+#include <Input.hpp>
+#include "GameStates.hpp"
+#include <iostream>
+#include <numeric>
+
 
 uint32_t MAX_ENTITIES = 100;
-uint16_t MAX_COMPONENT_TYPES = 33;
-uint16_t MAX_EVENT_TYPES = 13;
+uint16_t MAX_COMPONENT_TYPES = 34;
+uint16_t MAX_EVENT_TYPES = 14;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -39,6 +57,7 @@ void EntityEvents::eventIDsInitialize() {
 	EventRegistry::typeRegister<EventIDs<EventActorOrder>>();
 	EventRegistry::typeRegister<EventIDs<EventOrderTransmit>>();
 	EventRegistry::typeRegister<EventIDs<EventObjectsAtMouse>>();
+	EventRegistry::typeRegister<EventIDs<EventObjectNear>>();
 
 	//EventRegistry::typeRegister<EventIDs<EVENT_GOES_HERE>>();
 	//EventRegistry::typeRegister<EventIDs<EVENT_GOES_HERE>>();
@@ -74,6 +93,9 @@ void EntityComponents::componentIDsInitialize() {
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentEventOnObjectNear>>();
+	ComponentRegistry::typeRegister<ComponentIDs<ComponentWinOnPlayerNear>>();
+
 	
 	// sprites/drawing
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentSprite>>();
@@ -320,25 +342,6 @@ void EntityComponents::componentTemplatesInitialize() {
 
 using namespace EntityComponents;
 using namespace EntityEvents;
-
-// if you need to include a certain file for a system, include it here.
-#include <Auxiliary/VectorMath.hpp>
-#include <Audio/SoundHandler.hpp>
-#include <Auxiliary/TimeHandler.hpp>
-#include "../Include/Game/World/Objects/ObjectRegistry.hpp"
-#include <Auxiliary/NumberGenerator.hpp>
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
-#include "../Include/Debugging/AStarPathDrawer.hpp"
-#include <iostream>
-#include <Input.hpp>
-#include "Panels.hpp"
-#include <Graphics/WindowHolder.hpp>
-#include <Auxiliary/ConsoleHandler.hpp>
-#include <numeric>
-#include <Audio/SoundHandler.hpp>
-#include <Audio/SoundPlayer.hpp>
-
 
 // if the system is not using the entity parameter, remove it's name to avoid a C4100 error
 
@@ -1443,4 +1446,45 @@ void ComponentAudioPlayOnMove::system(Entity& entity) {
 		posLast = componentPosition->position;
 	}
 }
+void ComponentEventOnObjectNear::system(Entity& entity) {
+	if (!entity.entityComponentHas<ComponentPosition>()) return;
+
+	auto* componentPosition = entity.entityComponentGet<ComponentPosition>();
+
+	auto* gameLevel = GameLevelGrid::levelGet(entity.levelId);
+	auto& objectGrid = gameLevel->objectGrid;
+
+	float step = 1.f;
+
+	std::set<EntityId> entitiesNear;
+
+	for (float offsetX = -radius; offsetX <= radius; offsetX += step) {
+		for (float offsetY = -radius; offsetY <= radius; offsetY += step) {
+
+			sf::Vector2f posOffset = componentPosition->position + sf::Vector2f(offsetX, offsetY);
+
+			ObjectCell& objectCur = objectGrid.cellGetFromWorld(posOffset);
+
+			if (objectCur.hasAny()) {
+				entitiesNear.insert(objectCur.idsGet().begin(), objectCur.idsGet().end());
+			}
+		}
+	}
+
+	if (entitiesNear.size() > 0) {
+		auto* eventObjectNear = entity.entityEventAddAndGet<EventObjectNear>();
+		eventObjectNear->entitiesNear = entitiesNear;
+	}
+}
+void ComponentWinOnPlayerNear::system(Entity& entity) {
+
+	if (entity.entityEventHas<EventObjectNear>()) {
+		auto* event = entity.entityEventGet<EventObjectNear>();
+
+		if (event->entitiesNear.contains(GameData::playerId)) {
+			GameStateHandler::gameStateForceSet(GameStateTypes::Win);
+		}
+	}
+}
+
 #pragma endregion Systems

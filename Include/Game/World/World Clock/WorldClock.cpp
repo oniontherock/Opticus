@@ -34,7 +34,7 @@ double WorldClock::hoursSinceWorldStartGet() {
 Millisecond WorldClock::timeSinceDayStartGetReal() {
 	return timeSinceDayStart;
 }
-Millisecond WorldClock::timeSinceDayStartGet() {
+double WorldClock::timeSinceDayStartGet() {
 	return (timeSinceDayStart * dayTimeRealRatio) / (60 * 1000);
 }
 

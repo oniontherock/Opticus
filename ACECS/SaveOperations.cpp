@@ -389,6 +389,13 @@ void EntityComponents::ComponentEventOnObjectNear::load(std::ifstream& str) {
 	str >> radius;
 }
 
+void EntityComponents::ComponentObjectTypeAssigner::save(std::ofstream& str) {
+	str << objectType;
+}
+void EntityComponents::ComponentObjectTypeAssigner::load(std::ifstream& str) {
+	str >> objectType;
+}
+
 #pragma endregion
 
 std::ofstream& operator<< (std::ofstream& str, UtilityStateManager& item) {

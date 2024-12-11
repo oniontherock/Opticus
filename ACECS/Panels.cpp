@@ -1,13 +1,12 @@
-#include "Panels.hpp"
-
-#include <Auxiliary/Math.hpp>
-#include <Auxiliary/VectorMath.hpp>
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Debugging/ObjectGridRenderer.hpp"
 #include "../Include/Debugging/AStarPathDrawer.hpp"
+#include "../Include/Debugging/ObjectGridRenderer.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
+#include "Panels.hpp"
+#include <Auxiliary/Math.hpp>
+#include <Auxiliary/VectorMath.hpp>
 
 void PanelGameView::panelUpdate() {
 
@@ -79,8 +78,8 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 
 	levelActive->worldTextureStatic.draw(rectangleBackground);
 
-	for (uint32_t i = 0; i < levelActive->staticSpriteEntityIds.size(); i++) {
-		Entity& entityCur = EntityManager::entityGet(levelActive->staticSpriteEntityIds[i]);
+	for (const EntityId& i : levelActive->staticSpriteEntityIds) {
+		Entity& entityCur = EntityManager::entityGet(i);
 
 		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
 
@@ -92,8 +91,8 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 	levelActive->worldTextureDynamic.clear(sf::Color::Transparent);
 
-	for (uint32_t i = 0; i < levelActive->dynamicSpriteEntityIds.size(); i++) {
-		Entity& entityCur = EntityManager::entityGet(levelActive->dynamicSpriteEntityIds[i]);
+	for (const EntityId& i : levelActive->dynamicSpriteEntityIds) {
+		Entity& entityCur = EntityManager::entityGet(i);
 
 		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
 

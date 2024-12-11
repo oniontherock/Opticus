@@ -23,7 +23,7 @@
 
 uint32_t MAX_ENTITIES = 100;
 uint16_t MAX_COMPONENT_TYPES = 34;
-uint16_t MAX_EVENT_TYPES = 14;
+uint16_t MAX_EVENT_TYPES = 15;
 
 void ECSRegistry::ECSInitialize() {
 	EntityManager::entityIdsInitialize();
@@ -44,7 +44,8 @@ void ECSRegistry::ECSTerminate() {
 void EntityEvents::eventIDsInitialize() {
 
 	using EventRegistry = TypeIDAllocator<Event>;
-
+	
+	EventRegistry::typeRegister<EventIDs<EventInitialize>>();
 	EventRegistry::typeRegister<EventIDs<EventMove>>();
 	EventRegistry::typeRegister<EventIDs<EventRotate>>();
 	EventRegistry::typeRegister<EventIDs<EventMoved>>();
@@ -711,11 +712,14 @@ void ComponentDistortionRadius::system(Entity& entity) {
 	}
 }
 void ComponentObjectTypeAssigner::system(Entity& entity) {
-	ObjectRegistry::entityObjectTypeAssign(entity.Id, objectType);
+	if (!entity.entityEventHas<EventInitialize>()) return;
 
-	entity.entityComponentTerminate<ComponentObjectTypeAssigner>();
+	ObjectRegistry::entityObjectTypeAssign(entity.Id, objectType);
 }
 void ComponentSpriteDynamicRegister::system(Entity& entity) {
+	
+	if (!entity.entityEventHas<EventInitialize>()) return;
+
 	try {
 		if (!entity.entityComponentHas<ComponentSprite>()) {
 			throw "Does not have ComponentSprite";
@@ -729,11 +733,11 @@ void ComponentSpriteDynamicRegister::system(Entity& entity) {
 		return;
 	}
 
-	GameLevelGrid::levelGet(entity.levelId)->dynamicSpriteEntityIds.push_back(entity.Id);
-
-	entity.entityComponentTerminate<ComponentSpriteDynamicRegister>();
+	GameLevelGrid::levelGet(entity.levelId)->dynamicSpriteEntityIds.insert(entity.Id);
 }      
 void ComponentSpriteStaticRegister::system(Entity& entity) {
+	if (!entity.entityEventHas<EventInitialize>()) return;
+
 	try {
 		if (!entity.entityComponentHas<ComponentSprite>()) {
 			throw "Does not have ComponentSprite";
@@ -747,9 +751,7 @@ void ComponentSpriteStaticRegister::system(Entity& entity) {
 		return;
 	}
 
-	GameLevelGrid::levelGet(entity.levelId)->staticSpriteEntityIds.push_back(entity.Id);
-
-	entity.entityComponentTerminate<ComponentSpriteStaticRegister>();
+	GameLevelGrid::levelGet(entity.levelId)->staticSpriteEntityIds.insert(entity.Id);
 }
 void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 	// check that entity has ComponentPosition

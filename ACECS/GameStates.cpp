@@ -53,6 +53,8 @@ void GameStatePlay::gameStateUpdate() {
 
 	worldClockUpdate();
 
+	EntityManager::entitiesIntangibleUpdate();
+	EntityManager::entitiesQueuedUpdate();
 	LevelUpdater::levelsUpdate();
 }
 

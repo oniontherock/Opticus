@@ -19,7 +19,7 @@ void SaveDirector::gameDataSave() {
 		}
 	}
 
-	SaveHandler::objectSave(ObjectRegistry::objectsVector);
+	//SaveHandler::objectSave(ObjectRegistry::objectsVector);
 
 	SaveHandler::objectSave(EntityManager::entitiesIntangible);
 
@@ -50,7 +50,7 @@ void SaveDirector::gameDataLoad() {
 		}
 	}
 
-	SaveHandler::objectLoad(ObjectRegistry::objectsVector);
+	//SaveHandler::objectLoad(ObjectRegistry::objectsVector);
 
 	SaveHandler::objectLoad(EntityManager::entitiesIntangible);
 

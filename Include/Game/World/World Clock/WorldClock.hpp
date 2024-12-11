@@ -42,8 +42,8 @@ public:
 
 	// gets the actual amount of millisecond since the day started
 	Millisecond timeSinceDayStartGetReal();
-	// gets the amount of game "hours" since the day started in milliseconds, an hour is (1.0 / dayTimeRealRatio)
-	Millisecond timeSinceDayStartGet();
+	// gets the amount of game "hours" since the day started, an hour is (1.0 / dayTimeRealRatio)
+	double timeSinceDayStartGet();
 
 	// gets the current day
 	DayCount dayCurrentGet();

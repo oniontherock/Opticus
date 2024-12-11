@@ -278,7 +278,7 @@ namespace EntityComponents {
 		void save(std::ofstream& str) override;
 		void load(std::ifstream& str) override;
 	};
-	// registers this entity as having a dynamic sprite in the GameLevel then terminates itself
+	// registers this entity as having a dynamic sprite in the GameLevel
 	struct ComponentSpriteDynamicRegister final : public Component {
 
 		void system(Entity& entity) final;
@@ -291,7 +291,7 @@ namespace EntityComponents {
 			return std::unique_ptr<Duplicatable>(new ComponentSpriteDynamicRegister());
 		};
 	};
-	// registers this entity as having a static sprite in the GameLevel then terminates itself
+	// registers this entity as having a static sprite in the GameLevel
 	struct ComponentSpriteStaticRegister final : public Component {
 
 		void system(Entity& entity) final;
@@ -547,7 +547,7 @@ namespace EntityComponents {
 		void save(std::ofstream& str) override;
 		void load(std::ifstream& str) override;
 	};
-	// assigns the ObjectType in the ObjectRegistry for the entity to be the specified objectType, then deletes itself
+	// assigns the ObjectType in the ObjectRegistry for the entity to be the specified objectType
 	struct ComponentObjectTypeAssigner final : public Component {
 
 		void system(Entity& entity) final;
@@ -567,6 +567,9 @@ namespace EntityComponents {
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectTypeAssigner(objectType));
 		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
 	};
 	// populates the ObjectGrid with the specified type every update,
 	// NOTE: this component should be ordered AFTER any movement components.

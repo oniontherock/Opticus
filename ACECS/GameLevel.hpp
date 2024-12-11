@@ -1,10 +1,10 @@
 #ifndef __GAME_LEVEL_H__
 #define __GAME_LEVEL_H__
 
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
 #include "../Include/Game/Pathfinding/AStar/Grid/AStarGrid.hpp"
+#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
+#include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
 #include "SFML/Graphics.hpp"
 #include "World/Level.hpp"
@@ -23,10 +23,10 @@ struct GameLevel : public BaseLevel {
 
 	sf::Vector2u levelSize;
 
-	// list of EntityIds that contain dynamic sprite components
-	std::vector<EntityId> dynamicSpriteEntityIds;
-	// list of EntityIds that contain static sprite components
-	std::vector<EntityId> staticSpriteEntityIds;
+	// set of EntityIds that contain dynamic sprite components
+	std::set<EntityId> dynamicSpriteEntityIds;
+	// set of EntityIds that contain static sprite components
+	std::set<EntityId> staticSpriteEntityIds;
 
 	bool firstRun = true;
 

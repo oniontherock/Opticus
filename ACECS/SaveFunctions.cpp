@@ -64,6 +64,10 @@ void SaveDirector::gameDataLoad() {
 		EntityManager::entityCreateWithId(entityIdCur);
 		// get entity reference
 		Entity& entity = EntityManager::entityGet(entityIdCur);
+		// add entity to room if it's not an intangible entity
+		if (entity.levelId != NoLevelPosition) {
+			EntityManager::entityAddToRoom(entityIdCur, entity.levelId);
+		}
 		//load entity's data
 		SaveHandler::objectLoadIgnoreErrors(entity);
 		

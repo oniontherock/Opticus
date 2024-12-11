@@ -22,8 +22,6 @@ std::ifstream& operator>> (std::ifstream& str, std::string& item) {
 
 std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 
-	str << item.entities;
-	str << item.entitiesNoUpdate;
 	str << item.levelSize;
 	str << item.dynamicSpriteEntityIds;
 	str << item.staticSpriteEntityIds;
@@ -40,8 +38,6 @@ std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 }
 std::ifstream& operator>> (std::ifstream& str, GameLevel& item) {
 
-	str >> item.entities;
-	str >> item.entitiesNoUpdate;
 	str >> item.levelSize;
 	str >> item.dynamicSpriteEntityIds;
 	str >> item.staticSpriteEntityIds;

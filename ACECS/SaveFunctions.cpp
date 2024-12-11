@@ -2,6 +2,8 @@
 #include <Saving/SaveDirector.hpp>
 #include <ECS/Entities/EntityManager.hpp>
 #include "GameLevel.hpp"
+#include <GameState/GameStateHandler.hpp>
+#include "GameStates.hpp"
 
 // this file is for defining the SaveDirector's saving/loading functions for the game specific data.
 
@@ -16,7 +18,7 @@ void SaveDirector::gameDataSave() {
 			}
 		}
 	}
-	
+
 	SaveHandler::objectSave(ObjectRegistry::objectsVector);
 
 	// save entities

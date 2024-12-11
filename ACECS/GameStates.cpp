@@ -27,7 +27,7 @@ void GameStatePlay::gameStateUpdate() {
 		TimeHandler::timescale = 1.f;
 		break;
 	case 2:
-		TimeHandler::timescale = 5.f;
+		TimeHandler::timescale = 10.f;
 		break;
 	}
 
@@ -50,6 +50,8 @@ void GameStatePlay::gameStateUpdate() {
 			}, Cooldown(25.f)
 		));
 	}
+
+	worldClockUpdate();
 
 	LevelUpdater::levelsUpdate();
 }
@@ -97,6 +99,14 @@ void GameStatePlay::levelGenerate() {
 
 	gameLevel->roomGridGenerate();
 }
+void GameStatePlay::worldClockUpdate() {
+	GameData::worldClock.update(TimeHandler::timeSimulatedGet());
+
+	if (GameData::worldClock.dayCurrentGet() >= GameData::worldClock.dayCountMax) {
+		GameStateHandler::gameStateForceSet(GameStateType::Lose);
+	}
+}
+
 void GameStatePause::gameStateUpdate() {
 	WindowHolder::windowGet().close();
 }
@@ -106,3 +116,8 @@ void GameStateWin::gameStateUpdate() {
 
 }
 
+void GameStateLose::gameStateUpdate() {
+	if (exitCooldown.updateAutoReset(TimeHandler::deltaSimulatedGet())) {
+		WindowHolder::windowGet().close();
+	}
+}

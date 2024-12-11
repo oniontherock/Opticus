@@ -51,6 +51,16 @@ void Engine::panelsRegister() {
 		PanelRect(0, 0, 1280, 720), // world coordinates
 		sf::Color::Black
 	)));
+	panelAdd(PanelTypes::LoseScreen, PanelPtr(new PanelLoseScreen(
+		PanelRect(0, 0, 1280, 720), // screen coordinates
+		PanelRect(0, 0, 1280, 720), // world coordinates
+		sf::Color::Black
+	)));
+	//panelAdd(PanelTypes::ClockDisplay, PanelPtr(new PanelClockDisplay(
+	//	PanelRect(0, 0, 500, 250), // screen coordinates
+	//	PanelRect(0, 0, 500, 250), // world coordinates
+	//	sf::Color::Transparent
+	//)));
 }
 
 // game states are registered here
@@ -107,6 +117,18 @@ void Engine::gameStatesRegister() {
 		// note the commas after every panel name, without commas every name will become a single string
 		{
 			PanelTypes::WinScreen,
+		}
+		)));
+	GameStateHandler::gameStateAdd(GameStateUniquePtr(new GameStateLose(
+		/// transitions
+		// vector of GameStateTransitions, and their inputs
+		{
+		},
+		/// panels
+		// the panels belonging to this GameState,
+		// note the commas after every panel name, without commas every name will become a single string
+		{
+			PanelTypes::LoseScreen,
 		}
 		)));
 

@@ -7,6 +7,7 @@ enum GameStateTypes : uint16_t {
 	Play,
 	Pause,
 	Win,
+	Lose,
 };
 
 struct GameStatePlay : public GameState {
@@ -29,6 +30,7 @@ private:
 
 	void gameStateStart();
 	void levelGenerate();
+	void worldClockUpdate();
 };
 
 struct GameStatePause : public GameState {
@@ -63,6 +65,27 @@ struct GameStateWin : public GameState {
 	Modes mode = Normal;
 
 	void gameStateUpdate() final;
+};
+
+struct GameStateLose : public GameState {
+
+	GameStateLose(std::vector<GameStateTransition> _transitions, std::vector<PanelName> _panelNames) :
+		GameState::GameState(_transitions, _panelNames)
+	{
+		id = GameStateTypes::Lose;
+	}
+
+	enum Modes {
+		Normal,
+	};
+
+	Modes mode = Normal;
+
+	void gameStateUpdate() final;
+
+private:
+	// cooldown for closing the window
+	Cooldown exitCooldown = Cooldown(2.5f);
 };
 
 #endif

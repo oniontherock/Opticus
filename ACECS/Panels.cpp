@@ -1,7 +1,6 @@
 #include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
-#include "../Include/Game/World/Procedural Generation/Floors/GrassGenerator.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
@@ -81,25 +80,6 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 	rectangleBackground.setFillColor(sf::Color(25, 125, 0, 255));
 
 	levelActive->worldTextureStatic.draw(rectangleBackground);
-
-	static GrassGenerator grass = GrassGenerator(sf::FloatRect(1500, 1500, 1000, 1000), 4096 * 2);
-
-	static float angle = 0;
-
-	static float angleTarget = 0;
-
-	if (RNGf::probability(0.25f)) {
-		angleTarget = angle + RNGf::getRange(Mathf::PI);
-	}
-
-	angle = Mathf::slerp(angle, angleTarget, 0.1f);
-
-	grass.simulate(angle);
-	grass.grassSpritesUpdate();
-
-	for (sf::ConvexShape& i : grass.grassSprites) {
-		levelActive->worldTextureStatic.draw(i);
-	}
 
 	for (const EntityId& i : levelActive->staticSpriteEntityIds) {
 		Entity& entityCur = EntityManager::entityGet(i);

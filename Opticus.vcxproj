@@ -168,7 +168,6 @@
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectCell.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectGrid.cpp" />
     <ClCompile Include="Include\Game\World\Objects\ObjectRegistry.cpp" />
-    <ClCompile Include="Include\Game\World\Procedural Generation\Floors\GrassGenerator.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\RoomGrid.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\Room.cpp" />
     <ClCompile Include="Include\Game\World\Room Grid\Rooms\RoomCell.cpp" />
@@ -236,7 +235,6 @@
     <ClInclude Include="Include\Game\World\Objects\Object Grid\ObjectGrid.hpp" />
     <ClInclude Include="Include\Game\World\Objects\ObjectRegistry.hpp" />
     <ClInclude Include="Include\Game\World\Objects\ObjectTypes.hpp" />
-    <ClInclude Include="Include\Game\World\Procedural Generation\Floors\GrassGenerator.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\RoomGrid.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\Room.hpp" />
     <ClInclude Include="Include\Game\World\Room Grid\Rooms\RoomCell.hpp" />

@@ -1,12 +1,14 @@
 #include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
 #include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Procedural Generation/Floors/GrassGenerator.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
 #include "Panels.hpp"
 #include <Auxiliary/Math.hpp>
 #include <Auxiliary/VectorMath.hpp>
+#include <Auxiliary/NumberGenerator.hpp>
 
 void PanelGameView::panelUpdate() {
 
@@ -15,6 +17,8 @@ void PanelGameView::panelUpdate() {
 	auto* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
 	if (mode == Normal || mode == ObjectGridRender || mode == PathsRender) {
+		
+
 		staticDraw(levelActive);
 		dynamicDraw(levelActive);
 		playerDraw(levelActive);
@@ -74,9 +78,28 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 	// draw white background
 	sf::RectangleShape rectangleBackground;
 	rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));
-	rectangleBackground.setFillColor(sf::Color::White);
+	rectangleBackground.setFillColor(sf::Color(25, 125, 0, 255));
 
 	levelActive->worldTextureStatic.draw(rectangleBackground);
+
+	static GrassGenerator grass = GrassGenerator(sf::FloatRect(1500, 1500, 1000, 1000), 4096 * 2);
+
+	static float angle = 0;
+
+	static float angleTarget = 0;
+
+	if (RNGf::probability(0.25f)) {
+		angleTarget = angle + RNGf::getRange(Mathf::PI);
+	}
+
+	angle = Mathf::slerp(angle, angleTarget, 0.1f);
+
+	grass.simulate(angle);
+	grass.grassSpritesUpdate();
+
+	for (sf::ConvexShape& i : grass.grassSprites) {
+		levelActive->worldTextureStatic.draw(i);
+	}
 
 	for (const EntityId& i : levelActive->staticSpriteEntityIds) {
 		Entity& entityCur = EntityManager::entityGet(i);

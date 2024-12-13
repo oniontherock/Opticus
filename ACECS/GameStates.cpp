@@ -1,5 +1,5 @@
 #include "../Include/Game/GameData.hpp"
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -44,11 +44,11 @@ void GameStatePlay::gameStateUpdate() {
 		levelActive->aStarGrid.cellGetFromWorld(mousePos).valid = false;
 	}
 	if (InputInterface::inputGetActive("Cell Distort")) {
-		levelActive->distortionGrid.cellGetFromWorld(mousePos).distortionAdd(Distortion(
-			[](sf::Vector2f& heading, sf::Vector2f&) {
-				heading *= 0.999f;
-			}, Cooldown(25.f)
-		));
+
+		for (int32_t yOffset = -64; yOffset < 64; yOffset++) {
+			levelActive->distortionGrid.cellGetFromWorld(mousePos + sf::Vector2f(0, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(-50, 0), 50000);
+		}
+
 	}
 
 	worldClockUpdate();
@@ -90,10 +90,9 @@ void GameStatePlay::gameStateStart() {
 
 	EntityId targetPositionId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
 	Entity& targetPosition = EntityManager::entityGet(targetPositionId);
-	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
-	spriteB.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
-	spriteB.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
-
+	targetPosition.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
+	targetPosition.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
+	targetPosition.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
 }
 void GameStatePlay::levelGenerate() {
 
@@ -119,7 +118,7 @@ void GameStateWin::gameStateUpdate() {
 }
 
 void GameStateLose::gameStateUpdate() {
-	if (exitCooldown.updateAutoReset(TimeHandler::deltaSimulatedGet())) {
+	if (exitCooldown.updateAutoReset(float(TimeHandler::deltaSimulatedGet()))) {
 		WindowHolder::windowGet().close();
 	}
 }

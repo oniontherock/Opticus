@@ -244,13 +244,6 @@ void EntityComponents::ComponentViewFollow::load(std::ifstream& str) {
 	str >> panelViewToFollow;
 }
 
-void EntityComponents::ComponentDistortionRadius::save(std::ofstream& str) {
-	str << distortionRadius;
-}
-void EntityComponents::ComponentDistortionRadius::load(std::ifstream& str) {
-	str >> distortionRadius;
-}
-
 void EntityComponents::ComponentObjectGridInhabiterRadius::save(std::ofstream& str) {
 	str << radius;
 	str << positionPrev;
@@ -293,7 +286,7 @@ void EntityComponents::ComponentActorData::load(std::ifstream& str) {
 void EntityComponents::ComponentActorBlackboard::save(std::ofstream&) {
 
 }
-void EntityComponents::ComponentActorBlackboard::load(std::ifstream& str) {
+void EntityComponents::ComponentActorBlackboard::load(std::ifstream&) {
 	updateFunc = [](Entity& actor, ActorBlackboard& actorBlackboard) {
 
 		auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");

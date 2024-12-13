@@ -72,7 +72,7 @@ void VisionCaster::update(float fromX, float fromY, float angleTo, float coneSiz
 	raysCast(coneSize, rayMaxDist, rayCount);
 }
 
-static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAngleDifference, sf::Vector2f castPosition, float rayMaxDist, WorldDistortionGrid& distortionGrid, sf::Image& visionImage, sf::Vector2u gameLevelSize, sf::Vector2f cameraCenter, sf::Vector2u visionTextureSize) {
+static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float rayAngleDifference, sf::Vector2f castPosition, float rayMaxDist, DistortionGrid& distortionGrid, sf::Image& visionImage, sf::Vector2u gameLevelSize, sf::Vector2f cameraCenter, sf::Vector2u visionTextureSize) {
 
 	constexpr double posMultiplier = 1.0 / 255.0;
 
@@ -106,13 +106,10 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 					uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
 				);
 
-				// check if there are any distortions at the ray's position
-				if (distortion.distortions.size() > 0) {
-					// apply the distortion at the rayPosition to the ray.
-					distortion.headingApplyDistortion(rayHeading, rayPosition);
 
-					if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
-				}
+				// apply the distortion at the rayPosition to the ray.
+				distortion.distortionApplyToRay(rayHeading, rayPosition);
+
 				curTravelStep = 0.f;
 			}
 

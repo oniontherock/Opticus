@@ -3,7 +3,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <vector>
-#include "../../../World/Distortions/WorldDistortionGrid.hpp"
+#include "../../../World/Distortions/DistortionGrid.hpp"
 
 // position of a cell in the AStarGrid
 typedef sf::Vector2u AStarCellPosition;

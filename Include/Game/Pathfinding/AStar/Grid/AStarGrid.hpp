@@ -16,12 +16,12 @@ public:
 
 	AStarGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
 
-	void cellUpdateNeighbors(CellCoordinate cellX, CellCoordinate cellY, WorldDistortionGrid& distortionGrid);
-	void cellUpdateNeighbors(CellVector cellPos, WorldDistortionGrid& distortionGrid);
-	void cellUpdateNeighborsFromWorld(WorldCoordinate worldX, WorldCoordinate worldY, WorldDistortionGrid& distortionGrid);
-	void cellUpdateNeighborsFromWorld(WorldVector worldPos, WorldDistortionGrid& distortionGrid);
+	void cellUpdateNeighbors(CellCoordinate cellX, CellCoordinate cellY, DistortionGrid& distortionGrid);
+	void cellUpdateNeighbors(CellVector cellPos, DistortionGrid& distortionGrid);
+	void cellUpdateNeighborsFromWorld(WorldCoordinate worldX, WorldCoordinate worldY, DistortionGrid& distortionGrid);
+	void cellUpdateNeighborsFromWorld(WorldVector worldPos, DistortionGrid& distortionGrid);
 
-	void cellsAllUpdateNeighbors(WorldDistortionGrid& distortionGrid);
+	void cellsAllUpdateNeighbors(DistortionGrid& distortionGrid);
 	
 };
 

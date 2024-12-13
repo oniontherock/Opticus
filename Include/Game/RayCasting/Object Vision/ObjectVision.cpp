@@ -77,13 +77,9 @@ void ObjectVision::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 				uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
 			);
 
-			// check if there are any distortions at the ray's position
-			if (distortion.distortions.size() > 0) {
-				// apply the distortion at the rayPosition to the ray.
-				distortion.headingApplyDistortion(rayHeading, rayPosition);
 
-				if (Vector2fMath::lengthSqrd(rayHeading) <= 0.001f * 0.001f) break;
-			}
+			// apply the distortion at the rayPosition to the ray.
+			distortion.distortionApplyToRay(rayHeading, rayPosition);
 
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.

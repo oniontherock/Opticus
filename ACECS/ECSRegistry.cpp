@@ -1,7 +1,7 @@
 #include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "../Include/Game/AI/Actors/Movement/ActorMovementFunctions.hpp"
 #include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "../Include/Game/World/Objects/ObjectRegistry.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -93,7 +93,6 @@ void EntityComponents::componentIDsInitialize() {
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentRotation>>();
 
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentObjectGridInhabiterRadius>>();
-	ComponentRegistry::typeRegister<ComponentIDs<ComponentDistortionRadius>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentEventOnObjectNear>>();
 	ComponentRegistry::typeRegister<ComponentIDs<ComponentWinOnPlayerNear>>();
 
@@ -413,7 +412,7 @@ void ComponentPosition::system(Entity& entity) {
 		// amount the ray would have moved naturally
 		movedEvent->naturalMovedAxis = heading;
 
-		GameLevelGrid::levelGet(entity.levelId)->distortionGrid.cellGetFromWorld(position).headingApplyDistortion(heading, position);
+		GameLevelGrid::levelGet(entity.levelId)->distortionGrid.cellGetFromWorld(position).distortionApplyToRay(heading, position);
 		
 		position += heading;
 
@@ -693,22 +692,6 @@ void ComponentViewFollow::system(Entity& entity) {
 		viewMovedEvent->movedAxis = Vector2fMath::axis(cameraPositionPrev, panel.viewRect.getPosition());
 		// get the amount the camera moved naturally
 		viewMovedEvent->naturalMovedAxis = Vector2fMath::axis(cameraPositionPrevNaturalized, panel.viewRect.getPosition());
-	}
-}
-void ComponentDistortionRadius::system(Entity& entity) {
-	if (!entity.entityComponentHas<ComponentPosition>()) return;
-
-	auto* positionComponent = entity.entityComponentGet<ComponentPosition>();
-
-	auto& distortionGrid = GameLevelGrid::levelGet(entity.levelId)->distortionGrid;
-
-	for (float offsetX = -distortionRadius / 2.f; offsetX <= +distortionRadius / 2.f; offsetX += 1.f) {
-		for (float offsetY = -distortionRadius / 2.f; offsetY <= +distortionRadius / 2.f; offsetY += 1.f) {
-
-			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (distortionRadius * distortionRadius) / (2.f * 2.f)) continue;
-
-			distortionGrid.cellGetFromWorld(positionComponent->position.x + offsetX, positionComponent->position.y + offsetY).distortionAdd(distortion);
-		}
 	}
 }
 void ComponentObjectTypeAssigner::system(Entity& entity) {

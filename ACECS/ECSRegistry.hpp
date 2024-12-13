@@ -523,30 +523,6 @@ namespace EntityComponents {
 		void save(std::ofstream& str) override;
 		void load(std::ifstream& str) override;
 	};
-	struct ComponentDistortionRadius final : public Component {
-
-		void system(Entity& entity) final;
-
-		ComponentDistortionRadius() {
-			hasSystem = true;
-		};
-		ComponentDistortionRadius(float _distortionRadius, Distortion _distortion) :
-			ComponentDistortionRadius()
-		{
-			distortionRadius = _distortionRadius;
-			distortion = _distortion;
-		};
-
-		float distortionRadius = 0.f;
-		Distortion distortion;
-
-		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentDistortionRadius(distortionRadius, distortion));
-		};
-
-		void save(std::ofstream& str) override;
-		void load(std::ifstream& str) override;
-	};
 	// assigns the ObjectType in the ObjectRegistry for the entity to be the specified objectType
 	struct ComponentObjectTypeAssigner final : public Component {
 

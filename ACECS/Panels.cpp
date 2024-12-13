@@ -1,6 +1,6 @@
 #include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
@@ -104,7 +104,7 @@ void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 
 	levelActive->worldTextureDynamic.display();
 }
-void PanelGameView::playerDraw(GameLevel* levelActive) {
+void PanelGameView::playerDraw(GameLevel*) {
 
 	// draw player memory
 	Entity& player = EntityManager::entityGet(GameData::playerId);

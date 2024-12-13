@@ -18,20 +18,20 @@ AStarGrid::AStarGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, fl
 
 
 
-void AStarGrid::cellUpdateNeighbors(CellCoordinate, CellCoordinate, WorldDistortionGrid&) {
+void AStarGrid::cellUpdateNeighbors(CellCoordinate, CellCoordinate, DistortionGrid&) {
 	//return cells[cellX][cellY].neighborCellsVectorUpdate(*this, cellSize, distortionGrid);
 }
-void AStarGrid::cellUpdateNeighbors(CellVector cellPos, WorldDistortionGrid& distortionGrid) {
+void AStarGrid::cellUpdateNeighbors(CellVector cellPos, DistortionGrid& distortionGrid) {
 	return cellUpdateNeighbors(cellPos.x, cellPos.y, distortionGrid);
 }
-void AStarGrid::cellUpdateNeighborsFromWorld(WorldCoordinate worldX, WorldCoordinate worldY, WorldDistortionGrid& distortionGrid) {
+void AStarGrid::cellUpdateNeighborsFromWorld(WorldCoordinate worldX, WorldCoordinate worldY, DistortionGrid& distortionGrid) {
 	return cellUpdateNeighbors(coordinatesWorldToCell(worldX, worldY), distortionGrid);
 }
-void AStarGrid::cellUpdateNeighborsFromWorld(WorldVector worldPos, WorldDistortionGrid& distortionGrid) {
+void AStarGrid::cellUpdateNeighborsFromWorld(WorldVector worldPos, DistortionGrid& distortionGrid) {
 	return cellUpdateNeighborsFromWorld(worldPos.x, worldPos.y, distortionGrid);
 }
 
-void AStarGrid::cellsAllUpdateNeighbors(WorldDistortionGrid& distortionGrid) {
+void AStarGrid::cellsAllUpdateNeighbors(DistortionGrid& distortionGrid) {
 	for (uint32_t x = 0; x < gridSize.x; x++) {
 		for (uint32_t y = 0; y < gridSize.y; y++) {
 			cellUpdateNeighbors(x, y, distortionGrid);

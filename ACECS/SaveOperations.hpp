@@ -2,7 +2,7 @@
 #define __SAVE_OPERATIONS_H__
 
 #include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
-#include "../Include/Game/World/Distortions/WorldDistortionGrid.hpp"
+#include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "SaveOperations.hpp"

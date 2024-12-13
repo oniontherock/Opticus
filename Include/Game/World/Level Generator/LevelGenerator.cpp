@@ -62,7 +62,7 @@ void LevelGenerator::roomSideSolidify(Room& room, sf::Vector2i side) {
 	}
 }
 
-void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t, WorldDistortionGrid& distortionGrid) {
+void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFrom, Room& roomTo, sf::Vector2i sideTo, uint16_t, DistortionGrid&) {
 	
 	const uint16_t xFromStart = uint16_t(sideFrom.x > 0 ? roomFrom.gridGetSizeX() - 1 : 0);
 	const uint16_t xFromEnd = uint16_t(sideFrom.x < 0 ? 1 : roomFrom.gridGetSizeX());
@@ -113,11 +113,11 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 
 				const sf::Vector2f teleportToLocation = sf::Vector2f(cellTeleportSide + portalOffset - sideTo);
 
-				cellDistortions.push_back(
-					Distortion([teleportToLocation](sf::Vector2f& heading, sf::Vector2f& position) {
-						position = teleportToLocation;
-						position -= heading;
-					}, Cooldown(INFINITY)));
+				//cellDistortions.push_back(
+				//	Distortion([teleportToLocation](sf::Vector2f& heading, sf::Vector2f& position) {
+				//		position = teleportToLocation;
+				//		position -= heading;
+				//	}, Cooldown(INFINITY)));
 			}
 
 			const sf::Vector2f cellFromCenter = roomFrom.cellGet(xFrom, yFrom).worldPos.position + (cellSize / 2.f);
@@ -135,14 +135,14 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 
 				const sf::Vector2f distortionCellLocation = sf::Vector2f(cellDistortionSide + distortionOffset);
 
-				distortionGrid.cellGetFromWorld(distortionCellLocation).distortionAdd(cellDistortions[subCellOffset]);
+				//distortionGrid.cellGetFromWorld(distortionCellLocation).distortionAdd(cellDistortions[subCellOffset]);
 			}
 		}
 	}
 }
 
 
-void LevelGenerator::roomGridGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
+void LevelGenerator::roomGridGenerate(RoomGrid& roomGrid, DistortionGrid& distortionGrid) {
 	for (uint16_t x = 0; x < roomGrid.gridGetSizeX(); x++) {
 		for (uint16_t y = 0; y < roomGrid.gridGetSizeY(); y++) {
 			roomGenerate(roomGrid.cellGet(x, y), roomGrid, distortionGrid);
@@ -150,7 +150,7 @@ void LevelGenerator::roomGridGenerate(RoomGrid& roomGrid, WorldDistortionGrid& d
 	}
 	ConsoleHandler::consolePrintLoadingGame("RoomGrid generation finished");
 }
-void LevelGenerator::roomGridConnectionsGenerate(RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
+void LevelGenerator::roomGridConnectionsGenerate(RoomGrid& roomGrid, DistortionGrid& distortionGrid) {
 	for (uint16_t x = 0; x < roomGrid.gridGetSizeX(); x++) {
 		for (uint16_t y = 0; y < roomGrid.gridGetSizeY(); y++) {
 			roomConnectionsGenerate(roomGrid.cellGet(x, y), roomGrid, distortionGrid);
@@ -158,7 +158,7 @@ void LevelGenerator::roomGridConnectionsGenerate(RoomGrid& roomGrid, WorldDistor
 	}
 	ConsoleHandler::consolePrintLoadingGame("RoomGrid connections generation finished");
 }
-void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid& distortionGrid) {
+void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, DistortionGrid& distortionGrid) {
 
 	roomSolidify(room);
 
@@ -191,7 +191,7 @@ void LevelGenerator::roomGenerate(Room& room, RoomGrid& roomGrid, WorldDistortio
 		}
 	}
 }
-void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, WorldDistortionGrid&) {
+void LevelGenerator::roomConnectionsGenerate(Room& room, RoomGrid& roomGrid, DistortionGrid&) {
 	if (uint16_t(room.positionGrid.x) < roomGrid.gridGetSizeX() - 1) {
 		room.connectionRight = room.positionGrid + RoomGridPosition(1, 0);
 	}

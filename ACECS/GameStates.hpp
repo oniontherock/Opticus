@@ -26,9 +26,10 @@ struct GameStatePlay : public GameState {
 
 	void gameStateUpdate() final;
 private:
-	bool firstUpdate = false;
+	bool firstUpdate = true;
 
 	void gameStateStart();
+	void levelStart(GameLevel* level);
 	void levelGenerate();
 	void worldClockUpdate();
 };

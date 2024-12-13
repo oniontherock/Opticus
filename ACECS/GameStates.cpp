@@ -33,8 +33,13 @@ void GameStatePlay::gameStateUpdate() {
 
 	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
 
-	if (levelActive->firstRun) {
+
+	if (firstUpdate) {
 		gameStateStart();
+		firstUpdate = false;
+	}
+	if (levelActive->firstRun) {
+		levelStart(levelActive);
 		levelActive->firstRun = false;
 	}
 
@@ -45,8 +50,13 @@ void GameStatePlay::gameStateUpdate() {
 	}
 	if (InputInterface::inputGetActive("Cell Distort")) {
 
-		for (int32_t yOffset = -64; yOffset < 64; yOffset++) {
-			levelActive->distortionGrid.cellGetFromWorld(mousePos + sf::Vector2f(0, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(-50, 0), 50000);
+		sf::Vector2u distortionCellPos = levelActive->distortionGrid.coordinatesWorldToCell(mousePos);
+
+		float offset = 64;
+
+		for (int32_t yOffset = -16; yOffset <= 16; yOffset++) {
+			levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(0, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(-offset*4, 0), 50000);
+			levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(-offset+1, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(offset*4, 0), 50000);
 		}
 
 	}
@@ -60,40 +70,48 @@ void GameStatePlay::gameStateUpdate() {
 
 void GameStatePlay::gameStateStart() {
 
+	sf::Image& img = GraphicsStore::imageStore.fileGetOrLoadFromName("Art/Perlin Noise Seamless", "png");
+
+	sf::Texture tex;
+	tex.loadFromImage(img);
+
+	GraphicsStore::textureStore.objectAddFromInstance("Perlin Noise Seamless", tex);
+}
+void GameStatePlay::levelStart(GameLevel* level) {
+
 	levelGenerate();
 
-	GameLevel* levelActive = GameLevelGrid::levelGet(0, 0, 0);
+	level->aStarGrid.cellsAllUpdateNeighbors(level->distortionGrid);
 
-	levelActive->aStarGrid.cellsAllUpdateNeighbors(levelActive->distortionGrid);
-
-	sf::Vector2u roomSize = GameLevelGrid::levelGet(0, 0, 0)->levelSize;
+	sf::Vector2u roomSize = level->levelSize;
 
 
 	// create player and assign the level's playerId to the id of the newly created player
-	GameData::playerId = EntityManager::entityCreate(0, 0, 0, "Player");
+	GameData::playerId = EntityManager::entityCreate(level->levelPosition, "Player");
 	Entity& player = EntityManager::entityGet(GameData::playerId);
 	player.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000, 2000);
 
 	float offset = 64;
 	for (uint16_t i = 0; i < 3; i++) {
-		Entity& squadMember = EntityManager::entityGet(EntityManager::entityCreate(0, 0, 0, "Squad Member"));
+		Entity& squadMember = EntityManager::entityGet(EntityManager::entityCreate(level->levelPosition, "Squad Member"));
 		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - (i * offset), 2000);
 	}
 
-	EntityId spriteAId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
+	EntityId spriteAId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
 	Entity& spriteA = EntityManager::entityGet(spriteAId);
-	spriteA.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000-256, 2000);
+	spriteA.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000);
 
-	EntityId spriteBId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
+	EntityId spriteBId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
 	Entity& spriteB = EntityManager::entityGet(spriteBId);
-	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000-256, 2000+128);
+	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000 + 128);
 
-	EntityId targetPositionId = EntityManager::entityCreate(0, 0, 0, "Sprite Dynamic");
+	EntityId targetPositionId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
 	Entity& targetPosition = EntityManager::entityGet(targetPositionId);
 	targetPosition.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
 	targetPosition.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
 	targetPosition.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
 }
+
 void GameStatePlay::levelGenerate() {
 
 	GameLevel* gameLevel = GameLevelGrid::levelGet(0, 0, 0);

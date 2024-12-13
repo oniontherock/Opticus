@@ -245,6 +245,7 @@
   <ItemGroup>
     <Image Include="Art\Funky Noise.jpg" />
     <Image Include="Art\Perlin Noise.png" />
+    <Image Include="Art\Perlin Noise Seamless.png" />
     <Image Include="Art\Test Image.png" />
   </ItemGroup>
   <ItemGroup>

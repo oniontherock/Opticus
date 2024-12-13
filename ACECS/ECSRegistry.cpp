@@ -506,23 +506,23 @@ void ComponentVisionCasterHolder::system(Entity& entity) {
 
 	if (doUpdate) {
 		visionCaster.visionClear();
-		// get squad member surroundings
-		if (entity.entityComponentHas<ComponentActorBlackboard>()) {
-			ActorBlackboard& actorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard;
+		//// get squad member surroundings
+		//if (entity.entityComponentHas<ComponentActorBlackboard>()) {
+		//	ActorBlackboard& actorBlackboard = entity.entityComponentGet<ComponentActorBlackboard>()->actorBlackboard;
 
-			if (actorBlackboard.dataHas("SquadMemberPositionMemoriesVector")) {
+		//	if (actorBlackboard.dataHas("SquadMemberPositionMemoriesVector")) {
 
-				auto squadMemberPositionMemoriesVector = actorBlackboard.dataGet<std::vector<std::pair<sf::Vector2f, float>>>("SquadMemberPositionMemoriesVector");
+		//		auto squadMemberPositionMemoriesVector = actorBlackboard.dataGet<std::vector<std::pair<sf::Vector2f, float>>>("SquadMemberPositionMemoriesVector");
 
-				for (auto itr = squadMemberPositionMemoriesVector.begin(); itr != squadMemberPositionMemoriesVector.end(); itr++) {
-				
-					sf::Vector2f squadMemberPosition = itr->first;
-					float squadMemberTime = itr->second;
-				
-					visionCaster.update(squadMemberPosition.x, squadMemberPosition.y, 0, Mathf::TAU, squadMemberTime / 2.f, 128);
-				}
-			}
-		}
+		//		for (auto itr = squadMemberPositionMemoriesVector.begin(); itr != squadMemberPositionMemoriesVector.end(); itr++) {
+		//		
+		//			sf::Vector2f squadMemberPosition = itr->first;
+		//			float squadMemberTime = itr->second;
+		//		
+		//			visionCaster.update(squadMemberPosition.x, squadMemberPosition.y, 0, Mathf::TAU, squadMemberTime / 2.f, 128);
+		//		}
+		//	}
+		//}
 		// get vision
 		visionCaster.update(positionComponent->position.x, positionComponent->position.y, angle, coneSize, 1000, 512);
 		// get surroundings

@@ -89,7 +89,7 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 		sf::Vector2f rayPosition = castPosition;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
-		float curTravelStep = 0.f;
+		sf::Vector2u cellPositionPrev;
 
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
@@ -97,21 +97,18 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 		float curDist = 0.f;
 		while (curDist < rayMaxDist) {
 			curDist += 1.f;
-			curTravelStep += 1.f;
 
-			if (curTravelStep >= distortionGrid.distortionCellSizeX) {
+			sf::Vector2u cellPosition = sf::Vector2u(
+				uint32_t(rayPosition.x * distortionGrid.distortionCellMultiplier),
+				uint32_t(rayPosition.y * distortionGrid.distortionCellMultiplier)
+			);
 
-				auto& distortion = distortionGrid.cellGet(
-					uint16_t(rayPosition.x * distortionGrid.distortionCellMultiplierX),
-					uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
-				);
+			auto& distortion = distortionGrid.cellGet(cellPosition);
 
+			cellPositionPrev = cellPosition;
 
-				// apply the distortion at the rayPosition to the ray.
-				distortion.distortionApplyToRay(rayHeading, rayPosition);
-
-				curTravelStep = 0.f;
-			}
+			// apply the distortion at the rayPosition to the ray.
+			distortion.distortionApplyToRay(rayHeading, rayPosition);
 
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.
@@ -128,11 +125,11 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 			sf::Vector2f visionPixel = (cameraCenter) + (rayHeadingOrig * curDist);
 			if (visionPixel.x < 0 || visionPixel.x >= visionTextureSize.x || visionPixel.y < 0 || visionPixel.y >= visionTextureSize.y) break;
 
-			double xDivided = double((rayPosition.x)) * posMultiplier;
+			double xDivided = double(rayPosition.x) * posMultiplier;
 			sf::Uint8 xChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(xDivided));
 			sf::Uint8 xPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((xDivided - xChunk) * 255));
 
-			double yDivided = double((rayPosition.y)) * posMultiplier;
+			double yDivided = double(rayPosition.y) * posMultiplier;
 			sf::Uint8 yChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(yDivided));
 			sf::Uint8 yPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((yDivided - yChunk) * 255));
 

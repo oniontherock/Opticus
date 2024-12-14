@@ -1,11 +1,13 @@
 #ifndef __DISTORTION_H__
 #define __DISTORTION_H__
 
+#include <cmath>
 #include <Auxiliary/VectorMath.hpp>
 #include <Auxiliary/Cooldown.hpp>
 #include <queue>
 #include <Auxiliary/TimeHandler.hpp>
 #include <functional>
+#include <Auxiliary/Math.hpp>
 
 enum class DistortionType {
 	HeadingMultiplier,
@@ -66,6 +68,7 @@ class Distortion {
 		// apply headingMultiplier
 		rayHeading.x *= headingMultiplier.x;
 		rayHeading.y *= headingMultiplier.y;
+
 		// apply headingOffset
 		rayHeading += headingOffset;
 

@@ -52,13 +52,21 @@ void GameStatePlay::gameStateUpdate() {
 
 		sf::Vector2u distortionCellPos = levelActive->distortionGrid.coordinatesWorldToCell(mousePos);
 
-		float offset = 64;
+		constexpr uint32_t cellSize = DistortionGrid::distortionCellSize;
 
-		for (int32_t yOffset = -16; yOffset <= 16; yOffset++) {
-			levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(0, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(-offset*4, 0), 50000);
-			levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(-offset+1, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(offset*4, 0), 50000);
+		float offset = 512 / cellSize;
+		float halfOffset = offset / 2.f;
+
+		for (int32_t xOffset = -1; xOffset <= 1; xOffset++) {
+			for (int32_t yOffset = -halfOffset; yOffset <= halfOffset; yOffset++) {
+
+				if (Vector2fMath::lengthSqrd(xOffset, yOffset) > halfOffset * halfOffset) continue;
+
+				levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(xOffset, yOffset)).distortionAdd(DistortionType::HeadingMultiplier, sf::Vector2f(-0.1f / cellSize, -0.1f / cellSize), 60000);
+				//levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(0, yOffset)).distortionAdd(DistortionType::PositionOffset, sf::Vector2f(-4, 0), 60000);
+				//levelActive->distortionGrid.cellGet(distortionCellPos + sf::Vector2u(-offset+1, yOffset)).distortionAdd(DistortionType::HeadingMultiplier, sf::Vector2f(offset*4, 0), 50000);
+			}
 		}
-
 	}
 
 	worldClockUpdate();

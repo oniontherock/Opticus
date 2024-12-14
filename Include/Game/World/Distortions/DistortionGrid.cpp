@@ -3,8 +3,8 @@
 #include <Auxiliary/ConsoleHandler.hpp>
 
 DistortionGrid::DistortionGrid(uint32_t gridSizeX, uint32_t gridSizeY) :
-	Grid<Distortion>::Grid(gridSizeX, gridSizeY, distortionCellSizeX, distortionCellSizeY)
+	Grid<Distortion>::Grid(gridSizeX, gridSizeY, distortionCellSize, distortionCellSize)
 {
-	cells = DistortionGrid2D(size_t(gridSizeX * distortionCellMultiplierX), DistortionGrid1D(size_t(gridSizeY * distortionCellMultiplierY), Distortion()));
+	cells = DistortionGrid2D(size_t(gridSizeX * distortionCellMultiplier), DistortionGrid1D(size_t(gridSizeY * distortionCellMultiplier), Distortion()));
 }
 

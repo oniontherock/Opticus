@@ -66,20 +66,29 @@ void ObjectVision::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 		sf::Vector2u rayPositionCell = objectGrid.coordinatesWorldToCell(rayPosition.x, rayPosition.y);
 		sf::Vector2u rayPositionCellPrev;
 
+		sf::Vector2u cellPositionPrev;
+
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		float curDist = 0.f;
 		while (curDist < rayMaxDist) {
 			curDist += 1.f;
 
-			auto& distortion = distortionGrid.cellGet(
-				uint16_t(rayPosition.x * distortionGrid.distortionCellMultiplierX),
-				uint16_t(rayPosition.y * distortionGrid.distortionCellMultiplierY)
+
+			sf::Vector2u cellPosition = sf::Vector2u(
+				uint32_t(rayPosition.x * distortionGrid.distortionCellMultiplier),
+				uint32_t(rayPosition.y * distortionGrid.distortionCellMultiplier)
 			);
 
+			if (cellPosition != cellPositionPrev) {
 
-			// apply the distortion at the rayPosition to the ray.
-			distortion.distortionApplyToRay(rayHeading, rayPosition);
+				auto& distortion = distortionGrid.cellGet(cellPosition);
+
+				cellPositionPrev = cellPosition;
+
+				// apply the distortion at the rayPosition to the ray.
+				distortion.distortionApplyToRay(rayHeading, rayPosition);
+			}
 
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.

@@ -24,12 +24,10 @@ struct DistortionGrid : Grid<Distortion> {
 	// the size of the distortion cells.
 	// with a size of 1x1, the distortion cells will be the size of pixels.
 	// larger values are generally faster, but they decrease the resolution of the DistortionGrid
-	static constexpr uint32_t distortionCellSizeX = 4;
-	static constexpr uint32_t distortionCellSizeY = 4;
+	static constexpr uint32_t distortionCellSize = 8;
 
 	// multiplier for distortionCell coordinates
-	static constexpr float distortionCellMultiplierX = 1.f / distortionCellSizeX;
-	static constexpr float distortionCellMultiplierY = 1.f / distortionCellSizeY;
+	static constexpr float distortionCellMultiplier = 1.f / distortionCellSize;
 };
 
 #endif

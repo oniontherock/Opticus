@@ -108,7 +108,7 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 			cellPositionPrev = cellPosition;
 
 			// apply the distortion at the rayPosition to the ray.
-			distortion.distortionApplyToRay(rayHeading, rayPosition);
+			distortion.distortionsApplyToRay(rayHeading, rayPosition);
 
 			// move the rayPosition by the rayHeading.
 			// keep in mind that a distortion was just applied to the heading, though the distortion may not have done anything.

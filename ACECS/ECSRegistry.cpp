@@ -412,7 +412,7 @@ void ComponentPosition::system(Entity& entity) {
 		// amount the ray would have moved naturally
 		movedEvent->naturalMovedAxis = heading;
 
-		GameLevelGrid::levelGet(entity.levelId)->distortionGrid.cellGetFromWorld(position).distortionApplyToRay(heading, position);
+		GameLevelGrid::levelGet(entity.levelId)->distortionGrid.cellGetFromWorld(position).distortionsApplyToRay(heading, position);
 		
 		position += heading;
 

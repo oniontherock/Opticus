@@ -87,7 +87,7 @@ void ObjectVision::raysCast(float coneSize, float rayMaxDist, uint32_t rayCount)
 				cellPositionPrev = cellPosition;
 
 				// apply the distortion at the rayPosition to the ray.
-				distortion.distortionApplyToRay(rayHeading, rayPosition);
+				distortion.distortionsApplyToRay(rayHeading, rayPosition);
 			}
 
 			// move the rayPosition by the rayHeading.

@@ -164,6 +164,8 @@
     <ClCompile Include="Include\Game\RayCasting\Object Vision\ObjectVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.cpp" />
     <ClCompile Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.cpp" />
+    <ClCompile Include="Include\Game\World\Distortions\DistortionCell.cpp" />
+    <ClCompile Include="Include\Game\World\Distortions\DistortionRegistry.cpp" />
     <ClCompile Include="Include\Game\World\Level Generator\LevelGenerator.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectCell.cpp" />
     <ClCompile Include="Include\Game\World\Objects\Object Grid\ObjectGrid.cpp" />
@@ -228,8 +230,11 @@
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\MemoryHolderVision.hpp" />
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\Distortion.hpp" />
+    <ClInclude Include="Include\Game\World\Distortions\DistortionCell.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\DistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
+    <ClInclude Include="Include\Game\World\Distortions\DistortionIds.hpp" />
+    <ClInclude Include="Include\Game\World\Distortions\DistortionRegistry.hpp" />
     <ClInclude Include="Include\Game\World\Level Generator\LevelGenerator.hpp" />
     <ClInclude Include="Include\Game\World\Objects\Object Grid\ObjectCell.hpp" />
     <ClInclude Include="Include\Game\World\Objects\Object Grid\ObjectGrid.hpp" />

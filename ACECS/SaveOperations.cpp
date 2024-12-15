@@ -1,6 +1,5 @@
 #include "SaveOperations.hpp"
 
-
 std::ofstream& operator<< (std::ofstream& str, std::string& item) {
 	size_t itemLen = item.size();
 	str << itemLen;
@@ -384,6 +383,22 @@ void EntityComponents::ComponentObjectTypeAssigner::save(std::ofstream& str) {
 void EntityComponents::ComponentObjectTypeAssigner::load(std::ifstream& str) {
 	str >> objectType;
 }
+
+#pragma endregion
+#pragma region Distortions
+void Distortions::DistortionHeadingMultiply::save(std::ofstream& str) {
+	str << multiplier;
+}
+void Distortions::DistortionHeadingMultiply::load(std::ifstream& str) {
+	str >> multiplier;
+}
+void Distortions::DistortionPositionSet::save(std::ofstream& str) {
+	str << point;
+}
+void Distortions::DistortionPositionSet::load(std::ifstream& str) {
+	str >> point;
+}
+
 
 #pragma endregion
 

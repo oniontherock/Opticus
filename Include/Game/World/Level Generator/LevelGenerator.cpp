@@ -96,7 +96,7 @@ void LevelGenerator::roomToRoomPortalCreate(Room& roomFrom, sf::Vector2i sideFro
 			// bool representing whether the sideTo is on the X or Y axis, true if on the X axis.
 			const bool toAxis = sideTo.x != 0 ? true : false;
 
-			std::vector<Distortion> cellDistortions;
+			//std::vector<Distortion> cellDistortions;
 
 			const sf::Vector2f cellToCenter = roomTo.cellGet(xTo, yTo).worldPos.position + (cellSize / 2.f);
 

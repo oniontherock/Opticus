@@ -3,6 +3,7 @@
 
 #include "../Include/Game/AI/Utility AI/States/AIStates.hpp"
 #include "../Include/Game/World/Distortions/DistortionGrid.hpp"
+#include "../include/Game/World/Distortions/DistortionRegistry.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
 #include "SaveOperations.hpp"

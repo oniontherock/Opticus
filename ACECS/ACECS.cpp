@@ -1,4 +1,5 @@
 #include "../Include/Game/World/Distortions/DistortionGrid.hpp"
+#include "../Include/Game/World/Distortions/DistortionRegistry.hpp"
 #include "ACECS.hpp"
 #include "ECSRegistry.hpp"
 #include "GameLevel.hpp"
@@ -153,6 +154,7 @@ void Engine::audioRegister() {
 void Engine::engineInitialize() {
 
 	RNGf::initialize();
+	Distortions::distortionsRegister();
 
 	GameLevelGrid::levelGridInitialize(1, 1, 1);
 	GameLevelGrid::levelAdd(new GameLevel(0, 0, 0), true);

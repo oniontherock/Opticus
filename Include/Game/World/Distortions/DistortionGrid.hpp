@@ -2,19 +2,20 @@
 #define __DISTORTION_GRID_H__
 
 #include "../../../Common/Grid.hpp"
-#include "SFML/System/Vector2.hpp"
 #include "Distortion.hpp"
+#include "SFML/System/Vector2.hpp"
 #include <functional>
 #include <string>
 #include <vector>
+#include "DistortionCell.hpp"
 
-typedef std::vector<Distortion> DistortionGrid1D;
+typedef std::vector<DistortionCell> DistortionGrid1D;
 typedef std::vector<DistortionGrid1D> DistortionGrid2D;
 
 typedef uint32_t DistortionCellCoordinate;
 typedef sf::Vector2u DistortionCellVector;
 
-struct DistortionGrid : Grid<Distortion> {
+struct DistortionGrid : Grid<DistortionCell> {
 
 	friend std::ofstream& operator<<(std::ofstream& str, DistortionGrid& item);
 	friend std::ifstream& operator>>(std::ifstream& str, DistortionGrid& item);

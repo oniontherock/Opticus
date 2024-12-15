@@ -966,7 +966,6 @@ namespace EntityComponents {
 	private:
 		sf::Vector2f posLast;
 	};
-
 	struct ComponentEventOnObjectNear final : public Component {
 
 		void system(Entity& entity) final;
@@ -990,7 +989,6 @@ namespace EntityComponents {
 		void save(std::ofstream& str) override;
 		void load(std::ifstream& str) override;
 	};
-
 	struct ComponentWinOnPlayerNear final : public Component {
 		void system(Entity& entity) final;
 

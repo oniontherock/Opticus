@@ -8,6 +8,7 @@ void Distortions::distortionsRegister() {
 	using DistortionRegistry = TypeIDAllocator<Distortion>;
 
 	DistortionRegistry::typeRegister<DistortionIds<DistortionPositionSet>>();
+	DistortionRegistry::typeRegister<DistortionIds<DistortionPositionOffset>>();
 	DistortionRegistry::typeRegister<DistortionIds<DistortionHeadingMultiply>>();
 }
 

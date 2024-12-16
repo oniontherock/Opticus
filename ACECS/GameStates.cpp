@@ -51,23 +51,31 @@ void GameStatePlay::gameStateUpdate() {
 	}
 	if (InputInterface::inputGetActive("Cell Distort")) {
 
-		sf::Vector2u distortionCellPos = levelActive->distortionGrid.coordinatesWorldToCell(mousePos);
+		using namespace Distortions;
+
+		sf::Vector2f posOffset(-640.f, 0);
+
+		sf::Vector2u portalSideA = levelActive->distortionGrid.coordinatesWorldToCell(mousePos);
+		sf::Vector2u portalSideB = levelActive->distortionGrid.coordinatesWorldToCell(mousePos + posOffset);
 
 		constexpr uint32_t cellSize = DistortionGrid::distortionCellSize;
 
-		float offset = 512 / cellSize;
+		float offset = 128 / cellSize;
 		float halfOffset = offset / 2.f;
 
-		Distortions::DistortionSharedPtr distortionSlowDown = Distortions::DistortionSharedPtr(new Distortions::DistortionHeadingMultiply(0.999f));
+		DistortionSharedPtr distortionPortalA = DistortionSharedPtr(new DistortionPositionOffset(posOffset));
+		DistortionSharedPtr distortionPortalB = DistortionSharedPtr(new DistortionPositionOffset(-posOffset));
 
-		for (int32_t xOffset = -halfOffset; xOffset <= halfOffset; xOffset++) {
+		for (int32_t xOffset = -0; xOffset <= 0; xOffset++) {
 			for (int32_t yOffset = -halfOffset; yOffset <= halfOffset; yOffset++) {
 
 				if (Vector2fMath::lengthSqrd(xOffset, yOffset) > halfOffset * halfOffset) continue;
 
-				sf::Vector2u cellPosOffset = distortionCellPos + sf::Vector2u(xOffset, yOffset);
+				sf::Vector2u cellPosOffsetA = portalSideA + sf::Vector2u(xOffset, yOffset) + sf::Vector2u(Vector2fMath::normalize(posOffset));
+				sf::Vector2u cellPosOffsetB = portalSideB + sf::Vector2u(xOffset, yOffset);
 
-				levelActive->distortionGrid.cellGet(cellPosOffset).distortionAdd<Distortions::DistortionHeadingMultiply>(distortionSlowDown, 10000);
+				levelActive->distortionGrid.cellGet(cellPosOffsetA).distortionAdd<DistortionPositionOffset>(distortionPortalA, 60000);
+				levelActive->distortionGrid.cellGet(cellPosOffsetB).distortionAdd<DistortionPositionOffset>(distortionPortalB, 60000);
 			}
 		}
 	}

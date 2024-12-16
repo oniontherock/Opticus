@@ -19,5 +19,7 @@ void DistortionPositionSet::distortionApplyToRay(sf::Vector2f& rayHeading, sf::V
 	rayPosition = point;
 }
 
-
+void DistortionPositionOffset::distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {
+	rayPosition += offset;
+}
 

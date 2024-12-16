@@ -36,6 +36,9 @@ namespace Distortions {
 		DistortionPositionSet(sf::Vector2f _point) {
 			point = _point;
 		}
+		DistortionPositionSet(float x, float y) {
+			point = sf::Vector2f(x, y);
+		}
 
 		sf::Vector2f point;
 
@@ -43,6 +46,29 @@ namespace Distortions {
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new DistortionPositionSet(point));
+		};
+
+		void save(std::ofstream& str) override;
+		void load(std::ifstream& str) override;
+	};
+	struct DistortionPositionOffset final : Distortion {
+
+		DistortionPositionOffset() {
+			offset = sf::Vector2f(0, 0);
+		}
+		DistortionPositionOffset(sf::Vector2f _offset) {
+			offset = _offset;
+		}
+		DistortionPositionOffset(float x, float y) {
+			offset = sf::Vector2f(x, y);
+		}
+
+		sf::Vector2f offset;
+
+		void distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) override;
+
+		std::unique_ptr<Duplicatable> duplicate() override {
+			return std::unique_ptr<Duplicatable>(new DistortionPositionOffset(offset));
 		};
 
 		void save(std::ofstream& str) override;

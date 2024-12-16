@@ -393,22 +393,23 @@ void Distortions::Distortion::load(std::ifstream& str) {
 };
 
 void Distortions::DistortionHeadingMultiply::save(std::ofstream& str) {
-	Distortions::Distortion::save(str); // call base save function
 	str << multiplier;
 }
 void Distortions::DistortionHeadingMultiply::load(std::ifstream& str) {
-	Distortions::Distortion::load(str); // call base load function
 	str >> multiplier;
 }
 void Distortions::DistortionPositionSet::save(std::ofstream& str) {
-	Distortions::Distortion::save(str); // call base save function
 	str << point;
 }
 void Distortions::DistortionPositionSet::load(std::ifstream& str) {
-	Distortions::Distortion::load(str); // call base load function
 	str >> point;
 }
-
+void Distortions::DistortionPositionOffset::save(std::ofstream& str) {
+	str << offset;
+}
+void Distortions::DistortionPositionOffset::load(std::ifstream& str) {
+	str >> offset;
+}
 
 #pragma endregion
 
@@ -632,6 +633,7 @@ std::ofstream& operator<< (std::ofstream& str, DistortionCell& item) {
 		str << size;
 
 		for (uint32_t ind = 0; ind < size; ind++) {
+			item.distortions[id][ind]->Distortion::save(str); // call base save function
 			item.distortions[id][ind]->save(str);
 		}
 	}
@@ -656,6 +658,7 @@ std::ifstream& operator>> (std::ifstream& str, DistortionCell& item) {
 			// release unique ptr to duplicated distortion
 			componentDuplicated.release();
 
+			componentDuplicatedRaw->Distortion::load(str); // call base load function
 			// load the data that was saved for this distortion
 			componentDuplicatedRaw->load(str);
 

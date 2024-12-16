@@ -25,13 +25,9 @@ std::ofstream& operator<< (std::ofstream& str, GameLevel& item) {
 	str << item.dynamicSpriteEntityIds;
 	str << item.staticSpriteEntityIds;
 	str << item.firstRun;
-	//str << item.distortionGrid;
+	str << item.distortionGrid;
 	str << item.objectGrid;
-	//str << item.roomGrid;
-	//str << item.levelGenerator;
 	str << item.aStarGrid;
-	//str << item.worldTextureStatic;
-	//str << item.worldTextureDynamic;
 
 	return str;
 }
@@ -41,13 +37,9 @@ std::ifstream& operator>> (std::ifstream& str, GameLevel& item) {
 	str >> item.dynamicSpriteEntityIds;
 	str >> item.staticSpriteEntityIds;
 	str >> item.firstRun;
-	//str >> item.distortionGrid;
+	str >> item.distortionGrid;
 	str >> item.objectGrid;
-	//str >> item.roomGrid;
-	//str >> item.levelGenerator;
 	str >> item.aStarGrid;
-	//str >> item.worldTextureStatic;
-	//str >> item.worldTextureDynamic;
 
 	return str;
 }
@@ -386,16 +378,34 @@ void EntityComponents::ComponentObjectTypeAssigner::load(std::ifstream& str) {
 
 #pragma endregion
 #pragma region Distortions
+
+void Distortions::Distortion::save(std::ofstream& str) {
+	// save length of deathTime
+	Distortions::DistortionDeathTime deathTimeRemaining = deathTime - TimeHandler::timeSimulatedGet();
+	str << deathTimeRemaining;
+};
+void Distortions::Distortion::load(std::ifstream& str) {
+	// load remaining amount of deathTime
+	Distortions::DistortionDeathTime deathTimeRemaining;
+	str >> deathTimeRemaining;
+	// set deathTime to be current time plus loaded remaining deathTime
+	deathTime = deathTimeRemaining + TimeHandler::timeSimulatedGet();
+};
+
 void Distortions::DistortionHeadingMultiply::save(std::ofstream& str) {
+	Distortions::Distortion::save(str); // call base save function
 	str << multiplier;
 }
 void Distortions::DistortionHeadingMultiply::load(std::ifstream& str) {
+	Distortions::Distortion::load(str); // call base load function
 	str >> multiplier;
 }
 void Distortions::DistortionPositionSet::save(std::ofstream& str) {
+	Distortions::Distortion::save(str); // call base save function
 	str << point;
 }
 void Distortions::DistortionPositionSet::load(std::ifstream& str) {
+	Distortions::Distortion::load(str); // call base load function
 	str >> point;
 }
 
@@ -561,6 +571,125 @@ std::ifstream& operator>> (std::ifstream& str, ObjectMemoryHolder& item) {
 		for (uint32_t y = 0; y < objectMemoriesSubLength; y++) {
 			str >> item.objectMemoriesVector[x][y].first;
 			str >> item.objectMemoriesVector[x][y].second;
+		}
+	}
+
+	return str;
+}
+//
+//std::ofstream& operator<< (std::ofstream& str, Entity& item) {
+//	str << item.updateType;
+//	str << item.levelId;
+//
+//	for (EntityComponents::ComponentTypeID componentIdCur = 0; componentIdCur < EntityComponents::totalComponents; componentIdCur++) {
+//		if (item.entityComponentHasAtIndex(componentIdCur)) {
+//			str << componentIdCur;
+//			item.entityComponentGetAtIndex(componentIdCur)->save(str);
+//		}
+//	}
+//	// put in super high value so that the component loading loop exits
+//	str << EntityComponents::totalComponents;
+//
+//	return str;
+//}
+//std::ifstream& operator>> (std::ifstream& str, Entity& item) {
+//	str >> item.updateType;
+//	str >> item.levelId;
+//
+//	EntityComponents::ComponentTypeID componentIdCur;
+//	str >> componentIdCur;
+//	do {
+//
+//		// get the component of the current type that the entity saved.
+//		EntityComponents::Component* componentToDuplicate = EntityComponents::componentsAll[componentIdCur].get();
+//		// duplicate the component that the entity saved
+//		ComponentUniquePtr componentDuplicated = Duplicatable::duplicateAndConvertToType<EntityComponents::Component>(componentToDuplicate);
+//		// raw pointer to the duplicate that was duplicated
+//		EntityComponents::Component* componentDuplicatedRaw = componentDuplicated.get();
+//		// release unique ptr to duplicated component
+//		componentDuplicated.release();
+//
+//		// load the data that the entity saved for this component
+//		componentDuplicatedRaw->load(str);
+//
+//		// add the duplicated type to the entity
+//		item.entityComponentAddAtIndex(componentDuplicatedRaw, componentIdCur);
+//
+//		str >> componentIdCur;
+//	} while (componentIdCur < EntityComponents::totalComponents);
+//
+//	return str;
+//}
+
+
+std::ofstream& operator<< (std::ofstream& str, DistortionCell& item) {
+
+	using namespace Distortions;
+
+	for (DistortionTypeId id = 0; id < totalDistortions; id++) {
+
+		size_t size = item.distortions[id].size();
+		str << size;
+
+		for (uint32_t ind = 0; ind < size; ind++) {
+			item.distortions[id][ind]->save(str);
+		}
+	}
+
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, DistortionCell& item) {
+	using namespace Distortions;
+
+	for (DistortionTypeId id = 0; id < totalDistortions; id++) {
+
+		size_t size;
+		str >> size;
+
+		for (uint32_t ind = 0; ind < size; ind++) {
+			// get the distortion of the current type.
+			Distortion* componentToDuplicate = distortionsAll[id].get();
+			// duplicate the distortion
+			DistortionUniquePtr componentDuplicated = Duplicatable::duplicateAndConvertToType<Distortion>(componentToDuplicate);
+			// raw pointer to the duplicate that was duplicated
+			Distortion* componentDuplicatedRaw = componentDuplicated.get();
+			// release unique ptr to duplicated distortion
+			componentDuplicated.release();
+
+			// load the data that was saved for this distortion
+			componentDuplicatedRaw->load(str);
+
+			item.distortions[id].push_back(DistortionSharedPtr(componentDuplicatedRaw));
+		}
+	}
+
+	return str;
+}
+
+std::ofstream& operator<< (std::ofstream& str, DistortionGrid& item) {
+	str << item.gridSize;
+	str << item.cellCount;
+	str << item.cellSize;
+	str << item.gridSizeFull;
+
+	for (uint32_t x = 0; x < item.gridSize.x; x++) {
+		for (uint32_t y = 0; y < item.gridSize.y; y++) {
+			//std::cout << item.cells[x][y].distortions.size() << std::endl;
+			str << item.cells[x][y];
+		}
+	}
+
+	return str;
+}
+std::ifstream& operator>> (std::ifstream& str, DistortionGrid& item) {
+	str >> item.gridSize;
+	str >> item.cellCount;
+	str >> item.cellSize;
+	str >> item.gridSizeFull;
+
+	for (uint32_t x = 0; x < item.gridSize.x; x++) {
+		for (uint32_t y = 0; y < item.gridSize.y; y++) {
+			str >> item.cells[x][y];
 		}
 	}
 

@@ -183,6 +183,16 @@ std::ofstream& operator<< (std::ofstream& str, UtilityStateManager& item);
 // UtilityStateManager in
 std::ifstream& operator>> (std::ifstream& str, UtilityStateManager& item);
 
+// DistortionCell out
+std::ofstream& operator<< (std::ofstream& str, DistortionCell& item);
+// DistortionCell in
+//std::ifstream& operator>> (std::ifstream& str, DistortionCell& item);
+
+// DistortionGrid out
+std::ofstream& operator<< (std::ofstream& str, DistortionGrid& item);
+// DistortionGrid in
+std::ifstream& operator>> (std::ifstream& str, DistortionGrid& item);
+
 #pragma region ECS Saving
 // Entity out
 std::ofstream& operator<< (std::ofstream& str, Entity& item);

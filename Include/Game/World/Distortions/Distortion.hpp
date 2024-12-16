@@ -22,8 +22,8 @@ namespace Distortions {
 
 		virtual void distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {};
 
-		virtual void save(std::ofstream&) {};
-		virtual void load(std::ifstream&) {};
+		virtual void save(std::ofstream& str);
+		virtual void load(std::ifstream& str);
 
 		DistortionDeathTime deathTime = 0;
 	};

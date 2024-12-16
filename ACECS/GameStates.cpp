@@ -67,7 +67,7 @@ void GameStatePlay::gameStateUpdate() {
 
 				sf::Vector2u cellPosOffset = distortionCellPos + sf::Vector2u(xOffset, yOffset);
 
-				levelActive->distortionGrid.cellGet(cellPosOffset).distortionAdd<Distortions::DistortionHeadingMultiply>(distortionSlowDown, 6000);
+				levelActive->distortionGrid.cellGet(cellPosOffset).distortionAdd<Distortions::DistortionHeadingMultiply>(distortionSlowDown, 10000);
 			}
 		}
 	}

@@ -16,33 +16,6 @@ using namespace std;
 
 int main() {
 
-	//std::vector<uint16_t> vecIntsOut;
-	//for (int i = 0; i < 12; i++) {
-	//	vecIntsOut.push_back(uint16_t(i + 1));
-	//}
-	//std::vector<string> vecStringOut;
-	//vecStringOut.push_back("Hello");
-	//vecStringOut.push_back("World");
-	//vecStringOut.push_back("!");
-
-	//SaveHolder::fileWriterOpen();
-	//SaveHolder::objectSave(vecIntsOut);
-	//SaveHolder::fileWriterClose();
-
-	//std::vector<string> vecStringIn;
-	//std::vector<uint16_t> vecIntsIn;
-
-	//SaveHolder::fileReaderOpen();
-	//SaveHolder::objectLoad(vecIntsIn);
-	//SaveHolder::fileReaderClose();
-
-	//for (uint16_t e : vecIntsIn) {
-	//	cout << e << endl;
-	//}
-	////for (string e : vecStringIn) {
-	////	cout << e << endl;
-	////}
-
 	TimeHandler::deltaCompute();
 
 	srand(TimeHandler::timeRealGet());

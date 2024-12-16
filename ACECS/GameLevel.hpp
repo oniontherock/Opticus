@@ -40,6 +40,9 @@ struct GameLevel : public BaseLevel {
 	sf::RenderTexture worldTextureStatic;
 	// render texture for dynamic objects in the world, I.E. objects that do move, or even change sprite.
 	sf::RenderTexture worldTextureDynamic;
+	
+	// texture for the background, drawn to worldTextureStatic every frame
+	sf::RenderTexture backgroundTexture;
 
 	void roomGridGenerate();
 };

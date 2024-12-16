@@ -94,7 +94,7 @@ void GameStatePlay::levelStart(GameLevel* level) {
 
 	level->aStarGrid.cellsAllUpdateNeighbors(level->distortionGrid);
 
-	sf::Vector2u roomSize = level->levelSize;
+	sf::Vector2u levelSize = level->levelSize;
 
 
 	// create player and assign the level's playerId to the id of the newly created player
@@ -121,6 +121,57 @@ void GameStatePlay::levelStart(GameLevel* level) {
 	targetPosition.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
 	targetPosition.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
 	targetPosition.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
+
+
+
+	level->backgroundTexture.create(levelSize.x, levelSize.y);
+
+	sf::VertexArray lines;
+	lines.setPrimitiveType(sf::Lines);
+
+	uint32_t lineCount = 5000000;
+
+	for (uint32_t i = 0; i < lineCount; i++) {
+
+		sf::Color color = sf::Color(RNGf::getRange(50, 125), RNGf::getRange(100, 255), RNGf::getRange(0, 25), 85);
+
+		sf::Vertex lineStart;
+		lineStart.color = color;
+		lineStart.position = sf::Vector2f(RNGf::getRange(0.f, levelSize.x), RNGf::getRange(0, levelSize.y));
+
+		sf::Vertex lineEnd;
+		lineEnd.color = color;
+
+		// create vector with random heading
+		sf::Vector2f lineEndOffset = sf::Vector2f(cos(RNGf::getFullRange(Mathf::PI)), sin(RNGf::getFullRange(Mathf::PI)));
+		// scale length of vector
+		lineEndOffset = Vector2fMath::lengthSet(lineEndOffset, RNGf::getRange(3.f, 12.f));
+
+		lineEnd.position = lineStart.position + lineEndOffset;
+
+		lines.append(lineStart);
+		lines.append(lineEnd);
+
+
+		sf::Vector2f axis = lineEnd.position - lineStart.position;
+		float angleSide = atan2(axis.y, axis.x) + (Mathf::PI * 0.5f);
+
+		sf::Vector2f offset = Vector2fMath::lengthSet(sf::Vector2f(cos(angleSide), sin(angleSide)), RNGf::getRange(1.f, 2.f));
+
+		sf::Vertex lineStartOffsetted = lineStart;
+		lineStartOffsetted.position += offset;
+
+		sf::Vertex lineEndOffsetted = lineEnd;
+		lineStartOffsetted.position += offset;
+
+		lines.append(lineStartOffsetted);
+		lines.append(lineEndOffsetted);
+
+	}
+
+	level->backgroundTexture.draw(lines);
+
+	level->backgroundTexture.display();
 }
 
 void GameStatePlay::levelGenerate() {

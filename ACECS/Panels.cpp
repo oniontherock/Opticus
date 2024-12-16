@@ -77,9 +77,12 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 	// draw white background
 	sf::RectangleShape rectangleBackground;
 	rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));
-	rectangleBackground.setFillColor(sf::Color(25, 125, 0, 255));
+	rectangleBackground.setFillColor(sf::Color(10, 75, 0, 255));
 
 	levelActive->worldTextureStatic.draw(rectangleBackground);
+
+	sf::Sprite backgroundSprite(levelActive->backgroundTexture.getTexture());
+	levelActive->worldTextureStatic.draw(backgroundSprite);
 
 	for (const EntityId& i : levelActive->staticSpriteEntityIds) {
 		Entity& entityCur = EntityManager::entityGet(i);

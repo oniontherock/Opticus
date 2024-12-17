@@ -159,7 +159,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSpriteDynamicRegister>(),
-			createComponentPairFromType<ComponentSprite>("Art/Error texture"),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture", false),
 		}
 		);
 	ComponentTemplateManager::componentTemplateAdd(
@@ -172,7 +172,7 @@ void EntityComponents::componentTemplatesInitialize() {
 		/// list of components in template
 		{
 			createComponentPairFromType<ComponentSpriteStaticRegister>(),
-			createComponentPairFromType<ComponentSprite>("Art/Error texture"),
+			createComponentPairFromType<ComponentSprite>("Art/Error texture", false),
 		}
 		);
 
@@ -235,7 +235,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectVision>(0.1f),
 			createComponentPairFromType<ComponentObjectMemory>(),
 			createComponentPairFromType<ComponentAudioPlayOnMove>("HumanFootstep", sf::Vector2f(-0.25f, +0.25f), sf::Vector2f(-2.5f, +2.5f)),
-			createComponentPairFromType<ComponentSprite>("Art/Squad Member"),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member", true),
 			createComponentPairFromType<ComponentOrderTransmitByInput>(),
 			createComponentPairFromType<ComponentOrderTargeter>(),
 			createComponentPairFromType<ComponentOrderTransmitter>(),
@@ -283,7 +283,7 @@ void EntityComponents::componentTemplatesInitialize() {
 			createComponentPairFromType<ComponentObjectTypeAssigner>(ObjectType::SquadMember),
 			createComponentPairFromType<ComponentPosition>(sf::Vector2f(256.f + 64.f, 256.f)),
 			createComponentPairFromType<ComponentObjectGridInhabiterRadius>(32.f),
-			createComponentPairFromType<ComponentSprite>("Art/Squad Member"),
+			createComponentPairFromType<ComponentSprite>("Art/Squad Member", true),
 			createComponentPairFromType<ComponentActorBlackboard>([](Entity& actor, ActorBlackboard& actorBlackboard) {
 
 			auto objectsSeen = actorBlackboard.dataGet<ObjectIdVector>("ObjectsSeen");

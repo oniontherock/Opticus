@@ -312,16 +312,17 @@ namespace EntityComponents {
 			hasSystem = true;
 		};
 		// constructor that takes file name and extension, then loads/gets an image from the imageStore, and loads the texture with that image
-		ComponentSprite(std::string _fileName, std::string _fileExtension) :
+		ComponentSprite(std::string _fileName, std::string _fileExtension, bool _checkDistortions) :
 			ComponentSprite()
 		{
 			fileName = _fileName;
 			fileExtension = _fileExtension;
+			checkDistortions = _checkDistortions;
 			
 			textureInitialize();
 		};
-		ComponentSprite(std::string _fileName) :
-			ComponentSprite(_fileName, GraphicsStore::imageStore.extensionDefaultGet())
+		ComponentSprite(std::string _fileName, bool _checkDistortions) :
+			ComponentSprite(_fileName, GraphicsStore::imageStore.extensionDefaultGet(), _checkDistortions)
 		{};
 
 		// the name of the file for the texture
@@ -331,8 +332,11 @@ namespace EntityComponents {
 
 		sf::Sprite sprite;
 
+		// whether the sprite should check for distortions when drawing
+		bool checkDistortions = false;
+
 		std::unique_ptr<Duplicatable> duplicate() override {
-			return std::unique_ptr<Duplicatable>(new ComponentSprite(fileName, fileExtension));
+			return std::unique_ptr<Duplicatable>(new ComponentSprite(fileName, fileExtension, checkDistortions));
 		};
 
 		void save(std::ofstream& str) override;

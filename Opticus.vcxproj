@@ -231,6 +231,7 @@
     <ClInclude Include="Include\Game\RayCasting\Vision Rendering\VisionCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\Distortion.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\DistortionCell.hpp" />
+    <ClInclude Include="Include\Game\World\Distortions\DistortionCheckDrawer.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\DistortionGrid.hpp" />
     <ClInclude Include="Include\Game\RayCasting\RayCaster.hpp" />
     <ClInclude Include="Include\Game\World\Distortions\DistortionIds.hpp" />

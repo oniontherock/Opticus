@@ -1,13 +1,14 @@
 #include "../Include/Debugging/AStarPathDrawer.hpp"
 #include "../Include/Debugging/ObjectGridRenderer.hpp"
+#include "../Include/Game/World/Distortions/DistortionCheckDrawer.hpp"
 #include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "ECS/Entities/EntityManager.hpp"
 #include "ECSRegistry.hpp"
 #include "Input.hpp"
 #include "Panels.hpp"
 #include <Auxiliary/Math.hpp>
-#include <Auxiliary/VectorMath.hpp>
 #include <Auxiliary/NumberGenerator.hpp>
+#include <Auxiliary/VectorMath.hpp>
 
 void PanelGameView::panelUpdate() {
 
@@ -101,8 +102,14 @@ void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 		Entity& entityCur = EntityManager::entityGet(i);
 
 		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
+		auto* componentPosition = entityCur.entityComponentGet<EntityComponents::ComponentPosition>();
 
-		levelActive->worldTextureDynamic.draw(componentSprite->sprite);
+		if (componentSprite->checkDistortions) {
+			Distortions::drawCheckDistortions(levelActive->worldTextureDynamic, componentSprite->sprite, WorldPosition(entityCur.levelId, componentPosition->position), 64.f, 64.f);
+		}
+		else {
+			levelActive->worldTextureDynamic.draw(componentSprite->sprite);
+		}
 	}
 
 	levelActive->worldTextureDynamic.display();

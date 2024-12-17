@@ -12,15 +12,15 @@ void Distortions::distortionsRegister() {
 	DistortionRegistry::typeRegister<DistortionIds<DistortionHeadingMultiply>>();
 }
 
-void DistortionHeadingMultiply::distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {
+void DistortionHeadingMultiply::distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f&) {
 	rayHeading *= multiplier;
 }
 
-void DistortionPositionSet::distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {
+void DistortionPositionSet::distortionApplyToRay(sf::Vector2f&, sf::Vector2f& rayPosition) {
 	rayPosition = point;
 }
 
-void DistortionPositionOffset::distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {
+void DistortionPositionOffset::distortionApplyToRay(sf::Vector2f&, sf::Vector2f& rayPosition) {
 	rayPosition += offset;
 }
 

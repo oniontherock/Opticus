@@ -22,7 +22,7 @@ struct PanelGameView : public Panel {
 	Modes mode = Normal;
 
 	void panelUpdate() final;
-	
+
 private:
 	void checkModeChange();
 

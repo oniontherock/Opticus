@@ -89,8 +89,6 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 		sf::Vector2f rayPosition = castPosition;
 		sf::Vector2f rayHeading = rayHeadingOrig;
 
-		sf::Vector2u cellPositionPrev;
-
 		// the assumed dist that the ray has moved.
 		// note the "assumed", because the ray may have moved more or less, due to distortions.
 		// we can use this assumed distance to find where the ray would be on the visionImage if no distortions existed.
@@ -104,8 +102,6 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 			);
 
 			auto& distortion = distortionGrid.cellGet(cellPosition);
-
-			cellPositionPrev = cellPosition;
 
 			// apply the distortion at the rayPosition to the ray.
 			distortion.distortionsApplyToRay(rayHeading, rayPosition);

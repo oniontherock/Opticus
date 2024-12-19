@@ -762,14 +762,14 @@ void ComponentObjectGridInhabiterRadius::system(Entity& entity) {
 
 	// note that two separate objectGrid references are used because an entity could travel to a different level.
 	
-	auto& objectGridDepopulation = GameLevelGrid::levelGet(positionPrev.level)->objectGrid;
+	auto& objectGridDepopulation = GameLevelGrid::levelGet(entity.levelId)->objectGrid;
 
 	for (float offsetX = -radius / 2.f; offsetX <= +radius / 2.f; offsetX += 1.f) {
 		for (float offsetY = -radius / 2.f; offsetY <= +radius / 2.f; offsetY += 1.f) {
 
 			if (Vector2fMath::lengthSqrd(offsetX, offsetY) > (radius * radius) / (2.f * 2.f)) continue;
 
-			objectGridDepopulation.cellGetFromWorld(positionPrev.position.x + offsetX, positionPrev.position.y + offsetY).idRemove(entity.Id);
+			objectGridDepopulation.cellGetFromWorld(positionPrev.x + offsetX, positionPrev.y + offsetY).idRemove(entity.Id);
 		}
 	};
 

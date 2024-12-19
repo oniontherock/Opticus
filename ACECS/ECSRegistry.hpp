@@ -569,8 +569,8 @@ namespace EntityComponents {
 		};
 
 		float radius;
-		// previous WorldPosition of population, used for depopulation.
-		WorldPosition positionPrev;
+		// previous position of population, used for depopulation.
+		sf::Vector2f positionPrev;
 
 		std::unique_ptr<Duplicatable> duplicate() override {
 			return std::unique_ptr<Duplicatable>(new ComponentObjectGridInhabiterRadius(radius));

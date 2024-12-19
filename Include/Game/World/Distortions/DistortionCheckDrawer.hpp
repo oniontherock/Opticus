@@ -16,6 +16,7 @@ namespace Distortions {
 	inline void drawCheckDistortions(sf::RenderTexture& texture, sf::Sprite& drawableObject, WorldPosition position, uint16_t rayCount, float rayMaxDist) {
 
 		std::vector<sf::Vector2f> points;
+		points.push_back(position.position);
 
 		GameLevel* gameLevel = GameLevelGrid::levelGet(position.level);
 
@@ -67,7 +68,7 @@ namespace Distortions {
 			bool found = false;
 			// check if the rayPosition already exists in the point vector, if it does, don't add this one to it
 			for (uint32_t i = 0; i < points.size(); i++) {
-				if (Mathf::approxEquals(rayPosition.x, points[i].x, 0.1f) && Mathf::approxEquals(rayPosition.y, points[i].y, 0.1f)) {
+				if (Vector2fMath::distSqrd(rayPosition, points[i]) < 32.f * 32.f) {
 					found = true;
 					break;
 				}

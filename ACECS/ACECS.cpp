@@ -29,7 +29,8 @@ void Engine::inputsRegister() {
 	InputInterface::inputRegister("Order Target Select", KeySet{ KeyEvent("Mouse Left", Pressed) }, InputKeyLogic::Or);
 
 	InputInterface::inputRegister("Cell Invalidate", KeySet{ KeyEvent("Mouse Right", Held) }, InputKeyLogic::Or);
-	InputInterface::inputRegister("Cell Distort", KeySet{ KeyEvent("LShift", Held), KeyEvent("Mouse Left", Pressed) }, InputKeyLogic::And);
+	InputInterface::inputRegister("Portal Create", KeySet{ KeyEvent("LShift", Held), KeyEvent("Mouse Left", Pressed) }, InputKeyLogic::And);
+	InputInterface::inputRegister("Slow Field Create", KeySet{ KeyEvent("LShift", Held), KeyEvent("Mouse Right", Held) }, InputKeyLogic::And);
 
 	InputInterface::inputRegister("Order 1", KeySet{ KeyEvent("Num1", Pressed) }, InputKeyLogic::Or);
 	InputInterface::inputRegister("Order 2", KeySet{ KeyEvent("Num2", Pressed) }, InputKeyLogic::Or);

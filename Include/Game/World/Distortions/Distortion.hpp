@@ -20,7 +20,7 @@ namespace Distortions {
 
 		virtual ~Distortion() = default;
 
-		virtual void distortionApplyToRay(sf::Vector2f& rayHeading, sf::Vector2f& rayPosition) {};
+		virtual void distortionApplyToRay(sf::Vector2f&, sf::Vector2f&) {};
 
 		virtual void save(std::ofstream& str);
 		virtual void load(std::ifstream& str);

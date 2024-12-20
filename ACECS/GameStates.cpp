@@ -210,8 +210,6 @@ void GameStatePlay::levelStart(GameLevel* level) {
 
 	sf::CircleShape circle;
 
-	circle.setRadius(64.f);
-
 	circle.setFillColor(sf::Color(125, 50, 10, 255));
 
 	const auto& path = level->pathGenerator.pathGet();
@@ -225,7 +223,11 @@ void GameStatePlay::levelStart(GameLevel* level) {
 		sf::Vector2f pointFrom = path[from].position;
 		sf::Vector2f pointTo = path[to].position;
 
-		constexpr float desiredDist = 128.f;
+		constexpr float desiredDist = 64.f;
+
+		circle.setRadius(desiredDist);
+		circle.setPosition(pointFrom);
+		level->pathsTexture.draw(circle);
 
 		float dist = Vector2fMath::distSqrd(pointFrom, pointTo);
 		while (dist > desiredDist * desiredDist) {
@@ -237,10 +239,10 @@ void GameStatePlay::levelStart(GameLevel* level) {
 			}
 			else {
 				pointFrom += Vector2fMath::lengthSet(Vector2fMath::axis(pointFrom, pointTo), desiredDist);
-				pointFrom += sf::Vector2f(RNGf::getRange(128.f), RNGf::getRange(128.f));
+				pointFrom += sf::Vector2f(RNGf::getRange(32.f), RNGf::getRange(32.f));
 			}
 
-			circle.setRadius(desiredDist + RNGf::getRange(16.f));
+			circle.setRadius(desiredDist);
 			circle.setPosition(pointFrom);
 			//circle.setPosition(pointFrom + sf::Vector2f(RNGf::getRange(128.f), RNGf::getRange(128.f)));
 			level->pathsTexture.draw(circle);

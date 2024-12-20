@@ -47,6 +47,11 @@ class PathGenerator {
 	// creates a point, adds it to the points vector, and returns it
 	PathPoint& pointCreate(sf::Vector2f position);
 
+	// returns whether the given line intersects any of the point connections (I.E. if the line crosses the path.
+	bool lineIntersectsPath(const PathPoint& lineStart, const PathPoint& lineEnd);
+	// returns the squared distance to the point closest to the given point
+	float pointGetDistSqrdToClosest(const PathPoint& point);
+
 	// generates a point, this includes children and connections.
 	// this function recursively calls itself with it's children points,
 	//

@@ -49,7 +49,9 @@ struct GameLevel : public BaseLevel {
 	// texture for the paths, drawn to worldTextureStatic every frame
 	sf::RenderTexture pathsTexture;
 
+	void grassDraw();
 	void pathsGenerate();
+	void pathsDraw();
 };
 
 using GameLevelGrid = LevelGrid<GameLevel>;

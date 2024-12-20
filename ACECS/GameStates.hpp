@@ -30,7 +30,6 @@ private:
 
 	void gameStateStart();
 	void levelStart(GameLevel* level);
-	void levelGenerate();
 	void worldClockUpdate();
 };
 

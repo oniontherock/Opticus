@@ -1,7 +1,4 @@
 #include "GameLevel.hpp"
-
-// this file is used for defining functions of the GameLevel class
-
 #include "ECSRegistry.hpp"
 
 GameLevel::GameLevel() :
@@ -10,7 +7,8 @@ GameLevel::GameLevel() :
 	objectGrid(levelSize.x / 4, levelSize.y / 4, 4.f, 4.f),
 	roomGrid(RoomGrid(8, 8, 32, 32, 16.f, 16.f)),
 	levelGenerator(LevelGenerator()),
-	aStarGrid(AStarGrid(levelSize.x / 16, levelSize.y / 16, 16.f, 16.f))
+	aStarGrid(AStarGrid(levelSize.x / 16, levelSize.y / 16, 16.f, 16.f)),
+	pathGenerator(PathGenerator())
 {
 	worldTextureStatic.create(levelSize.x, levelSize.y);
 	worldTextureDynamic.create(levelSize.x, levelSize.y);
@@ -28,7 +26,6 @@ GameLevel::GameLevel(LevelPosition _id) :
 	GameLevel(_id.x, _id.y, _id.z)
 {}
 
-void GameLevel::roomGridGenerate() {
-	//levelGenerator.roomGridConnectionsGenerate(roomGrid, distortionGrid);
-	//levelGenerator.roomGridGenerate(roomGrid, distortionGrid);
+void GameLevel::pathsGenerate() {
+	pathGenerator.pathGenerate(sf::Vector2f(256, levelSize.y / 2), sf::Vector2f(levelSize.x - 256, levelSize.y / 2));
 }

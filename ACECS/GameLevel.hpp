@@ -5,6 +5,7 @@
 #include "../Include/Game/World/Distortions/DistortionGrid.hpp"
 #include "../Include/Game/World/Level Generator/LevelGenerator.hpp"
 #include "../Include/Game/World/Objects/Object Grid/ObjectGrid.hpp"
+#include "../Include/Game/World/Procedural Generation/Path Generation/PathGenerator.hpp"
 #include "../Include/Game/World/Room Grid/RoomGrid.hpp"
 #include "SFML/Graphics.hpp"
 #include "World/Level.hpp"
@@ -36,6 +37,8 @@ struct GameLevel : public BaseLevel {
 	LevelGenerator levelGenerator;
 	AStarGrid aStarGrid;
 
+	PathGenerator pathGenerator;
+
 	// render texture for static objects in the world, I.E. objects that don't move.
 	sf::RenderTexture worldTextureStatic;
 	// render texture for dynamic objects in the world, I.E. objects that do move, or even change sprite.
@@ -43,8 +46,10 @@ struct GameLevel : public BaseLevel {
 	
 	// texture for the background, drawn to worldTextureStatic every frame
 	sf::RenderTexture backgroundTexture;
+	// texture for the paths, drawn to worldTextureStatic every frame
+	sf::RenderTexture pathsTexture;
 
-	void roomGridGenerate();
+	void pathsGenerate();
 };
 
 using GameLevelGrid = LevelGrid<GameLevel>;

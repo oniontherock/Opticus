@@ -189,7 +189,7 @@ void GameLevel::pathsDraw() {
 		quads.append(cornerBottomLeft);
 	}
 
-	const uint32_t lineCount = 100 * points.size();
+	const uint32_t lineCount = 25 * points.size();
 
 	for (uint32_t i = 0; i < lineCount; i++) {
 

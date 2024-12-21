@@ -7,10 +7,22 @@
 #include <string>
 #include <vector>
 
-typedef std::vector<sf::RenderTexture> TextureGrid1D;
-typedef std::vector<sf::RenderTexture> TextureGrid2D;
+// render texture that has a boolean representing whether or not it's active
+struct GridTexture : sf::RenderTexture {
+	inline bool getDrawActive() const {
+		return IsDrawActive;
+	}
+	inline void setDrawActive(bool state) {
+		IsDrawActive = state;
+	}
+private:
+	bool IsDrawActive = false;
+};
 
-struct TextureGrid : Grid<sf::RenderTexture> {
+typedef std::vector<GridTexture> TextureGrid1D;
+typedef std::vector<TextureGrid1D> TextureGrid2D;
+
+struct TextureGrid : Grid<GridTexture> {
 	TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
 };
 

@@ -1,15 +1,33 @@
 #include "TextureGrid.hpp"
 
+GridTexture::GridTexture() {
+	initialize();
+}
+
+bool GridTexture::getDrawActive() const {
+	return IsDrawActive;
+}
+void GridTexture::setDrawActive(bool state) {
+	IsDrawActive = state;
+}
+
+
 TextureGrid::TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
 	Grid<GridTexture>::Grid(gridSizeX, gridSizeY, cellSizeX, cellSizeY)
 {
+	TextureGrid2D rows(gridSize.x);
+
 	for (uint32_t x = 0; x < gridSize.x; x++) {
-		cells.push_back(TextureGrid1D());
+
+		TextureGrid1D columns(gridSize.y);
 		for (uint32_t y = 0; y < gridSize.y; y++) {
-			cells[x].push_back(GridTexture());
-			cells[x][y].create(cellSize.x, cellSize.y);
+			columns[y].create(cellSize.x, cellSize.y);
 		}
+
+		rows[x] = std::move(columns);
 	}
+
+	cells = std::move(rows);
 }
 
 

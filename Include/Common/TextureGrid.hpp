@@ -9,12 +9,10 @@
 
 // render texture that has a boolean representing whether or not it's active
 struct GridTexture : sf::RenderTexture {
-	inline bool getDrawActive() const {
-		return IsDrawActive;
-	}
-	inline void setDrawActive(bool state) {
-		IsDrawActive = state;
-	}
+	GridTexture();
+
+	bool getDrawActive() const;
+	void setDrawActive(bool state);
 private:
 	bool IsDrawActive = false;
 };

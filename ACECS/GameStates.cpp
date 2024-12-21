@@ -141,19 +141,19 @@ void GameStatePlay::levelStart(GameLevel* level) {
 		squadMember.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - (i * offset), 2000);
 	}
 
-	EntityId spriteAId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
-	Entity& spriteA = EntityManager::entityGet(spriteAId);
-	spriteA.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000);
+	//EntityId spriteAId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
+	//Entity& spriteA = EntityManager::entityGet(spriteAId);
+	//spriteA.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000);
 
-	EntityId spriteBId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
-	Entity& spriteB = EntityManager::entityGet(spriteBId);
-	spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000 + 128);
+	//EntityId spriteBId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
+	//Entity& spriteB = EntityManager::entityGet(spriteBId);
+	//spriteB.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 256, 2000 + 128);
 
-	EntityId targetPositionId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
-	Entity& targetPosition = EntityManager::entityGet(targetPositionId);
-	targetPosition.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
-	targetPosition.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
-	targetPosition.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
+	//EntityId targetPositionId = EntityManager::entityCreate(level->levelPosition, "Sprite Dynamic");
+	//Entity& targetPosition = EntityManager::entityGet(targetPositionId);
+	//targetPosition.entityComponentGet<EntityComponents::ComponentPosition>()->position = sf::Vector2f(2000 - 500, 2000);
+	//targetPosition.entityComponentAdd<EntityComponents::ComponentWinOnPlayerNear>(new EntityComponents::ComponentWinOnPlayerNear);
+	//targetPosition.entityComponentAdd<EntityComponents::ComponentEventOnObjectNear>(new EntityComponents::ComponentEventOnObjectNear(32));
 
 
 	level->grassDraw();

@@ -63,53 +63,16 @@ void GameLevel::grassDraw() {
 		sf::Vector2f offset = Vector2fMath::lengthSet(sf::Vector2f(cos(angleSide), sin(angleSide)), RNGf::getRange(1.f, 2.f));
 
 		sf::Vertex lineStartOffsetted = lineStart;
+		lineStartOffsetted.color = lineStart.color;
 		lineStartOffsetted.position += offset;
 
 		sf::Vertex lineEndOffsetted = lineEnd;
-		lineStartOffsetted.position += offset;
+		lineEndOffsetted.color = lineEnd.color;
+		lineEndOffsetted.position += offset;
 
 		lines.append(lineStartOffsetted);
 		lines.append(lineEndOffsetted);
 	}
-	uint32_t leafCount = 50000;
-
-	for (uint32_t i = 0; i < leafCount; i++) {
-
-		sf::Color color = sf::Color(RNGf::getRange(75, 125), RNGf::getRange(25, 75), RNGf::getRange(0, 25), 85);
-
-		sf::Vertex lineStart;
-		lineStart.color = color;
-		lineStart.position = sf::Vector2f(RNGf::getRange(0.f, levelSize.x), RNGf::getRange(0, levelSize.y));
-
-		sf::Vertex lineEnd;
-		lineEnd.color = color;
-
-		// create vector with random heading
-		sf::Vector2f lineEndOffset = sf::Vector2f(cos(RNGf::getFullRange(Mathf::PI)), sin(RNGf::getFullRange(Mathf::PI)));
-		// scale length of vector
-		lineEndOffset = Vector2fMath::lengthSet(lineEndOffset, RNGf::getRange(3.f, 12.f));
-
-		lineEnd.position = lineStart.position + lineEndOffset;
-
-		lines.append(lineStart);
-		lines.append(lineEnd);
-
-
-		sf::Vector2f axis = lineEnd.position - lineStart.position;
-		float angleSide = atan2(axis.y, axis.x) + (Mathf::PI * 0.5f);
-
-		sf::Vector2f offset = Vector2fMath::lengthSet(sf::Vector2f(cos(angleSide), sin(angleSide)), RNGf::getRange(1.f, 2.f));
-
-		sf::Vertex lineStartOffsetted = lineStart;
-		lineStartOffsetted.position += offset;
-
-		sf::Vertex lineEndOffsetted = lineEnd;
-		lineStartOffsetted.position += offset;
-
-		lines.append(lineStartOffsetted);
-		lines.append(lineEndOffsetted);
-	}
-
 
 	backgroundTexture.draw(lines);
 	backgroundTexture.display();
@@ -124,10 +87,15 @@ void GameLevel::pathsDraw() {
 	sf::VertexArray lines;
 	lines.setPrimitiveType(sf::Lines);
 
+	// we use this quad array to batch draw circles by drawing a quad with the texture of a circle
+	sf::VertexArray quads;
+	quads.setPrimitiveType(sf::Quads);
+	sf::Texture& circleTexture = GraphicsStore::textureStore.objectGet("Circle");
+
 	const auto& path = pathGenerator.pathGet();
 	const auto& connections = pathGenerator.connectionsGet();
 
-	constexpr float circleSize = 256.f;
+	constexpr float circleSize = 325.f;
 
 	std::vector<sf::Vector2f> points;
 	for (uint16_t i = 0; i < connections.size(); i++) {
@@ -158,7 +126,70 @@ void GameLevel::pathsDraw() {
 		}
 	}
 
-	const uint32_t lineCount = 500 * points.size();
+	const uint32_t dirtCount = 500 * points.size();
+
+	for (uint32_t i = 0; i < dirtCount; i++) {
+
+		sf::Vector2f pointPosition = points[RNGu16::getUnder(points.size())];
+
+		sf::Vector2f averagedOffset;
+		uint16_t weight = 32;
+		for (uint16_t weightIteration = 0; weightIteration < weight; weightIteration++) {
+			averagedOffset += sf::Vector2f(RNGf::getFullRange(circleSize), RNGf::getFullRange(circleSize));
+		}
+		averagedOffset /= float(weight);
+
+		sf::Vector2f circlePosition = pointPosition + Vector2fMath::lengthLimit(averagedOffset, circleSize);
+
+		float distToNearestPointSqrd = 99999999999;
+		for (uint32_t i = 0; i < points.size(); i++) {
+
+			float distSqrd = Vector2fMath::distSqrd(points[i], circlePosition);
+			if (distSqrd < distToNearestPointSqrd) {
+				distToNearestPointSqrd = distSqrd;
+			}
+		}
+
+		float offsetDistFromCenter = 1.f - (sqrt(distToNearestPointSqrd) / circleSize);
+		float colorMult = offsetDistFromCenter * offsetDistFromCenter * offsetDistFromCenter;
+
+		sf::Color color = sf::Color(RNGf::getRange(25, 70) * colorMult, RNGf::getRange(20, 60) * colorMult, RNGf::getRange(0, 6) * colorMult, 85 * colorMult);
+
+		sf::FloatRect circleDimensions = sf::FloatRect(circlePosition.x, circlePosition.y, RNGf::getRange(1.f, 16.f), RNGf::getRange(1.f, 16.f));
+		circleDimensions.left -= (circleDimensions.width / 2.f);
+		circleDimensions.top -= (circleDimensions.height / 2.f);
+
+
+		// top left corner
+		sf::Vertex cornerTopLeft;
+		cornerTopLeft.position = sf::Vector2f(circleDimensions.left, circleDimensions.top);
+		// top right corner
+		sf::Vertex cornerTopRight;
+		cornerTopRight.position = sf::Vector2f(circleDimensions.left + circleDimensions.width, circleDimensions.top);
+		// bottom right corner
+		sf::Vertex cornerBottomRight;
+		cornerBottomRight.position = sf::Vector2f(circleDimensions.left + circleDimensions.width, circleDimensions.top + circleDimensions.height);
+		// bottom left corner
+		sf::Vertex cornerBottomLeft;
+		cornerBottomLeft.position = sf::Vector2f(circleDimensions.left, circleDimensions.top + circleDimensions.height);
+
+		cornerTopLeft.color = color;
+		cornerTopRight.color = color;
+		cornerBottomRight.color = color;
+		cornerBottomLeft.color = color;
+
+		cornerTopLeft.texCoords = sf::Vector2f(0.f, 0.f);
+		cornerTopRight.texCoords = sf::Vector2f(circleTexture.getSize().x, 0.f);
+		cornerBottomRight.texCoords = sf::Vector2f(circleTexture.getSize().x, circleTexture.getSize().y);
+		cornerBottomLeft.texCoords = sf::Vector2f(0.f, circleTexture.getSize().y);
+
+		quads.append(cornerTopLeft);
+		quads.append(cornerTopRight);
+		quads.append(cornerBottomRight);
+		quads.append(cornerBottomLeft);
+	}
+
+	const uint32_t lineCount = 100 * points.size();
 
 	for (uint32_t i = 0; i < lineCount; i++) {
 
@@ -183,9 +214,9 @@ void GameLevel::pathsDraw() {
 		}
 
 		float offsetDistFromCenter = 1.f - (sqrt(distToNearestPointSqrd) / circleSize);
-		offsetDistFromCenter = offsetDistFromCenter * offsetDistFromCenter;
+		float colorMult = offsetDistFromCenter * offsetDistFromCenter;
 
-		sf::Color color = sf::Color(RNGf::getRange(25, 125) * offsetDistFromCenter, RNGf::getRange(25, 75) * offsetDistFromCenter, RNGf::getRange(0, 0) * offsetDistFromCenter, 85);
+		sf::Color color = sf::Color(RNGf::getRange(25, 125) * colorMult, RNGf::getRange(25, 75) * colorMult, RNGf::getRange(0, 0) * colorMult, 85);
 
 		sf::Vertex lineStart;
 		lineStart.color = color;
@@ -211,15 +242,18 @@ void GameLevel::pathsDraw() {
 		sf::Vector2f offset = Vector2fMath::lengthSet(sf::Vector2f(cos(angleSide), sin(angleSide)), RNGf::getRange(1.f, 2.f));
 
 		sf::Vertex lineStartOffsetted = lineStart;
+		lineStartOffsetted.color = lineStart.color;
 		lineStartOffsetted.position += offset;
 
 		sf::Vertex lineEndOffsetted = lineEnd;
-		lineStartOffsetted.position += offset;
+		lineEndOffsetted.color = lineEnd.color;
+		lineEndOffsetted.position += offset;
 
 		lines.append(lineStartOffsetted);
 		lines.append(lineEndOffsetted);
 	}
 
+	pathsTexture.draw(quads, &circleTexture);
 	pathsTexture.draw(lines);
 	pathsTexture.display();
 }

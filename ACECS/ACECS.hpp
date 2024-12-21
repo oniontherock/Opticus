@@ -17,6 +17,10 @@ private:
 	static void gameStatesRegister();
 	// audio is registered here
 	static void audioRegister();
+	// registers all sorts of image files
+	static void imagesRegister();
+	// registers all sorts of textures
+	static void texturesRegister();
 public:
 	// saves the engine
 	static void engineSave();

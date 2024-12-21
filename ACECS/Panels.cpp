@@ -84,10 +84,14 @@ void PanelGameView::staticDraw(GameLevel* levelActive) {
 	
 	// draw background texture
 	sf::Sprite backgroundSprite(levelActive->backgroundTexture.getTexture());
+	backgroundSprite.setTextureRect(sf::IntRect(viewRect));
+	backgroundSprite.setPosition(viewRect.left, viewRect.top);
 	levelActive->worldTextureStatic.draw(backgroundSprite);
 
 	// draw paths
 	sf::Sprite pathsSprite(levelActive->pathsTexture.getTexture());
+	pathsSprite.setTextureRect(sf::IntRect(viewRect));
+	pathsSprite.setPosition(viewRect.left, viewRect.top);
 	levelActive->worldTextureStatic.draw(pathsSprite);
 
 	for (const EntityId& i : levelActive->staticSpriteEntityIds) {

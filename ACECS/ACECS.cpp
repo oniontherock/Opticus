@@ -150,6 +150,15 @@ void Engine::audioRegister() {
 		SoundHandler::soundAdd("HumanFootstep", soundCur);
 	}
 }
+void Engine::imagesRegister() {
+	GraphicsStore::imageStore.fileLoadFromName("Art/Circle");
+}
+void Engine::texturesRegister() {
+	sf::Texture circleTexture;
+	circleTexture.loadFromImage(GraphicsStore::imageStore.objectGet("Art/Circle"));
+	GraphicsStore::textureStore.objectAddFromInstance("Circle", circleTexture);
+}
+
 // initialize the ACECS engine by registering all inputs, initializing the ECS module, and registering game states.
 // of course, certain modules do not have to be initialized if the user does not want them to be
 void Engine::engineInitialize() {
@@ -159,6 +168,10 @@ void Engine::engineInitialize() {
 
 	GameLevelGrid::levelGridInitialize(1, 1, 1);
 	GameLevelGrid::levelAdd(new GameLevel(0, 0, 0), true);
+
+	// register textures and images
+	imagesRegister();
+	texturesRegister();
 
 	inputsRegister();
 	panelsRegister();

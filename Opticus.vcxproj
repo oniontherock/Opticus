@@ -147,6 +147,7 @@
     <ClCompile Include="ACECS\SaveFunctions.cpp" />
     <ClCompile Include="ACECS\SaveOperations.cpp" />
     <ClCompile Include="Include\Common\DataCache.cpp" />
+    <ClCompile Include="Include\Common\TextureGrid.cpp" />
     <ClCompile Include="Include\Debugging\AStarPathDrawer.cpp" />
     <ClCompile Include="Include\Debugging\ObjectGridRenderer.cpp" />
     <ClCompile Include="Include\Game\AI\Actors\Data\ActorDataHolder.cpp" />
@@ -209,6 +210,7 @@
     <ClInclude Include="ACECS\SaveOperations.hpp" />
     <ClInclude Include="Include\Common\DataCache.hpp" />
     <ClInclude Include="Include\Common\Grid.hpp" />
+    <ClInclude Include="Include\Common\TextureGrid.hpp" />
     <ClInclude Include="Include\Debugging\AStarPathDrawer.hpp" />
     <ClInclude Include="Include\Debugging\ObjectGridRenderer.hpp" />
     <ClInclude Include="Include\Game\AI\Actors\Blackboard\ActorBlackboard.hpp" />

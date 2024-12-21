@@ -11,3 +11,38 @@ TextureGrid::TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX
 		}
 	}
 }
+
+
+void TextureGrid::texturesAllDeactivate() {
+	for (uint16_t i = 0; i < activeTextureIndexes.size(); i++) {
+		cellDeactivate(activeTextureIndexes[i]);
+	}
+}
+
+void TextureGrid::cellActivate(CellCoordinate cellX, CellCoordinate cellY) {
+	cellGet(cellX, cellY).setDrawActive(true);
+	activeTextureIndexes.push_back(CellVector(cellX, cellY));
+}
+void TextureGrid::cellActivate(CellVector cellPos) {
+	cellActivate(cellPos.x, cellPos.y);
+}
+void TextureGrid::cellActivateFromWorld(WorldCoordinate worldX, WorldCoordinate worldY) {
+	cellActivate(coordinatesWorldToCell(worldX, worldY));
+}
+void TextureGrid::cellActivateFromWorld(WorldVector worldPos) {
+	cellActivateFromWorld(worldPos.x, worldPos.y);
+}
+
+
+void TextureGrid::cellDeactivate(CellCoordinate cellX, CellCoordinate cellY) {
+	cellGet(cellX, cellY).setDrawActive(false);
+}
+void TextureGrid::cellDeactivate(CellVector cellPos) {
+	cellDeactivate(cellPos.x, cellPos.y);
+}
+void TextureGrid::cellDeactivateFromWorld(WorldCoordinate worldX, WorldCoordinate worldY) {
+	cellDeactivate(coordinatesWorldToCell(worldX, worldY));
+}
+void TextureGrid::cellDeactivateFromWorld(WorldVector worldPos) {
+	cellDeactivateFromWorld(worldPos.x, worldPos.y);
+}

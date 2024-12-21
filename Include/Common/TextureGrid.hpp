@@ -24,6 +24,21 @@ typedef std::vector<TextureGrid1D> TextureGrid2D;
 
 struct TextureGrid : Grid<GridTexture> {
 	TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY);
+
+	void texturesAllDeactivate();
+
+	void cellActivate(CellCoordinate cellX, CellCoordinate cellY);
+	void cellActivate(CellVector cellPos);
+	void cellActivateFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
+	void cellActivateFromWorld(WorldVector worldPos);
+
+	void cellDeactivate(CellCoordinate cellX, CellCoordinate cellY);
+	void cellDeactivate(CellVector cellPos);
+	void cellDeactivateFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
+	void cellDeactivateFromWorld(WorldVector worldPos);
+
+private:
+	std::vector<CellVector> activeTextureIndexes;
 };
 
 #endif

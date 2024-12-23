@@ -575,7 +575,7 @@ void ComponentVisionCasterDynamic::system(Entity& entity) {
 	VisionCaster& visionCaster = componentVisionCasterHolder->visionCaster;
 
 	if (componentVisionCasterHolder->doUpdate) {
-		visionCaster.textureToSeeSet(GameLevelGrid::levelGet(entity.levelId)->worldTextureDynamic);
+		//visionCaster.textureToSeeSet(GameLevelGrid::levelGet(entity.levelId)->worldTextureDynamic);
 		visionCaster.visionDisplay();
 	}
 }

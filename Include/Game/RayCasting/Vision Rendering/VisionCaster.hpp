@@ -1,12 +1,13 @@
 #ifndef __VISION_CASTER_H__
 #define __VISION_CASTER_H__
 
-#include <Auxiliary/Cooldown.hpp>
-#include <Auxiliary/Math.hpp>
-#include <Auxiliary/TimeHandler.hpp>
+#include "../../../Common/TextureGrid.hpp"
 #include "../ACECS/GameLevel.hpp"
 #include "../ACECS/Panels.hpp"
 #include "../RayCaster.hpp"
+#include <Auxiliary/Cooldown.hpp>
+#include <Auxiliary/Math.hpp>
+#include <Auxiliary/TimeHandler.hpp>
 #include <cstdint>
 #include <SFML/Graphics.hpp>
 
@@ -25,7 +26,7 @@ struct VisionCaster : public RayCaster {
 
 	void update(float fromX, float fromY, float angleTo, float coneSize, float rayMaxDist, uint32_t rayCount) override;
 
-	void textureToSeeSet(sf::RenderTexture& texture);
+	void textureToSeeSet(TextureGrid& texture);
 
 	const sf::RenderTexture& visionTextureGet();
 
@@ -45,7 +46,7 @@ protected:
 	sf::Vector2f cameraCenterLocal;
 
 	// texture that the raysCast function will use when casting
-	sf::RenderTexture* textureToSee;
+	TextureGrid* textureToSee;
 
 	void raysCast(float coneSize, float rayMaxDist, uint32_t rayCount) override;
 };

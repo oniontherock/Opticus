@@ -10,6 +10,7 @@
 #include "SFML/Graphics.hpp"
 #include "World/Level.hpp"
 #include "World/LevelGrid.hpp"
+#include "../Include/Common/TextureGrid.hpp"
 
 // example of the game level class,
 // 
@@ -40,7 +41,7 @@ struct GameLevel : public BaseLevel {
 	PathGenerator pathGenerator;
 
 	// render texture for static objects in the world, I.E. objects that don't move.
-	sf::RenderTexture worldTextureStatic;
+	TextureGrid worldTextureStatic;
 	// render texture for dynamic objects in the world, I.E. objects that do move, or even change sprite.
 	sf::RenderTexture worldTextureDynamic;
 	

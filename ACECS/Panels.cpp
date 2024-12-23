@@ -73,36 +73,53 @@ void PanelGameView::checkModeChange() {
 }
 
 void PanelGameView::staticDraw(GameLevel* levelActive) {
-	levelActive->worldTextureStatic.clear(sf::Color::Transparent);
 
-	// draw background base color
-	sf::RectangleShape rectangleBackground;
-	rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));
-	rectangleBackground.setFillColor(sf::Color(10, 75, 0, 255));
+	levelActive->worldTextureStatic.cellActivateFromWorld(EntityManager::entityGet(GameData::playerId).entityComponentGet<EntityComponents::ComponentPosition>()->position);
 
-	levelActive->worldTextureStatic.draw(rectangleBackground);
+	for (auto& ind : levelActive->worldTextureStatic.activeTextureIndexes) {
+		levelActive->worldTextureStatic.cellGet(ind).clear(sf::Color::Transparent);
+
+		sf::Vector2f texPosition = levelActive->worldTextureStatic.coordinatesCellToWorld(ind);
+
+		// draw background base color
+		sf::RectangleShape rectangleBackground;
+		rectangleBackground.setSize(sf::Vector2f(levelActive->levelSize));
+		rectangleBackground.setFillColor(sf::Color(10, 75, 0, 255));
+		rectangleBackground.setPosition(texPosition);
+
+		levelActive->worldTextureStatic.cellGet(ind).draw(rectangleBackground);
 	
-	// draw background texture
-	sf::Sprite backgroundSprite(levelActive->backgroundTexture.getTexture());
-	backgroundSprite.setTextureRect(sf::IntRect(viewRect));
-	backgroundSprite.setPosition(viewRect.left, viewRect.top);
-	levelActive->worldTextureStatic.draw(backgroundSprite);
+		// draw background texture
+		sf::Sprite backgroundSprite(levelActive->backgroundTexture.getTexture());
+		backgroundSprite.setTextureRect(sf::IntRect(viewRect));
+		backgroundSprite.setPosition(viewRect.left, viewRect.top);
+		levelActive->worldTextureStatic.cellGet(ind).draw(backgroundSprite);
 
-	// draw paths
-	sf::Sprite pathsSprite(levelActive->pathsTexture.getTexture());
-	pathsSprite.setTextureRect(sf::IntRect(viewRect));
-	pathsSprite.setPosition(viewRect.left, viewRect.top);
-	levelActive->worldTextureStatic.draw(pathsSprite);
+		// draw paths
+		sf::Sprite pathsSprite(levelActive->pathsTexture.getTexture());
+		pathsSprite.setTextureRect(sf::IntRect(viewRect));
+		pathsSprite.setPosition(viewRect.left, viewRect.top);
+		pathsSprite.setPosition(texPosition);
+		levelActive->worldTextureStatic.cellGet(ind).draw(pathsSprite);
+	}
 
 	for (const EntityId& i : levelActive->staticSpriteEntityIds) {
 		Entity& entityCur = EntityManager::entityGet(i);
 
 		auto* componentSprite = entityCur.entityComponentGet<EntityComponents::ComponentSprite>();
 
-		levelActive->worldTextureStatic.draw(componentSprite->sprite);
+		auto& texture = levelActive->worldTextureStatic.cellGetFromWorld(componentSprite->sprite.getPosition());
+
+		if (texture.getDrawActive()) {
+			texture.draw(componentSprite->sprite);
+		}
 	}
 
-	levelActive->worldTextureStatic.display();
+	for (auto& ind : levelActive->worldTextureStatic.activeTextureIndexes) {
+		levelActive->worldTextureStatic.cellDeactivate(ind);
+		levelActive->worldTextureStatic.cellGet(ind).display();
+	}
+	levelActive->worldTextureStatic.activeTextureIndexes.clear();
 }
 void PanelGameView::dynamicDraw(GameLevel* levelActive) {
 	levelActive->worldTextureDynamic.clear(sf::Color::Transparent);

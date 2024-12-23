@@ -26,7 +26,7 @@ void VisionCaster::operator= (const VisionCaster& other) {
 	castPosition = other.castPosition;
 }
 
-void VisionCaster::textureToSeeSet(sf::RenderTexture& texture) {
+void VisionCaster::textureToSeeSet(TextureGrid& texture) {
 	textureToSee = &texture;
 }
 
@@ -38,7 +38,7 @@ void VisionCaster::visionClear() {
 }
 
 void VisionCaster::visionDisplay() {
-	sf::Vector2u worldImageTextureSize = textureToSee->getTexture().getSize();
+	sf::Vector2u worldImageTextureSize = textureToSee->cellGetFromWorld(castPosition.position).getTexture().getSize();
 
 	sf::Texture visionImageTexture;
 	visionImageTexture.loadFromImage(visionImage);
@@ -46,7 +46,7 @@ void VisionCaster::visionDisplay() {
 	sf::Shader shader;
 	shader.loadFromFile("Include/Shaders/Raycasting/RayPositionsToWorldColors.glsl", sf::Shader::Fragment);
 	shader.setUniform("rayPositions", visionImageTexture);
-	shader.setUniform("worldTexture", textureToSee->getTexture());
+	shader.setUniform("worldTexture", textureToSee->cellGetFromWorld(castPosition.position).getTexture());
 	shader.setUniform("worldSize", sf::Glsl::Vec2(float(worldImageTextureSize.x), float(worldImageTextureSize.y)));
 	shader.setUniform("raysOrigin", sf::Glsl::Vec2(sf::Vector2f(visionImageCenter - cameraCenterLocal)));
 
@@ -121,11 +121,13 @@ static void raysCastAndUpdateVisionImage(uint32_t rayCount, float angleTo, float
 			sf::Vector2f visionPixel = (cameraCenter) + (rayHeadingOrig * curDist);
 			if (visionPixel.x < 0 || visionPixel.x >= visionTextureSize.x || visionPixel.y < 0 || visionPixel.y >= visionTextureSize.y) break;
 
-			double xDivided = double(rayPosition.x) * posMultiplier;
+			auto& asdf = GameLevelGrid::levelGet(0, 0, 0)->worldTextureStatic;
+
+			double xDivided = double(rayPosition.x - asdf.coordinatesCellToWorld(asdf.coordinatesWorldToCell(castPosition)).x) * posMultiplier;
 			sf::Uint8 xChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(xDivided));
 			sf::Uint8 xPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((xDivided - xChunk) * 255));
 
-			double yDivided = double(rayPosition.y) * posMultiplier;
+			double yDivided = double(rayPosition.y - asdf.coordinatesCellToWorld(asdf.coordinatesWorldToCell(castPosition)).y) * posMultiplier;
 			sf::Uint8 yChunk = static_cast<sf::Uint8>(static_cast<uint8_t>(yDivided));
 			sf::Uint8 yPoint = static_cast<sf::Uint8>(static_cast<uint8_t>((yDivided - yChunk) * 255));
 

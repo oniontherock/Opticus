@@ -1,5 +1,5 @@
 #ifndef __TEXTURE_GRID_H__
-#define __DISTORTION_GRID_H__
+#define __TEXTURE_GRID_H__
 
 #include "Grid.hpp"
 #include "SFML/System/Vector2.hpp"
@@ -11,9 +11,12 @@
 struct GridTexture : sf::RenderTexture {
 	GridTexture();
 
+	friend class TextureGrid;
+
 	bool getDrawActive() const;
-	void setDrawActive(bool state);
 private:
+	void setDrawActive(bool state);
+
 	bool IsDrawActive = false;
 };
 
@@ -35,7 +38,6 @@ struct TextureGrid : Grid<GridTexture> {
 	void cellDeactivateFromWorld(WorldCoordinate worldX, WorldCoordinate worldY);
 	void cellDeactivateFromWorld(WorldVector worldPos);
 
-private:
 	std::vector<CellVector> activeTextureIndexes;
 };
 

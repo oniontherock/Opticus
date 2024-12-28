@@ -11,6 +11,9 @@ void GridTexture::setDrawActive(bool state) {
 	IsDrawActive = state;
 }
 
+sf::Vector2u GridTexture::positionGet() {
+	return position;
+}
 
 TextureGrid::TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX, float cellSizeY) :
 	Grid<GridTexture>::Grid(gridSizeX, gridSizeY, cellSizeX, cellSizeY)
@@ -22,6 +25,7 @@ TextureGrid::TextureGrid(uint32_t gridSizeX, uint32_t gridSizeY, float cellSizeX
 		TextureGrid1D columns(gridSize.y);
 		for (uint32_t y = 0; y < gridSize.y; y++) {
 			columns[y].create(cellSize.x, cellSize.y);
+			columns[y].position = sf::Vector2u(x * cellSizeX, y * cellSizeY);
 		}
 
 		rows[x] = std::move(columns);

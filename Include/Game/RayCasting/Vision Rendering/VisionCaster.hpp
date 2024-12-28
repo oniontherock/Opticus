@@ -36,7 +36,6 @@ struct VisionCaster : public RayCaster {
 protected:
 	
 	sf::RenderTexture visionTexture;
-	sf::Image visionImage;
 	
 	// the center of the visionImage
 	sf::Vector2f visionImageCenter;

@@ -14,10 +14,16 @@ struct GridTexture : sf::RenderTexture {
 	friend class TextureGrid;
 
 	bool getDrawActive() const;
+
+	sf::Vector2u positionGet();
+
 private:
+
 	void setDrawActive(bool state);
 
 	bool IsDrawActive = false;
+	
+	sf::Vector2u position;
 };
 
 typedef std::vector<GridTexture> TextureGrid1D;

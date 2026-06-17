@@ -12,7 +12,7 @@ The vision system was my own design — I worked out the ray casting, the grid d
 - The world is represented as grids laid over space, rather than as a single fixed plane.
 - An observer casts rays; those rays sample the grids, which can be transformed — bent, moved, teleported — along the way.
 - For the player, the resolved rays become pixels: a rendered view of a non-Euclidean space.
-- The design is observer-agnostic. Swap what the rays sample, and the same system answers "what can this entity perceive?"
+- The design is observer-agnostic. Swap what the rays sample, and the same system answers "what can this entity see?"
 
 ## Tech
 
